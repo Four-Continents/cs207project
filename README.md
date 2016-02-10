@@ -17,7 +17,7 @@
 1. First update master: ```git checkout master```
 2. Pull into master ```git pull``` from master branch
 3. Check back into your branch: ```git checkout yourbranchname```
-4. To merge master into your current branch type ```git merge master``` (NOTE BE CAREFUL about this. If there are any of the same files that were changed concurrently changed on your branch and master, there will be a merge conflict). 
+4. To merge master into your current branch: ```git merge master``` (NOTE BE CAREFUL about this. If there are any of the same files that were changed concurrently changed on your branch and master, you will need to manually resolve the merge conflicts). 
 
 
 ## Collaboration Docs
