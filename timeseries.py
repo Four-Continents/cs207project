@@ -12,40 +12,39 @@ class TimeSeries(object):
     """
 
     def __init__(self, data):
-        self.data = data
-        assert type(data) == list, "Please enter a list."  # TODO: sequence base class
+        self._data = data
 
     def __len__(self):
-        return len(self.data)
+        return len(self._data)
 
     def __getitem__(self, index):
-        assert index < self.__len__() and index >= 0, "Please enter a valid index."
-        return self.data[index]
+        return self._data[index]
 
     def __setitem__(self, index, value):
-        assert index <= self.__len__() and index >= 0, "Please enter a valid index."
-        self.data[index] = value
-        return 1
+        self._data[index] = value
 
     def __repr__(self):
-        return reprlib.repr(self.data)
+        return reprlib.repr(self._data)
 
     def __str__(self):
-        return reprlib.repr(self.data)
+        return reprlib.repr(self._data)
 
 
 if __name__ == '__main__':
-    # print(TimeSeries(list(range(0, 1000000))))
+    print(TimeSeries(list(range(0, 1000000))))
 
-    # a = TimeSeries(list(range(0, 1000000)))
-    # print(a[5])
+    a = TimeSeries(list(range(0, 1000000)))
+    print(a[5])
+
+    threes = TimeSeries(range(0, 1000, 3))
+    fives = TimeSeries(range(0, 1000, 5))
+
+    # threes = TimeSeries(list(range(0, 1000, 3)))
+    # fives = TimeSeries(list(range(0, 1000, 5)))
+    #
+    # s = 0
+    # for i in range(0, 1000):
     #     if i in threes or i in fives:
-
-    threes = TimeSeries(list(range(0, 1000, 3)))
-    fives = TimeSeries(list(range(0, 1000, 5)))
-
-    s = 0
-    for i in range(0, 1000):
-            s += i
-
-    print("sum", s)
+    #         s += i
+    #
+    # print("sum", s)
