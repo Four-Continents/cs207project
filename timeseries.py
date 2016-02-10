@@ -9,6 +9,9 @@ class TimeSeries(object):
     can take; for the string function, maybe describe how it abbreviates the output.
 
     stores a single, ordered set of numerical data. You can store this data as a Python list.
+
+    TODO add doctests
+    TODO implement __iter__
     """
 
     def __init__(self, data):
