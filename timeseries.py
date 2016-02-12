@@ -18,7 +18,7 @@ class TimeSeries(object):
     >>> B = TimeSeries(1)
     Traceback (most recent call last):
         ...
-    TypeError: parameter must be iterable
+    TypeError: parameter must be a sequence
     >>> C = TimeSeries('hello')
     Traceback (most recent call last):
         ...
@@ -33,6 +33,8 @@ class TimeSeries(object):
     >>> a[6] = 100
     >>> a[6]
     100
+    >>> a[0:3]
+    [0, 1, 2]
     """
     def __init__(self, data):
         """
@@ -43,8 +45,8 @@ class TimeSeries(object):
         data: sequence
             The ordered sequence of data points.
         """
-        if not hasattr(data, '__iter__') and not hasattr(data, '__getitem__'):
-            msg = 'parameter must be iterable'
+        if not hasattr(data, '__len__') and not hasattr(data, '__getitem__'):
+            msg = 'parameter must be a sequence'
             raise TypeError(msg)
 
         for item in data:
@@ -98,7 +100,7 @@ class ArrayTimeSeries(TimeSeries):
     >>> B = ArrayTimeSeries(1)
     Traceback (most recent call last):
         ...
-    TypeError: parameter must be iterable
+    TypeError: parameter must be a sequence
     >>> a = ArrayTimeSeries(range(0,1000000))
     >>> a
     array([     0...9998, 999999])
