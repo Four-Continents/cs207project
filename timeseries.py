@@ -1,22 +1,39 @@
 import reprlib
+import numpy as np
+from doctest import run_docstring_examples as dtest
+import numbers
 
 
 class TimeSeries(object):
     """
-    A class which stores an ordered sequence of observations, and supports lookup and modification operations on the
-    data.
+    A class which stores a single ordered sequence of numerical data, and supports lookup and modification operations
+    on the data.
 
-    TODO Document: We'd like you to add docstrings to some of the components you've built. Specifically, please document: the
-    TimeSeries class, its constructor, and the __str__ function. Try to include meaningful notes, instead of "this is a
-    time series class" or "this returns a string". For the constructor, maybe describe its argument and what values it
-    can take; for the string function, maybe describe how it abbreviates the output.
-
-    stores a single, ordered set of numerical data. You can store this data as a Python list.
-
-    TODO add doctests
-    TODO implement __iter__
+    Examples
+    --------
+    >>> A = TimeSeries()
+    Traceback (most recent call last):
+        ...
+    TypeError: __init__() missing 1 required positional argument: 'data'
+    >>> B = TimeSeries(1)
+    Traceback (most recent call last):
+        ...
+    TypeError: parameter must be iterable
+    >>> C = TimeSeries('hello')
+    Traceback (most recent call last):
+        ...
+    TypeError: iterable must contain numerical types
+    >>> a = TimeSeries(list(range(0,1000000)))
+    >>> a
+    [0, 1, 2, 3, 4, 5, ...]
+    >>> print(a)
+    [0, 1, 2, 3, 4, 5, ...]
+    >>> len(a)
+    1000000
+    >>> a[6] = 100
+    >>> a[6]
+    100
     """
-
     def __init__(self, data):
         """
         Constructor for the TimeSeries class.
@@ -26,7 +43,20 @@ class TimeSeries(object):
         data: sequence
             The ordered sequence of data points.
         """
+        if not hasattr(data, '__iter__') or not hasattr(data, '__getitem__'):
+            msg = 'parameter must be iterable'
+            raise TypeError(msg)
+        for item in data:
+            if not isinstance(item, numbers.Integral):
+                msg = 'iterable must contain numerical types'
+                raise TypeError(msg)
+
         self._data = data
+
+    # TODO check this is ok
+    def __iter__(self):
+        for x in self._data:
+            yield x
 
     def __len__(self):
         return len(self._data)
@@ -51,28 +81,41 @@ class TimeSeries(object):
 
 
 class ArrayTimeSeries(TimeSeries):
+    """
+    Examples
+    --------
+    >>> C = ArrayTimeSeries('hello')
+    Traceback (most recent call last):
+        ...
+    TypeError: iterable must contain numerical types
+    >>> A = ArrayTimeSeries()
+    Traceback (most recent call last):
+    ...
+    TypeError: __init__() missing 1 required positional argument: 'data'
+    >>> B = ArrayTimeSeries(1)
+    Traceback (most recent call last):
+    ...
+    TypeError: parameter must be iterable
+
+    >>> a = ArrayTimeSeries(list(range(0,1000000)))
+    >>> a
+    [0, 1, 2, 3, 4, 5, ...]
+    >>> print(a)
+    [0, 1, 2, 3, 4, 5, ...]
+    >>> len(a)
+    1000000
+    >>> a[6] = 100
+    >>> a[6]
+    100
+    """
     def __init__(self, data):
         """
 
         """
+        super().__init__(data)
         self.data = np.array(data)
 
 
 if __name__ == '__main__':
-    print(TimeSeries(list(range(0, 1000000))))
-
-    a = TimeSeries(list(range(0, 1000000)))
-    print(a[5])
-
-    threes = TimeSeries(range(0, 1000, 3))
-    fives = TimeSeries(range(0, 1000, 5))
-
-    # threes = TimeSeries(list(range(0, 1000, 3)))
-    # fives = TimeSeries(list(range(0, 1000, 5)))
-    #
-    # s = 0
-    # for i in range(0, 1000):
-    #     if i in threes or i in fives:
-    #         s += i
-    #
-    # print("sum", s)
+    dtest(TimeSeries, globals(), verbose = True)
+    dtest(ArrayTimeSeries, globals(), verbose = True)
