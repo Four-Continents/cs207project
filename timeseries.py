@@ -3,6 +3,9 @@ import reprlib
 
 class TimeSeries(object):
     """
+    A class which stores an ordered sequence of observations, and supports lookup and modification operations on the
+    data.
+
     TODO Document: We'd like you to add docstrings to some of the components you've built. Specifically, please document: the
     TimeSeries class, its constructor, and the __str__ function. Try to include meaningful notes, instead of "this is a
     time series class" or "this returns a string". For the constructor, maybe describe its argument and what values it
@@ -15,6 +18,14 @@ class TimeSeries(object):
     """
 
     def __init__(self, data):
+        """
+        Constructor for the TimeSeries class.
+
+        Parameters
+        ----------
+        data: sequence
+            The ordered sequence of data points.
+        """
         self._data = data
 
     def __len__(self):
@@ -30,7 +41,21 @@ class TimeSeries(object):
         return reprlib.repr(self._data)
 
     def __str__(self):
+        """
+        Returns:
+        --------
+        str_rep: str
+            A string representation of the sequence data. Truncates longer sequences using the reprlib library.
+        """
         return reprlib.repr(self._data)
+
+
+class ArrayTimeSeries(TimeSeries):
+    def __init__(self, data):
+        """
+
+        """
+        self.data = np.array(data)
 
 
 if __name__ == '__main__':
