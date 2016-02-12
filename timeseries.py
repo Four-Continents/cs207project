@@ -1,21 +1,67 @@
 import reprlib
+import numpy as np
+from doctest import run_docstring_examples as dtest
+import numbers
 
 
 class TimeSeries(object):
     """
-    TODO Document: We'd like you to add docstrings to some of the components you've built. Specifically, please document: the
-    TimeSeries class, its constructor, and the __str__ function. Try to include meaningful notes, instead of "this is a
-    time series class" or "this returns a string". For the constructor, maybe describe its argument and what values it
-    can take; for the string function, maybe describe how it abbreviates the output.
+    A class which stores a single ordered sequence of numerical data, and supports lookup and modification operations
+    on the data.
 
-    stores a single, ordered set of numerical data. You can store this data as a Python list.
-
-    TODO add doctests
-    TODO implement __iter__
+    Examples
+    --------
+    >>> A = TimeSeries()
+    Traceback (most recent call last):
+        ...
+    TypeError: __init__() missing 1 required positional argument: 'data'
+    >>> B = TimeSeries(1)
+    Traceback (most recent call last):
+        ...
+    TypeError: parameter must be a sequence
+    >>> C = TimeSeries('hello')
+    Traceback (most recent call last):
+        ...
+    TypeError: iterable must contain numerical types
+    >>> a = TimeSeries(range(0,1000000))
+    >>> a
+    [0, 1, 2, 3, 4, 5, ...]
+    >>> print(a)
+    [0, 1, 2, 3, 4, 5, ...]
+    >>> len(a)
+    1000000
+    >>> a[6] = 100
+    >>> a[6]
+    100
+    >>> a[0:3]
+    [0, 1, 2]
     """
-
     def __init__(self, data):
-        self._data = data
+        """
+        Constructor for the TimeSeries class.
+
+        Parameters
+        ----------
+        data: sequence
+            The ordered sequence of data points.
+        """
+        if not hasattr(data, '__len__') and not hasattr(data, '__getitem__'):
+            msg = 'parameter must be a sequence'
+            raise TypeError(msg)
+
+        for item in data:
+            if not isinstance(item, numbers.Integral):
+                msg = 'iterable must contain numerical types'
+                raise TypeError(msg)
+
+        if not hasattr(data, '__setitem__'):
+            self._data = list(data)
+        else:
+            self._data = data
+
+    def __iter__(self):
+        for x in self._data:
+            yield x
 
     def __len__(self):
         return len(self._data)
@@ -30,24 +76,57 @@ class TimeSeries(object):
         return reprlib.repr(self._data)
 
     def __str__(self):
+        """
+        Returns:
+        --------
+        str_rep: str
+            A string representation of the sequence data. Truncates longer sequences using the reprlib library.
+        """
         return reprlib.repr(self._data)
 
 
+class ArrayTimeSeries(TimeSeries):
+    """
+    Examples
+    --------
+    >>> C = ArrayTimeSeries('hello')
+    Traceback (most recent call last):
+        ...
+    TypeError: iterable must contain numerical types
+    >>> A = ArrayTimeSeries()
+    Traceback (most recent call last):
+    ...
+    TypeError: __init__() missing 1 required positional argument: 'data'
+    >>> B = ArrayTimeSeries(1)
+    Traceback (most recent call last):
+        ...
+    TypeError: parameter must be a sequence
+    >>> a = ArrayTimeSeries(range(0,1000000))
+    >>> a
+    array([     0...9998, 999999])
+    >>> print(a)
+    array([     0...9998, 999999])
+    >>> len(a)
+    1000000
+    >>> a[6] = 100
+    >>> a[6]
+    100
+    """
+    def __init__(self, data):
+        """
+
+        """
+        super().__init__(data)
+
+        if not hasattr(self._data, '__len__') and not hasattr(self._data, '__array_interface__') and not \
+                hasattr(self._data, '__array__'):
+            msg = 'Passed in parameter must be an array, any object exposing the array interface, an object whose ' \
+                  '__array__ method returns an array, or any (nested) sequence.'
+            raise TypeError(msg)
+
+        self._data = np.array(data)
+
+
 if __name__ == '__main__':
-    print(TimeSeries(list(range(0, 1000000))))
-
-    a = TimeSeries(list(range(0, 1000000)))
-    print(a[5])
-
-    threes = TimeSeries(range(0, 1000, 3))
-    fives = TimeSeries(range(0, 1000, 5))
-
-    # threes = TimeSeries(list(range(0, 1000, 3)))
-    # fives = TimeSeries(list(range(0, 1000, 5)))
-    #
-    # s = 0
-    # for i in range(0, 1000):
-    #     if i in threes or i in fives:
-    #         s += i
-    #
-    # print("sum", s)
+    dtest(TimeSeries, globals(), verbose = True)
+    dtest(ArrayTimeSeries, globals(), verbose = True)
