@@ -23,7 +23,7 @@ class TimeSeries(object):
     Traceback (most recent call last):
         ...
     TypeError: iterable must contain numerical types
-    >>> a = TimeSeries(list(range(0,1000000)))
+    >>> a = TimeSeries(range(0,1000000))
     >>> a
     [0, 1, 2, 3, 4, 5, ...]
     >>> print(a)
@@ -43,17 +43,20 @@ class TimeSeries(object):
         data: sequence
             The ordered sequence of data points.
         """
-        if not hasattr(data, '__iter__') or not hasattr(data, '__getitem__'):
+        if not hasattr(data, '__iter__') and not hasattr(data, '__getitem__'):
             msg = 'parameter must be iterable'
             raise TypeError(msg)
+
         for item in data:
             if not isinstance(item, numbers.Integral):
                 msg = 'iterable must contain numerical types'
                 raise TypeError(msg)
 
-        self._data = data
+        if not hasattr(data, '__setitem__'):
+            self._data = list(data)
+        else:
+            self._data = data
 
-    # TODO check this is ok
     def __iter__(self):
         for x in self._data:
             yield x
@@ -94,14 +97,13 @@ class ArrayTimeSeries(TimeSeries):
     TypeError: __init__() missing 1 required positional argument: 'data'
     >>> B = ArrayTimeSeries(1)
     Traceback (most recent call last):
-    ...
+        ...
     TypeError: parameter must be iterable
-
-    >>> a = ArrayTimeSeries(list(range(0,1000000)))
+    >>> a = ArrayTimeSeries(range(0,1000000))
     >>> a
-    [0, 1, 2, 3, 4, 5, ...]
+    array([     0...9998, 999999])
     >>> print(a)
-    [0, 1, 2, 3, 4, 5, ...]
+    array([     0...9998, 999999])
     >>> len(a)
     1000000
     >>> a[6] = 100
@@ -113,7 +115,14 @@ class ArrayTimeSeries(TimeSeries):
 
         """
         super().__init__(data)
-        self.data = np.array(data)
+
+        if not hasattr(self._data, '__len__') and not hasattr(self._data, '__array_interface__') and not \
+                hasattr(self._data, '__array__'):
+            msg = 'Passed in parameter must be an array, any object exposing the array interface, an object whose ' \
+                  '__array__ method returns an array, or any (nested) sequence.'
+            raise TypeError(msg)
+
+        self._data = np.array(data)
 
 
 if __name__ == '__main__':
