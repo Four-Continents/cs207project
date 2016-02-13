@@ -124,7 +124,7 @@ class ArrayTimeSeries(TimeSeries):
                   '__array__ method returns an array, or any (nested) sequence.'
             raise TypeError(msg)
 
-        self._data = np.array(data)
+        self._data = np.array(self._data)
 
 
 if __name__ == '__main__':
