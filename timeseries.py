@@ -44,6 +44,11 @@ class TimeSeries(object):
         ----------
         data: sequence
             The ordered sequence of data points.
+            
+        Raises
+        ------
+        TypeError
+            Raises the error if the input data is not a sequence or if it contains any type that is not numerical  
         """
         if not hasattr(data, '__len__') and not hasattr(data, '__getitem__'):
             msg = 'parameter must be a sequence'
@@ -60,26 +65,73 @@ class TimeSeries(object):
             self._data = data
 
     def __iter__(self):
+        """
+        Yields a generator for the entire iterable
+
+        Returns
+        -------
+        Generator
+        """
         for x in self._data:
             yield x
+            
+
 
     def __len__(self):
+        """
+        Returns the length of the iterable or sequence
+
+        Returns
+        -------
+        int
+        """
         return len(self._data)
+    
+    
 
     def __getitem__(self, index):
+        """
+        Getter for the class - used to retrieve individual values in the TimeSeries based on the index provided
+
+        Parameters
+        ----------
+        index : int
+
+        Returns
+        -------
+        float
+            Returns the value at the given index
+        """
         return self._data[index]
+    
+
 
     def __setitem__(self, index, value):
-        self._data[index] = value
+        """
+        Setter for the class - used to modify individual values in the TimeSeries
 
+        Parameters
+        ----------
+        index : int
+    
+        value : float
+        """
+        self._data[index] = value
+        
     def __repr__(self):
+        """
+        Returns
+        -------
+        string
+            A string representation of the sequence data. Truncates longer sequences using the reprlib library.
+        """
         return reprlib.repr(self._data)
 
     def __str__(self):
         """
-        Returns:
-        --------
-        str_rep: str
+        Returns
+        -------
+        string
             A string representation of the sequence data. Truncates longer sequences using the reprlib library.
         """
         return reprlib.repr(self._data)
@@ -114,7 +166,17 @@ class ArrayTimeSeries(TimeSeries):
     """
     def __init__(self, data):
         """
+        Constructor for the ArrayTimeSeries class.
 
+        Parameters
+        ----------
+        data: iterable
+            The ordered sequence of data points.
+            
+        Raises
+        ------
+        TypeError
+            Raises the error if the input data is not an iterable  
         """
         super().__init__(data)
 
