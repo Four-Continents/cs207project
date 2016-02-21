@@ -60,14 +60,11 @@ class TimeSeries(object):
                 raise TypeError(msg)
 
             for item in data:
-                if not isinstance(item, numbers.Integral):
+                if not isinstance(item, numbers.Number):
                     msg = 'iterable must contain numerical types'
                     raise TypeError(msg)
 
-            if not hasattr(data, '__setitem__'):
-                return list(data)
-            else:
-                return data
+            return np.array(data)
 
 
         self._times = CheckNumpy(times)
@@ -81,7 +78,7 @@ class TimeSeries(object):
         -------
         Generator
         """
-        for x in self._data:
+        for x in self._values:
             yield x
             
 
@@ -93,14 +90,14 @@ class TimeSeries(object):
         Returns
         -------
         int
-        """
-        return len(self._data)
+        """        
+        return len(self._times)
     
     
 
     def __getitem__(self, index):
         """
-        Getter for the class - used to retrieve individual values in the TimeSeries based on the index provided
+        Getter for the class - used to retrieve individual values in the TimeSeries based on the time provided
 
         Parameters
         ----------
@@ -109,15 +106,22 @@ class TimeSeries(object):
         Returns
         -------
         float
-            Returns the value at the given index
+            Returns the value at the given time point
         """
-        return self._data[index]
-    
+
+        position = np.where(self._times == index)[0]
+        
+        if len(position) == 0:
+            msg = "The index you are providing does not exist. Please enter a valid time index."
+            raise TypeError(msg)
+        else:
+            return self._values[position]
+
 
 
     def __setitem__(self, index, value):
         """
-        Setter for the class - used to modify individual values in the TimeSeries
+        Setter for the class - used to modify individual values in the TimeSeries given a particular time point
 
         Parameters
         ----------
@@ -125,16 +129,34 @@ class TimeSeries(object):
     
         value : float
         """
-        self._data[index] = value
         
-    def __repr__(self):
-        """
-        Returns
-        -------
-        string
-            A string representation of the sequence data. Truncates longer sequences using the reprlib library.
-        """
-        return reprlib.repr(self._data)
+        position = np.where(self._times == index)[0]
+        
+        if len(position) == 0:
+            msg = "The index you are providing does not exist. Please enter a valid time index."
+            raise TypeError(msg)
+        else:
+            self._values[position] = value
+
+
+    def __contains__(self, index):
+        
+        position = np.where(self._times == index)[0]
+        
+        if len(position) == 0:
+            return False
+        else:
+            return True
+
+        
+#     def __repr__(self):
+#         """
+#         Returns
+#         -------
+#         string
+#             A string representation of the sequence data. Truncates longer sequences using the reprlib library.
+#         """
+#         return reprlib.repr(self._data)
 
     def __str__(self):
         """
@@ -143,61 +165,18 @@ class TimeSeries(object):
         string
             A string representation of the sequence data. Truncates longer sequences using the reprlib library.
         """
-        return reprlib.repr(self._data)
+        return self._times
+    
+    def values(self):
+        
+        return self._values
+    
+    def times(self):
+        
+        return reprlib.repr(self._times)
+    
+    def items(self):
+        
+        return zip(times, values)
 
 
-class ArrayTimeSeries(TimeSeries):
-    """
-    Examples
-    --------
-    >>> C = ArrayTimeSeries('hello')
-    Traceback (most recent call last):
-        ...
-    TypeError: iterable must contain numerical types
-    >>> A = ArrayTimeSeries()
-    Traceback (most recent call last):
-    ...
-    TypeError: __init__() missing 1 required positional argument: 'data'
-    >>> B = ArrayTimeSeries(1)
-    Traceback (most recent call last):
-        ...
-    TypeError: parameter must be a sequence
-    >>> a = ArrayTimeSeries(range(0,1000000))
-    >>> a
-    array([     0...9998, 999999])
-    >>> print(a)
-    array([     0...9998, 999999])
-    >>> len(a)
-    1000000
-    >>> a[6] = 100
-    >>> a[6]
-    100
-    """
-    def __init__(self, data):
-        """
-        Constructor for the ArrayTimeSeries class.
-
-        Parameters
-        ----------
-        data: iterable
-            The ordered sequence of data points.
-            
-        Raises
-        ------
-        TypeError
-            Raises the error if the input data is not an iterable  
-        """
-        super().__init__(data)
-
-        if not hasattr(self._data, '__len__') and not hasattr(self._data, '__array_interface__') and not \
-                hasattr(self._data, '__array__'):
-            msg = 'Passed in parameter must be an array, any object exposing the array interface, an object whose ' \
-                  '__array__ method returns an array, or any (nested) sequence.'
-            raise TypeError(msg)
-
-        self._data = np.array(self._data)
-
-
-if __name__ == '__main__':
-    dtest(TimeSeries, globals(), verbose = True)
-    dtest(ArrayTimeSeries, globals(), verbose = True)
