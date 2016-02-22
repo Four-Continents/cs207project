@@ -4,11 +4,6 @@ from doctest import run_docstring_examples as dtest
 import numbers
 import lazy as lz
 
-# TODO should be monotonically increasing (you don't need to enforce this right now
-# TODO Victor's comment about binary search
-# Nice work! Since the times must be monotonically increasing, we can also do a binary search to get the O(lg(N))
-# lookup. Should also refactor position = np.where(self._times == index)[0] out to a separate function if we do this.
-
 
 class TimeSeries(object):
     """
@@ -42,6 +37,7 @@ class TimeSeries(object):
     >>> a[0:3]
     [0, 1, 2]
     """
+    # TODO should be monotonically increasing (you don't need to enforce this right now)v
     def __init__(self, times, values):
         """
         Constructor for the TimeSeries class.
@@ -93,12 +89,11 @@ class TimeSeries(object):
         -------
         int
         """
-        # TODO check this works
-        assert len(self._times) == len(self._values)
+        assert len(self._times) == len(self._values),  "lengths of times and values arrays not equal"
 
         return len(self._times)
 
-    def __getitem__(self, index):
+    def __getitem__(self, time):
         """
         Getter for the class - used to retrieve individual values in the TimeSeries based on the time provided
 
@@ -112,15 +107,15 @@ class TimeSeries(object):
             Returns the value at the given time point
         """
 
-        position = np.where(self._times == index)[0]
+        position = self.binary_search(time)
 
-        if len(position) == 0:
+        if position is None:
             msg = "The index you are providing does not exist. Please enter a valid time index."
-            raise TypeError(msg)
+            raise IndexError(msg)
         else:
             return self._values[position]
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, time, value):
         """
         Setter for the class - used to modify individual values in the TimeSeries given a particular time point
 
@@ -131,25 +126,30 @@ class TimeSeries(object):
         value : float
         """
 
-        position = np.where(self._times == index)[0]
+        position = self.binary_search(time)
 
-        if len(position) == 0:
+        if position is None:
             msg = "The index you are providing does not exist. Please enter a valid time index."
-            raise TypeError(msg)
+            raise IndexError(msg)
         else:
             self._values[position] = value
 
-    def __contains__(self, index):
+    def __contains__(self, time):
 
-        position = np.where(self._times == index)[0]
+        position = self.binary_search(time)
 
-        if len(position) == 0:
+        if position is None:
             return False
         else:
             return True
 
-    def binary_search(self, value):
-        pass
+    def binary_search(self, time):
+        position = np.searchsorted(self._times, time)
+
+        if position == len(self._times) or self._times[position] != time:
+            return None
+        else:
+            return position
 
     def __repr__(self):
         """
@@ -158,7 +158,7 @@ class TimeSeries(object):
         string
             A string representation of the sequence time series values. Truncates longer sequences using the reprlib library.
         """
-        return reprlib.repr(self._values)
+        return str("TimeSeries" + reprlib.repr(list(zip(self._times, self._values))))
 
     def __str__(self):
         """
@@ -167,7 +167,7 @@ class TimeSeries(object):
         string
             A string representation of the sequence of time series values. Truncates longer sequences using the reprlib library.
         """
-        return str("TimeSeries" + reprlib.repr(list(zip(self._times, self._values))))
+        return repr(self)
 
     def values(self):
         """
@@ -206,5 +206,19 @@ class TimeSeries(object):
 
 
 if __name__ == '__main__':
-    dtest(TimeSeries, globals(), verbose = True)
+    # dtest(TimeSeries, globals(), verbose = True)
 
+    #[v for v in TimeSeries([0,1,2],[1,3,5
+    # [1,3,5]
+
+    a = TimeSeries([1, 2, 3], [4, 5, 6])
+    print(str(a))
+    # TimeSeries[(1, 4), (2, 5), (3, 6)]
+    # print(len(a))
+    # 3
+
+    # print(a.binary_search(4))
+    # print(np.searchsorted([0, 2, 3], 1))
+
+    # a = TimeSeries([1, 2], [4, 5, 6])
+    # print(len(a)) # AssertionError: lengths of times and values arrays not equal
