@@ -182,7 +182,3 @@ class TimeSeries(object):
     @property
     def lazy(self):
         return lz.lazy(lambda x: x)(self)
-
-x = TimeSeries(range(1000), range(1000))
-print(x)
-print(x.lazy.eval())
