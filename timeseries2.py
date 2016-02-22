@@ -15,42 +15,66 @@ class TimeSeries(object):
     >>> A = TimeSeries()
     Traceback (most recent call last):
         ...
-    TypeError: __init__() missing 1 required positional argument: 'data'
+    TypeError: __init__() missing 2 required positional arguments: 'times' and 'values'
     >>> B = TimeSeries(1)
     Traceback (most recent call last):
         ...
-    TypeError: parameter must be a sequence
+    TypeError: __init__() missing 1 required positional argument: 'values'
     >>> C = TimeSeries('hello')
     Traceback (most recent call last):
         ...
+    TypeError: __init__() missing 1 required positional argument: 'values'
+    >>> D = TimeSeries([1, 2, 3], ['h', 'e', 'l'])
+    Traceback (most recent call last):
+        ...
     TypeError: iterable must contain numerical types
-    >>> a = TimeSeries(range(0,1000000))
-    >>> a
-    [0, 1, 2, 3, 4, 5, ..g.]
+    >>> E = TimeSeries([1, 2], [4, 5, 6])
+    >>> print(len(E))
+    Traceback (most recent call last):
+        ...
+    AssertionError: lengths of times and values arrays not equal
+    >>> a = TimeSeries([1, 2, 3], [4, 5.5, 6.5])
     >>> print(a)
-    [0, 1, 2, 3, 4, 5, ...]
+    TimeSeries[(1, 4.0), (2, 5.5), (3, 6.5)]
     >>> len(a)
-    1000000
-    >>> a[6] = 100
+    3
     >>> a[6]
-    100
-    >>> a[0:3]
-    [0, 1, 2]
+    Traceback (most recent call last):
+        ...
+    IndexError: The index you are providing does not exist. Please enter a valid time index.
+    >>> a[2]
+    5.5
+    >>> a[2] = 10
+    >>> a[2]
+    10
+    >>> [v for v in TimeSeries([0,1,2],[1,3,5])]
+    [1, 3, 5]
+    >>> a.times()
+    array([1, 2, 3])
+    >>> a.values()
+    array([  4. ,  10. ,   6.5])
+    >>> print([x for x in a.items()])
+    [(1, 4.0), (2, 10.0), (3, 6.5)]
     """
-    # TODO should be monotonically increasing (you don't need to enforce this right now)v
     def __init__(self, times, values):
         """
         Constructor for the TimeSeries class.
 
         Parameters
         ----------
-        data: sequence
+        times: sequence
+            Monotonically increasing sequence of times the values were collected
+        values: sequence
             The ordered sequence of data points.
 
         Raises
         ------
         TypeError
-            Raises the error if the input data is not a sequence or if it contains any type that is not numerical
+            Raises the error if the input data is not an iterable or if it contains any type that is not numerical
+
+        Notes
+        -----
+        PRE: times is sorted in monotonically increasing order and has matching indices to values
         """
         def convert_to_np_array(data):
 
@@ -84,6 +108,11 @@ class TimeSeries(object):
     def __len__(self):
         """
         Returns the length of the iterable or sequence
+
+        Raises
+        ------
+        AssertionError
+            Raises the error if the values and times arrays are not of equal length
 
         Returns
         -------
@@ -135,7 +164,18 @@ class TimeSeries(object):
             self._values[position] = value
 
     def __contains__(self, time):
+        """
+        Setter for the class - used to modify individual values in the TimeSeries given a particular time point
 
+        Parameters
+        ----------
+        index : int
+
+        Returns
+        ----------
+        bool:
+            True if time exists in self._times. False otherwise.
+        """
         position = self.binary_search(time)
 
         if position is None:
@@ -156,7 +196,8 @@ class TimeSeries(object):
         Returns
         -------
         string
-            A string representation of the sequence time series values. Truncates longer sequences using the reprlib library.
+            A string representation of the sequence of time series times and values.
+            Truncates longer sequences using the reprlib library.
         """
         return str("TimeSeries" + reprlib.repr(list(zip(self._times, self._values))))
 
@@ -165,7 +206,8 @@ class TimeSeries(object):
         Returns
         -------
         string
-            A string representation of the sequence of time series values. Truncates longer sequences using the reprlib library.
+            A string representation of the sequence of time series times and values.
+            Truncates longer sequences using the reprlib library.
         """
         return repr(self)
 
@@ -206,19 +248,4 @@ class TimeSeries(object):
 
 
 if __name__ == '__main__':
-    # dtest(TimeSeries, globals(), verbose = True)
-
-    #[v for v in TimeSeries([0,1,2],[1,3,5
-    # [1,3,5]
-
-    a = TimeSeries([1, 2, 3], [4, 5, 6])
-    print(str(a))
-    # TimeSeries[(1, 4), (2, 5), (3, 6)]
-    # print(len(a))
-    # 3
-
-    # print(a.binary_search(4))
-    # print(np.searchsorted([0, 2, 3], 1))
-
-    # a = TimeSeries([1, 2], [4, 5, 6])
-    # print(len(a)) # AssertionError: lengths of times and values arrays not equal
+    dtest(TimeSeries, globals(), verbose = True)
