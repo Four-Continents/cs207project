@@ -2,7 +2,7 @@ import reprlib
 import numpy as np
 from doctest import run_docstring_examples as dtest
 import numbers
-
+import lazy as lz
 
 class TimeSeries(object):
     """
@@ -44,13 +44,13 @@ class TimeSeries(object):
         ----------
         data: sequence
             The ordered sequence of data points.
-            
+
         Raises
         ------
         TypeError
-            Raises the error if the input data is not a sequence or if it contains any type that is not numerical  
+            Raises the error if the input data is not a sequence or if it contains any type that is not numerical
         """
-        
+
         def CheckNumpy(data):
 
             if not hasattr(data, '__len__') and not hasattr(data, '__getitem__') and not hasattr(self._data, '__array_interface__') and not \
@@ -80,7 +80,7 @@ class TimeSeries(object):
         """
         for x in self._values:
             yield x
-            
+
 
 
     def __len__(self):
@@ -90,10 +90,10 @@ class TimeSeries(object):
         Returns
         -------
         int
-        """        
+        """
         return len(self._times)
-    
-    
+
+
 
     def __getitem__(self, index):
         """
@@ -110,7 +110,7 @@ class TimeSeries(object):
         """
 
         position = np.where(self._times == index)[0]
-        
+
         if len(position) == 0:
             msg = "The index you are providing does not exist. Please enter a valid time index."
             raise TypeError(msg)
@@ -126,12 +126,12 @@ class TimeSeries(object):
         Parameters
         ----------
         index : int
-    
+
         value : float
         """
-        
+
         position = np.where(self._times == index)[0]
-        
+
         if len(position) == 0:
             msg = "The index you are providing does not exist. Please enter a valid time index."
             raise TypeError(msg)
@@ -140,15 +140,15 @@ class TimeSeries(object):
 
 
     def __contains__(self, index):
-        
+
         position = np.where(self._times == index)[0]
-        
+
         if len(position) == 0:
             return False
         else:
             return True
 
-        
+
 #     def __repr__(self):
 #         """
 #         Returns
@@ -165,18 +165,24 @@ class TimeSeries(object):
         string
             A string representation of the sequence data. Truncates longer sequences using the reprlib library.
         """
-        return self._times
-    
+        return str("TimeSeries" + reprlib.repr(list(zip(self._times, self._values))))
+
     def values(self):
-        
+
         return self._values
-    
+
     def times(self):
-        
+
         return reprlib.repr(self._times)
-    
+
     def items(self):
-        
+
         return zip(times, values)
 
+    @property
+    def lazy(self):
+        return lz.lazy(lambda x: x)(self)
 
+x = TimeSeries(range(1000), range(1000))
+print(x)
+print(x.lazy.eval())
