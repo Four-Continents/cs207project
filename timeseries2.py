@@ -46,7 +46,7 @@ class TimeSeries(object):
     5.5
     >>> a[2] = 10
     >>> a[2]
-    10
+    10.0
     >>> [v for v in TimeSeries([0,1,2],[1,3,5])]
     [1, 3, 5]
     >>> a.times()
@@ -60,7 +60,16 @@ class TimeSeries(object):
     TimeSeries[(1.0, 0.0), (1.5, 2.0), (2.0, -1.0), (2.5, 0.5), (10.0, 0.0)]
     >>> b.values()
     array([ 0. ,  2. , -1. ,  0.5,  0. ])
+    >>> a = TimeSeries([0,5,10], [1,2,3])
+    >>> b = TimeSeries([2.5,7.5], [100, -100])
+    >>> print(a.interpolate([1]))
+    TimeSeries[(1, 1.2)]
+    >>> print(a.interpolate(b.times()))
+    TimeSeries[(2.5, 1.5), (7.5, 2.5)]
+    >>> print(a.interpolate([-100, 100]))
+    TimeSeries[(-100, 1.0), (100, 3.0)]
     """
+
     def __init__(self, times, values):
         """
         Constructor for the TimeSeries class.
@@ -81,12 +90,13 @@ class TimeSeries(object):
         -----
         PRE: times is sorted in monotonically increasing order and has matching indices to values
         """
+
         def convert_to_np_array(data):
 
             if not hasattr(data, '__len__') and not hasattr(data, '__getitem__') and not \
                     hasattr(data, '__array_interface__') and not hasattr(data, '__array__'):
                 msg = 'Passed in parameter must be an array, any object exposing the array interface, an object whose ' \
-                  '__array__ method returns an array, or any (nested) sequence.'
+                      '__array__ method returns an array, or any (nested) sequence.'
                 raise TypeError(msg)
 
             for item in data:
@@ -123,7 +133,7 @@ class TimeSeries(object):
         -------
         int
         """
-        assert len(self._times) == len(self._values),  "lengths of times and values arrays not equal"
+        assert len(self._times) == len(self._values), "lengths of times and values arrays not equal"
 
         return len(self._times)
 
@@ -162,8 +172,10 @@ class TimeSeries(object):
         Parameters
         ----------
         time : int or float
+            time to change
 
         value : int or float
+            value to change to
 
         Raises
         ------
@@ -186,6 +198,7 @@ class TimeSeries(object):
         Parameters
         ----------
         time : int or float
+            time to check for
 
         Returns
         ----------
@@ -231,8 +244,8 @@ class TimeSeries(object):
         """
         Returns
         -------
-        sequence
-            a sequence of the time series values
+        ndarray
+            a numpy array of the time series values
         """
         return self._values
 
@@ -240,8 +253,8 @@ class TimeSeries(object):
         """
         Returns
         -------
-        sequence
-            a sequence of the time series times
+        ndarray
+            a numpy array of the time series times
         """
 
         return self._times
@@ -255,8 +268,23 @@ class TimeSeries(object):
         """
         return zip(self._times, self._values)
 
-    def interpolate(self):
-        pass
+    def interpolate(self, interp_times):
+        """
+        creates new TimeSeries object by interpolating interp_times in piece-wise linear fashion from self
+        Uses stationary boundary conditions if points are smaller than first time point or larger than last.
+
+        Parameters
+        ----------
+        interp_times : sequence
+            list of times to interpolate from self
+
+        Returns
+        -------
+        TimeSeries object
+            new TimesSeries object with interp_times as times and interpolated values
+        """
+        new_values = [np.interp(it, self._times, self._values) for it in interp_times]
+        return TimeSeries(interp_times, new_values)
 
     @property
     def lazy(self):
@@ -264,4 +292,4 @@ class TimeSeries(object):
 
 
 if __name__ == '__main__':
-    dtest(TimeSeries, globals(), verbose = True)
+    dtest(TimeSeries, globals(), verbose=True)
