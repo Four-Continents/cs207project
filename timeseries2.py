@@ -55,6 +55,11 @@ class TimeSeries(object):
     array([  4. ,  10. ,   6.5])
     >>> print([x for x in a.items()])
     [(1, 4.0), (2, 10.0), (3, 6.5)]
+    >>> b = TimeSeries([1, 1.5, 2, 2.5, 10], [0, 2, -1, 0.5, 0])
+    >>> print(b)
+    TimeSeries[(1.0, 0.0), (1.5, 2.0), (2.0, -1.0), (2.5, 0.5), (10.0, 0.0)]
+    >>> b.values()
+    array([ 0. ,  2. , -1. ,  0.5,  0. ])
     """
     def __init__(self, times, values):
         """
@@ -128,12 +133,18 @@ class TimeSeries(object):
 
         Parameters
         ----------
-        index : int
+        time: int or float
 
         Returns
         -------
         float
             Returns the value at the given time point
+
+        Raises
+        ------
+        IndexError
+            Raises the error if the time does not exist in the times array
+
         """
 
         position = self.binary_search(time)
@@ -150,9 +161,14 @@ class TimeSeries(object):
 
         Parameters
         ----------
-        index : int
+        time : int or float
 
-        value : float
+        value : int or float
+
+        Raises
+        ------
+        IndexError
+            Raises the error if the time does not exist in the times array
         """
 
         position = self.binary_search(time)
@@ -169,7 +185,7 @@ class TimeSeries(object):
 
         Parameters
         ----------
-        index : int
+        time : int or float
 
         Returns
         ----------
