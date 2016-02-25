@@ -1,5 +1,10 @@
 # cs207project
 
+[![Build Status](https://travis-ci.org/Four-Continents/cs207project.svg?branch=master)](https://travis-ci.org/Four-Continents/cs207project)
+
+[![Coverage Status](https://coveralls.io/repos/github/Four-Continents/cs207project/badge.svg?branch=master)](https://coveralls.io/github/Four-Continents/cs207project?branch=master)
+
+
 ## Branch Instructions
 - Please do not make any changes on the master branch
 - Please make any individual changes to files in this repo on a separate branch
