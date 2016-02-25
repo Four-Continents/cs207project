@@ -6,10 +6,6 @@
 
 
 ## Branch Instructions
-- Please do not make any changes on the master branch
-- Please make any individual changes to files in this repo on a separate branch
-- Any changes made to master will only be done with a quorum of team members
- 
 ### How to git branch
 1. First: git clone the repo
 2. Make sure to do a ```git pull``` to get the latest from the master branch
