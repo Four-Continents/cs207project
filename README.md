@@ -24,7 +24,12 @@
 3. Check back into your branch: ```git checkout yourbranchname```
 4. To merge master into your current branch: ```git merge master``` (NOTE BE CAREFUL. If any of the same files were changed concurrently on your branch and master, you will need to manually resolve merge conflicts). 
 
-
 ## Collaboration Docs
 1. [Trello](https://trello.com/b/WRhE0pgH/four-continents)
 2. Slack Channel
+3. Project Leader Rotation Assignment
+
+| Date  | Weekday | Lead |
+| ------------- | ------------- |------------- |
+| Content Cell  | Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  | Content Cell  |
