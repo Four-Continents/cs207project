@@ -15,8 +15,7 @@ class TimeSeries(object):
     >>> A = TimeSeries()
     Traceback (most recent call last):
         ...
-    TypeError: __init__() missing 2 required positional arguments: 'times' and\
-    'values'
+    TypeError: __init__() missing 2 required positional arguments: 'times' and 'values'
     >>> B = TimeSeries(1)
     Traceback (most recent call last):
         ...
@@ -42,8 +41,7 @@ class TimeSeries(object):
     >>> a[6]
     Traceback (most recent call last):
         ...
-    IndexError: The index you are providing does not exist. Please enter a \
-    valid time index.
+    IndexError: The index you are providing does not exist. Please enter a valid time index.
     >>> a[2]
     5.5
     >>> a[2] = 10
