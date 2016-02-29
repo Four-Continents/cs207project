@@ -121,7 +121,6 @@ class TimeSeries(object):
     (2, 4)
     """
 
-    """
 
     def __init__(self, times, values):
         """
