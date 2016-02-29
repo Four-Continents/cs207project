@@ -20,8 +20,8 @@ class LazyOperation(object):
 
         for k, v in self.kwargs.items():
             self.kwargs[k] = self.getFinalEval(v)
-
-        return self.function(*self.args, **self.kwargs)  # http://stackoverflow.com/questions/3394835/args-and-kwargs
+        # http://stackoverflow.com/questions/3394835/args-and-kwargs
+        return self.function(*self.args, **self.kwargs)
 
 
 def lazy(func):
