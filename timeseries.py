@@ -4,6 +4,22 @@ from doctest import run_docstring_examples as dtest
 import numbers
 import lazy as lz
 
+class TimeSeriesIterator:
+    def __init__(self, values): 
+        self._values = values
+        self.index = 0
+    
+    def __next__(self): 
+        try:
+            value = self._values[self.index] 
+        except IndexError:
+            raise StopIteration() 
+        self.index += 1
+        return value
+
+    def __iter__(self):
+        return self
+
 
 class TimeSeries(object):
     """
@@ -78,7 +94,33 @@ class TimeSeries(object):
     5.5
     >>> print(x.median())
     5.5
+    >>> x = TimeSeries([1,2,3,4],[1,4,9,16])
+    >>> [v for v in x]
+    [1, 4, 9, 16]
+    >>> [v for v in x._times]
+    [1, 2, 3, 4]
+    >>> [v for v in x._values]
+    [1, 4, 9, 16]
+    >>> xit=x.itertimes()
+    >>> print(next(xit))
+    1
+    >>> print(next(xit))
+    2
+    >>> list(xit)
+    [3, 4]
+    >>> xit=iter(x)
+    >>> print(next(xit))
+    1
+    >>> xit2=iter(xit)
+    >>> next(xit),next(xit2)
+    (4, 9)
+    >>> combined_it=x.iteritems()
+    >>> print(next(combined_it))
+    (1, 1)
+    >>> print(next(combined_it))
+    (2, 4)
     """
+
 
     def __init__(self, times, values):
         """
@@ -125,16 +167,45 @@ class TimeSeries(object):
         self._times = convert_to_np_array(times)
         self._values = convert_to_np_array(values)
 
-    def __iter__(self):
-        """
-        Yields a generator for the entire iterable
 
+    def __iter__(self):
+         """
         Returns
         -------
-        Generator
+        iterator
+            a sequence of values in the series
         """
-        for x in self._values:
-            yield x
+         return TimeSeriesIterator(self._values)
+    
+    def itertimes(self):
+         """
+        Returns
+        -------
+        iterator
+            an iterator of time points in the series
+        """
+         return TimeSeriesIterator(self._times)
+    
+    def itervalues(self):
+         """
+        Returns
+        -------
+        iterator
+            an iterator of values in the series
+        """
+         return TimeSeriesIterator(self._values)
+    
+    def iteritems(self):
+         """
+        Returns
+        -------
+        iterator
+            an iterator of (time,values) tuples in the series
+        """
+         time_value = []
+         for i in range(len(self._times)):
+            time_value.append((self._times[i], self._values[i]))
+         return TimeSeriesIterator(time_value)
 
     def __len__(self):
         """
