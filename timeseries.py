@@ -150,8 +150,7 @@ class TimeSeries(object):
         -------
         int
         """
-        assert len(self._times) == len(self._values), "lengths of times and \
-        values arrays not equal"
+        assert len(self._times) == len(self._values), "lengths of times and values arrays not equal"
 
         return len(self._times)
 
@@ -179,8 +178,7 @@ class TimeSeries(object):
         position = self._binary_search(time)
 
         if position is None:
-            msg = "The index you are providing does not exist. Please enter a \
-            valid time index."
+            msg = "The index you are providing does not exist. Please enter a valid time index."
             raise IndexError(msg)
         else:
             return self._values[position]
@@ -207,8 +205,7 @@ class TimeSeries(object):
         position = self._binary_search(time)
 
         if position is None:
-            msg = "The index you are providing does not exist. Please enter a \
-            valid time index."
+            msg = "The index you are providing does not exist. Please enter a valid time index."
             raise IndexError(msg)
         else:
             self._values[position] = value
