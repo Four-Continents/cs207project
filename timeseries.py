@@ -3,17 +3,18 @@ import numpy as np
 from doctest import run_docstring_examples as dtest
 import numbers
 import lazy as lz
+import operator
 
 class TimeSeriesIterator:
     def __init__(self, values): 
         self._values = values
         self.index = 0
-    
-    def __next__(self): 
+
+    def __next__(self):
         try:
-            value = self._values[self.index] 
+            value = self._values[self.index]
         except IndexError:
-            raise StopIteration() 
+            raise StopIteration()
         self.index += 1
         return value
 
@@ -65,22 +66,22 @@ class TimeSeries(object):
     10.0
     >>> [v for v in TimeSeries([0,1,2],[1,3,5])]
     [1, 3, 5]
-    >>> a.times()
+    >>> a.times
     array([1, 2, 3])
-    >>> a.values()
+    >>> a.values
     array([  4. ,  10. ,   6.5])
     >>> print([x for x in a.items()])
     [(1, 4.0), (2, 10.0), (3, 6.5)]
     >>> b = TimeSeries([1, 1.5, 2, 2.5, 10], [0, 2, -1, 0.5, 0])
     >>> print(b)
     TimeSeries[(1.0, 0.0), (1.5, 2.0), (2.0, -1.0), (2.5, 0.5), (10.0, 0.0)]
-    >>> b.values()
+    >>> b.values
     array([ 0. ,  2. , -1. ,  0.5,  0. ])
     >>> a = TimeSeries([0,5,10], [1,2,3])
     >>> b = TimeSeries([2.5,7.5], [100, -100])
     >>> print(a.interpolate([1]))
     TimeSeries[(1, 1.2)]
-    >>> print(a.interpolate(b.times()))
+    >>> print(a.interpolate(b.times))
     TimeSeries[(2.5, 1.5), (7.5, 2.5)]
     >>> print(a.interpolate([-100, 100]))
     TimeSeries[(-100, 1.0), (100, 3.0)]
@@ -97,9 +98,9 @@ class TimeSeries(object):
     >>> x = TimeSeries([1,2,3,4],[1,4,9,16])
     >>> [v for v in x]
     [1, 4, 9, 16]
-    >>> [v for v in x._times]
+    >>> [v for v in x.times]
     [1, 2, 3, 4]
-    >>> [v for v in x._values]
+    >>> [v for v in x.values]
     [1, 4, 9, 16]
     >>> xit=x.itertimes()
     >>> print(next(xit))
@@ -119,9 +120,52 @@ class TimeSeries(object):
     (1, 1)
     >>> print(next(combined_it))
     (2, 4)
+    >>> #Test for overloaded operators
+    >>> x = TimeSeries([1,2,3,4],[1,4,9,16])
+    >>> y = TimeSeries([1,2,3,4],[2,4.5,-1,20])
+    >>> z = TimeSeries([1,2], [0,0.5])
+    >>> z_ts = TimeSeries([1,2,3], [0,0,0])
+    >>> x + y
+    TimeSeries[(1, 3.0), (2, 8.5), (3, 8.0), (4, 36.0)]
+    >>> y - x
+    TimeSeries[(1, 1.0), (2, 0.5), (3, -10.0), (4, 4.0)]
+    >>> x - y
+    TimeSeries[(1, -1.0), (2, -0.5), (3, 10.0), (4, -4.0)]
+    >>> x * y
+    TimeSeries[(1, 2.0), (2, 18.0), (3, -9.0), (4, 320.0)]
+    >>> x * 5.0
+    TimeSeries[(1, 5.0), (2, 20.0), (3, 45.0), (4, 80.0)]
+    >>> y * 2.5
+    TimeSeries[(1, 5.0), (2, 11.25), (3, -2.5), (4, 50.0)]
+    >>> x * [1, 2, 3, 4]
+    Traceback (most recent call last):
+        ...
+    NotImplementedError
+
+    >>> x == [1, 2, 3, 4]
+    Traceback (most recent call last):
+        ...
+    NotImplementedError
+    >>> abs(x)
+    18.814887722226779
+    >>> bool(z_ts)
+    False
+    >>> not x
+    False
+    >>> x2 = +x
+    >>> x2 is x
+    False
+    >>> x2 == x
+    True
+    >>> x == y
+    False
+    >>> z + x
+    Traceback (most recent call last):
+        ...
+    ValueError: TimeSeries[(1, 0.0), (2, 0.5)] and TimeSeries[(1, 1), (2, 4), (3, 9), (4, 16)] must have the same length
+    >>> -z
+    TimeSeries[(1, -0.0), (2, -0.5)]
     """
-
-
     def __init__(self, times, values):
         """
         Constructor for the TimeSeries class.
@@ -175,8 +219,8 @@ class TimeSeries(object):
         iterator
             a sequence of values in the series
         """
-         return TimeSeriesIterator(self._values)
-    
+         return TimeSeriesIterator(self.values)
+
     def itertimes(self):
          """
         Returns
@@ -184,8 +228,8 @@ class TimeSeries(object):
         iterator
             an iterator of time points in the series
         """
-         return TimeSeriesIterator(self._times)
-    
+         return TimeSeriesIterator(self.times)
+
     def itervalues(self):
          """
         Returns
@@ -193,8 +237,8 @@ class TimeSeries(object):
         iterator
             an iterator of values in the series
         """
-         return TimeSeriesIterator(self._values)
-    
+         return TimeSeriesIterator(self.values)
+
     def iteritems(self):
          """
         Returns
@@ -203,8 +247,8 @@ class TimeSeries(object):
             an iterator of (time,values) tuples in the series
         """
          time_value = []
-         for i in range(len(self._times)):
-            time_value.append((self._times[i], self._values[i]))
+         for i in range(len(self.times)):
+            time_value.append((self.times[i], self.values[i]))
          return TimeSeriesIterator(time_value)
 
     def __len__(self):
@@ -221,9 +265,9 @@ class TimeSeries(object):
         -------
         int
         """
-        assert len(self._times) == len(self._values), "lengths of times and values arrays not equal"
+        assert len(self.times) == len(self.values), "lengths of times and values arrays not equal"
 
-        return len(self._times)
+        return len(self.times)
 
     def __getitem__(self, time):
         """
@@ -252,7 +296,7 @@ class TimeSeries(object):
             msg = "The index you are providing does not exist. Please enter a valid time index."
             raise IndexError(msg)
         else:
-            return self._values[position]
+            return self.values[position]
 
     def __setitem__(self, time, value):
         """
@@ -279,7 +323,7 @@ class TimeSeries(object):
             msg = "The index you are providing does not exist. Please enter a valid time index."
             raise IndexError(msg)
         else:
-            self._values[position] = value
+            self.values[position] = value
 
     def __contains__(self, time):
         """
@@ -293,7 +337,7 @@ class TimeSeries(object):
         Returns
         ----------
         bool:
-            True if time exists in self._times. False otherwise.
+            True if time exists in self.times. False otherwise.
         """
         position = self._binary_search(time)
 
@@ -314,12 +358,12 @@ class TimeSeries(object):
         Returns
         ----------
         bool:
-            Position if it exists in self._times. 'None' otherwise.
+            Position if it exists in self.times. 'None' otherwise.
         """
 
-        position = np.searchsorted(self._times, time)
+        position = np.searchsorted(self.times, time)
 
-        if position == len(self._times) or self._times[position] != time:
+        if position == len(self.times) or self.times[position] != time:
             return None
         else:
             return position
@@ -333,7 +377,7 @@ class TimeSeries(object):
             values. Truncates longer sequences using the reprlib library.
         """
         return str("TimeSeries" +
-                   reprlib.repr(list(zip(self._times, self._values))))
+                   reprlib.repr(list(zip(self.times, self.values))))
 
     def __str__(self):
         """
@@ -345,6 +389,7 @@ class TimeSeries(object):
         """
         return repr(self)
 
+    @property
     def values(self):
         """
         Returns
@@ -354,6 +399,7 @@ class TimeSeries(object):
         """
         return self._values
 
+    @property
     def times(self):
         """
         Returns
@@ -370,7 +416,7 @@ class TimeSeries(object):
         sequence
             a sequence of of (time, value) tuples
         """
-        return zip(self._times, self._values)
+        return zip(self.times, self.values)
 
     def interpolate(self, interp_times):
         """
@@ -391,8 +437,8 @@ class TimeSeries(object):
             values
         """
         new_values = [np.interp(it,
-                                self._times,
-                                self._values) for it in interp_times]
+                                self.times,
+                                self.values) for it in interp_times]
         return TimeSeries(interp_times, new_values)
 
     def mean(self):
@@ -409,11 +455,11 @@ class TimeSeries(object):
         ValueError
             Raises the error if there are no values in the TimesSeries
         """
-        if len(self._values) == 0:
+        if len(self.values) == 0:
             msg = "Cannot take mean of TimesSeries with no values"
             raise ValueError(msg)
         else:
-            return np.mean(self._values)
+            return np.mean(self.values)
 
     def median(self):
         """
@@ -429,11 +475,223 @@ class TimeSeries(object):
         ValueError
             Raises the error if there are no values in the TimesSeries
         """
-        if len(self._values) == 0:
+        if len(self.values) == 0:
             msg = "Cannot take median of TimesSeries with no values"
             raise ValueError(msg)
         else:
-            return np.median(self._values)
+            return np.median(self.values)
+
+    def _seq_equal(self, seqA, seqB):
+        """
+        Helper function that returns whether two sequences have all elements equal
+
+        Returns
+        -------
+        bool
+            Whether all elements in the sequence are equal
+        """
+        return all(a == b for a, b in zip(seqA, seqB))
+
+    def _seq_equal_len(self, seqA, seqB):
+        """
+        Helper function to determine whether two sequences have an equal number of elements
+
+        Returns
+        -------
+        bool
+            Whether the sequence length is the same
+        """
+        return len(seqA) == len(seqB)
+
+    def _check_length_helper(self , rhs):
+        """
+        Helper function to determine whether two sequences have an equal number of elements
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            Raises the error if the lengths are unequal
+        """
+        if not self._seq_equal_len(self, rhs):
+            raise ValueError(str(self)+' and '+str(rhs)+' must have the same length')
+
+    def _check_times_helper(self, rhs):
+        """
+        Helper function to determine whether two TimeSeries have the same time points
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            Raises the error if the time points are different
+        """
+        if not self._seq_equal(self.times, rhs.times):
+            raise ValueError(str(self)+' and '+str(rhs)+' must have the same time points')
+
+    def _elem_op(self, rhs, op):
+        """
+        Helper function to apply the operator `op` to the values and `rhs`. `rhs` can be a real number or
+        another TimeSeries object.
+
+        Returns
+        -------
+        Float or
+            The result of applying the operation to self.values and `rhs`.
+
+        Raises
+        -------
+        NotImplementedError
+            NotImplementedError is raised if the operation cannot be applied.
+        """
+        try:
+            if isinstance(rhs, numbers.Real):
+                return TimeSeries(self.times, [op(a, rhs) for a in self.values])
+            elif isinstance(rhs, TimeSeries):
+                self._check_length_helper(rhs)
+                self._check_times_helper(rhs)
+                pairs = zip(self, rhs)
+                return TimeSeries( self.times, [op(a, b) for a, b in pairs] )
+            else:
+                raise NotImplementedError
+        except TypeError:
+            raise NotImplementedError
+
+    def __add__(self, rhs):
+        """
+        Addition operator between the values of `self` and `rhs`. Operations are element-wise.
+
+        Returns
+        -------
+        TimeSeries
+            Result of adding `rhs` to the values of `self`.
+
+        Raises
+        -------
+        NotImplementedError
+            NotImplementedError is raised if the operation cannot be applied.
+        """
+        return self._elem_op(rhs, operator.add)
+
+    def __radd__(self, other):
+        """
+        Reverses the addition order if the regular order is not implemented.
+
+        Returns
+        -------
+        TimeSeries
+            Result of adding `self` to the values of `rhs`.
+        """
+        return self + other
+
+    def __mul__(self, rhs):
+        """
+        Multiplication operator between the values of `self` and `rhs`. Operations are element-wise.
+
+        Returns
+        -------
+        TimeSeries
+            Result of multiplying the values of `rhs` to the values of `self`.
+
+        Raises
+        -------
+        NotImplementedError
+            NotImplementedError is raised if the operation cannot be applied.
+        """
+        return self._elem_op(rhs, operator.mul)
+
+    def __rmul__(self, other):
+        """
+        Reverses the multiplication order if the regular order is not implemented.
+
+        Returns
+        -------
+        TimeSeries
+            Result of multiplying the values of `self` to the values of `rhs`.
+
+        Raises
+        -------
+        NotImplementedError
+            NotImplementedError is raised if the operation cannot be applied.
+        """
+        return self * other
+
+    def __sub__(self, rhs):
+        """
+        Subtraction operator between the values of `self` and `rhs`. Operations are element-wise.
+
+        Returns
+        -------
+        TimeSeries
+            Result of subtracting `rhs` from the values of `self`.
+
+        Raises
+        -------
+        NotImplementedError
+            NotImplementedError is raised if the operation cannot be applied.
+        """
+        return self._elem_op(rhs, operator.sub)
+
+    def __eq__(self, rhs):
+        """
+        Equality operator between the values of `self` and `rhs`. Operations are element-wise.
+
+        Returns
+        -------
+        bool
+           True if the values from `rhs` are equal to the values from `self`.
+
+        Raises
+        -------
+        NotImplementedError
+            NotImplementedError is raised if the operation cannot be applied.
+        """
+        if not isinstance(rhs, TimeSeries):
+            raise NotImplementedError
+        return self._seq_equal_len(self.times, rhs.times) and self._seq_equal_len(self.values, rhs.values) and \
+               self._seq_equal(self.times, rhs.times) and self._seq_equal(self.values, rhs.values)
+
+    def __abs__(self):
+        """
+        Returns
+        -------
+        float
+           L2 norm of the values of `self`.
+        """
+        return np.sqrt(sum(x * x for x in self.values))
+
+    def __bool__(self):
+        """
+        Returns
+        -------
+        bool
+           Boolean value after taking the L2 norm of the values of `self`
+        """
+        return bool(abs(self))
+
+    def __neg__(self):
+        """
+        Returns
+        -------
+        TimeSeries
+           A copy of `self` with each value multiplied by -1.
+        """
+        return TimeSeries(self.times, -self.values)
+
+    def __pos__(self):
+        """
+        Returns
+        -------
+        TimeSeries
+           A copy of `self`.
+        """
+        return TimeSeries(self.times, self.values)
 
     @property
     def lazy(self):
