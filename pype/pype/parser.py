@@ -5,7 +5,7 @@ from .ast import *
 
 # Here's an example production rule which constructs an AST node
 def p_program(p):
-    r'program : statement_list'
+    r'''program : statement_list'''
     p[0] = ASTProgram(p[1])
 
 
@@ -26,9 +26,11 @@ def p_import_statement(p):
     r'''import_statement : LPAREN IMPORT ID RPAREN'''
     p[0] = ASTImport(p[3])
 
+
 def p_component(p):
     r'''component : LBRACE ID expression_list RBRACE'''
     p[0] = ASTComponent(ASTID(p[2]), p[3])
+
 
 def p_expression_list(p):
     r'''expression_list : expression_list expression
@@ -139,6 +141,7 @@ def p_params_list(p):
         p[0] = p[1]
     else:
         p[0] = [p[1]]
+
 
 # TODO: Write an error handling function. You should attempt to make the error
 #       message sensible. For instance, print out the line and column numbers to
