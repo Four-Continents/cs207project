@@ -1,4 +1,4 @@
-from .error import *
+# TODO fix formatting, 4 spaces
 
 class ASTVisitor():
   def visit(self, astnode):
@@ -17,11 +17,15 @@ class ASTNode(object):
   def children(self, children):
     self._children = children
     for child in children:
+      # NOTE allows you to set child's parent to self
       child.parent = self
 
-  def pprint(self,indent=''):
+  def pprint(self, indent=''):
     '''Recursively prints a formatted string representation of the AST.'''
     # TODO
+    print(indent+self.__class__.__name__)
+    for child in self._children:
+      child.pprint(indent+'  ')
 
   def walk(self, visitor):
     '''Traverses an AST, calling visitor.visit() on every node.
@@ -30,27 +34,68 @@ class ASTNode(object):
     any children, children will be visited in order, and (by extension) a node's
     children will all be visited before its siblings.
     The visitor may modify attributes, but may not add or delete nodes.'''
-    # TODO
+    visitor.visit(self)
+    for child in self._children:
+      child.walk(visitor)
 
 class ASTProgram(ASTNode):
   def __init__(self, statements):
     super().__init__()
     self.children = statements
 
-class ASTImport(ASTNode): # TODO
+class ASTImport(ASTNode):
+  def __init__(self, mod):
+    super().__init__()
+    self.mod = mod
+
+  @property
+  def module(self):
+    return self.mod
+
 class ASTComponent(ASTNode): # TODO
+  def __init__(self, name, expressions):
+    super().__init__()
+    self.children = [name] + expressions
+
+  # NOTE this allows you to print .p without () or without exposing property. Advantage: disallows user to set attribute
+  # use name.setter to allow setting with some checking or other auxiliary functions like setting parent to self
   @property
   def name(self): # TODO return an element of self.children
+    return self.children[0]
   @property
   def expressions(self): # TODO return one or more children
+    return self.children[1:]
+
 class ASTInputExpr(ASTNode): # TODO
+  def __init__(self, decl_list):
+    super().__init__()
+    self.children = decl_list
+
 class ASTOutputExpr(ASTNode): # TODO
+  def __init__(self, decl_list):
+    super().__init__()
+    self.children = decl_list
+
 class ASTAssignmentExpr(ASTNode): # TODO
+  def __init__(self, id, expr):
+    super().__init__()
+    self.children = [id, expr]
+
   @property
   def binding(self): # TODO
+    return self.children[0]
   @property
   def value(self): # TODO
+    return self.children[1]
+
 class ASTEvalExpr(ASTNode): # TODO
+  def __init__(self, op, args=None):
+    super().__init__()
+    if args is None:
+      self.children = [op]
+    else:
+      self.children = [op] + args
+
   @property
   def op(self): # TODO
     return self.children[0]
