@@ -1,8 +1,15 @@
 import pype
 import pytest
 from ply.lex import LexError
+import os
 
 # to run, type in command line: ```PYTHONPATH=. py.test -vv tests/test_lexer.py```
+
+samples_dir = os.path.join(os.path.dirname(__file__), '../samples')
+
+
+def read_sample(filename):
+    return open(os.path.join(samples_dir, filename)).read()
 
 
 def test_regexes():
@@ -57,7 +64,7 @@ def test_error():
 def test_example0():
     lexer = pype.lexer.new_lexer()
 
-    data = open('samples/example0.ppl').read()
+    data = read_sample('example0.ppl')
 
     lexer.input(data)
 
@@ -68,7 +75,7 @@ def test_example0():
             break
         tok_strs.append(str(tok))
 
-    lexed_data = open('samples/example0.tokens').read().strip().split('\n')
+    lexed_data = read_sample('example0.tokens').strip().split('\n')
 
     for i, line in enumerate(lexed_data):
         assert line == tok_strs[i]
@@ -79,7 +86,7 @@ def test_example0():
 def test_example1():
     lexer = pype.lexer.new_lexer()
 
-    data = open('samples/example1.ppl').read()
+    data = read_sample('example1.ppl')
 
     lexer.input(data)
 
@@ -90,7 +97,7 @@ def test_example1():
             break
         tok_strs.append(str(tok))
 
-    lexed_data = open('samples/example1.tokens').read().strip().split('\n')
+    lexed_data = read_sample('example1.tokens').strip().split('\n')
 
     for i, line in enumerate(lexed_data):
         assert line == tok_strs[i]

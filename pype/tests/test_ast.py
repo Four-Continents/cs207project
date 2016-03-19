@@ -1,7 +1,14 @@
 import pype
 import pytest
+import os
 
 # to run, type in command line: ```PYTHONPATH=. py.test -vv tests/test_lexer.py```
+
+samples_dir = os.path.join(os.path.dirname(__file__), '../samples')
+
+
+def read_sample(filename):
+    return open(os.path.join(samples_dir, filename)).read()
 
 
 def pprint_str(ast, indent=''):
@@ -17,13 +24,13 @@ def pprint_str(ast, indent=''):
 def test_example0():
     lexer = pype.lexer.new_lexer()
 
-    data = open('samples/example0.ppl').read()
+    data = read_sample('example0.ppl')
 
     ast = pype.parser.parser.parse(data, lexer=lexer)
 
     ast_strs = pprint_str(ast).strip().split('\n')
 
-    parsed_data = open('samples/example0.ast').read().strip().split('\n')
+    parsed_data = read_sample('example0.ast').strip().split('\n')
 
     print('\n'.join(ast_strs))
     for i, line in enumerate(parsed_data):
@@ -35,13 +42,13 @@ def test_example0():
 def test_example1():
     lexer = pype.lexer.new_lexer()
 
-    data = open('samples/example1.ppl').read()
+    data = read_sample('example1.ppl')
 
     ast = pype.parser.parser.parse(data, lexer=lexer)
 
     ast_strs = pprint_str(ast).strip().split('\n')
 
-    parsed_data = open('samples/example1.ast').read().strip().split('\n')
+    parsed_data = read_sample('example1.ast').strip().split('\n')
 
     print('\n'.join(ast_strs))
     for i, line in enumerate(parsed_data):
