@@ -6,7 +6,6 @@ import pytest
 
 def pprint_str(ast, indent=''):
     '''Recursively prints a formatted string representation of the AST.'''
-    # TODO
     result = ''
     result += indent+ast.__class__.__name__+'\n'
     for child in ast.children:
@@ -22,13 +21,15 @@ def test_example0():
 
     ast = pype.parser.parser.parse(data, lexer=lexer)
 
-    ast_strs = pprint_str(ast).split('\n')
+    ast_strs = pprint_str(ast).strip().split('\n')
 
-    parsed_data = open('samples/example0.ast').read().strip()
+    parsed_data = open('samples/example0.ast').read().strip().split('\n')
 
     print('\n'.join(ast_strs))
-    for i, line in enumerate(parsed_data.split('\n')):
+    for i, line in enumerate(parsed_data):
         assert line == ast_strs[i]
+
+    assert len(parsed_data) == len(ast_strs)
 
 
 def test_example1():
@@ -38,10 +39,12 @@ def test_example1():
 
     ast = pype.parser.parser.parse(data, lexer=lexer)
 
-    ast_strs = pprint_str(ast).split('\n')
+    ast_strs = pprint_str(ast).strip().split('\n')
 
-    parsed_data = open('samples/example1.ast').read().strip()
+    parsed_data = open('samples/example1.ast').read().strip().split('\n')
 
     print('\n'.join(ast_strs))
-    for i, line in enumerate(parsed_data.split('\n')):
+    for i, line in enumerate(parsed_data):
         assert line == ast_strs[i]
+
+    assert len(parsed_data) == len(ast_strs)

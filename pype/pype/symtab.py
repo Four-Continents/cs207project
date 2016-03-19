@@ -4,6 +4,7 @@ import enum
 SymbolType = enum.Enum('SymbolType', 'component var input output libraryfunction librarymethod')
 Symbol = collections.namedtuple('Symbol','name type ref')
 
+
 class SymbolTable(object):
     # A symbol table is a dictionary of scoped symbol tables.
     # Each scoped symbol table is a dictionary of metadata for each variable.
@@ -29,4 +30,5 @@ class SymbolTable(object):
                 print(' ',name,'=>',symbol)
 
     def addsym(self, sym, scope='global'):
-    # TODO
+        pass
+        # TODO

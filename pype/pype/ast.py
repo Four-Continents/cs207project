@@ -1,122 +1,132 @@
-# TODO fix formatting, 4 spaces
-
 class ASTVisitor():
-  def visit(self, astnode):
-    'A read-only function which looks at a single AST node.'
-    pass
+    def visit(self, astnode):
+        """A read-only function which looks at a single AST node."""
+        pass
 
-  def return_value(self):
-    return None
+    def return_value(self):
+        return None
+
 
 class ASTNode(object):
-  def __init__(self):
-    self.parent = None
-    self._children = []
+    def __init__(self):
+        self.parent = None
+        self._children = []
 
-  @property
-  def children(self):
-    return self._children
-  @children.setter
-  def children(self, children):
-    self._children = children
-    for child in children:
-      # NOTE allows you to set child's parent to self
-      child.parent = self
+    @property
+    def children(self):
+        return self._children
 
-  def pprint(self, indent=''):
-    '''Recursively prints a formatted string representation of the AST.'''
-    # TODO
-    print(indent+self.__class__.__name__)
-    for child in self._children:
-      child.pprint(indent+'  ')
+    @children.setter
+    def children(self, children):
+        self._children = children
+        for child in children:
+            # NOTE allows you to set child's parent to self
+            child.parent = self
 
-  def walk(self, visitor):
-    '''Traverses an AST, calling visitor.visit() on every node.
+    def pprint(self, indent=''):
+        """Recursively prints a formatted string representation of the AST."""
+        print(indent+self.__class__.__name__)
+        for child in self._children:
+            child.pprint(indent+'  ')
 
-    This is a depth-first, pre-order traversal. Parents will be visited before
-    any children, children will be visited in order, and (by extension) a node's
-    children will all be visited before its siblings.
-    The visitor may modify attributes, but may not add or delete nodes.'''
-    visitor.visit(self)
-    for child in self._children:
-      child.walk(visitor)
+    def walk(self, visitor):
+        """Traverses an AST, calling visitor.visit() on every node.
 
-    return visitor.return_value()
+        This is a depth-first, pre-order traversal. Parents will be visited before
+        any children, children will be visited in order, and (by extension) a node's
+        children will all be visited before its siblings.
+        The visitor may modify attributes, but may not add or delete nodes."""
+        visitor.visit(self)
+        for child in self._children:
+            child.walk(visitor)
+
+        return visitor.return_value()
+
 
 class ASTProgram(ASTNode):
-  def __init__(self, statements):
-    super().__init__()
-    self.children = statements
+    def __init__(self, statements):
+        super().__init__()
+        self.children = statements
+
 
 class ASTImport(ASTNode):
-  def __init__(self, mod):
-    super().__init__()
-    self.mod = mod
+    def __init__(self, mod):
+        super().__init__()
+        self.mod = mod
 
-  @property
-  def module(self):
-    return self.mod
+    @property
+    def module(self):
+        return self.mod
 
-class ASTComponent(ASTNode): # TODO
-  def __init__(self, name, expressions):
-    super().__init__()
-    self.children = [name] + expressions
 
-  # NOTE this allows you to print .p without () or without exposing property. Advantage: disallows user to set attribute
-  # use name.setter to allow setting with some checking or other auxiliary functions like setting parent to self
-  @property
-  def name(self): # TODO return an element of self.children
-    return self.children[0]
-  @property
-  def expressions(self): # TODO return one or more children
-    return self.children[1:]
+class ASTComponent(ASTNode):
+    def __init__(self, name, expressions):
+        super().__init__()
+        self.children = [name] + expressions
 
-class ASTInputExpr(ASTNode): # TODO
-  def __init__(self, decl_list):
-    super().__init__()
-    self.children = decl_list
+     # NOTE this allows you to print .p without () or without exposing property. Advantage: disallows user to set attribute
+     # use name.setter to allow setting with some checking or other auxiliary functions like setting parent to self
+    @property
+    def name(self):
+        return self.children[0]
 
-class ASTOutputExpr(ASTNode): # TODO
-  def __init__(self, decl_list):
-    super().__init__()
-    self.children = decl_list
+    @property
+    def expressions(self):
+        return self.children[1:]
 
-class ASTAssignmentExpr(ASTNode): # TODO
-  def __init__(self, id, expr):
-    super().__init__()
-    self.children = [id, expr]
 
-  @property
-  def binding(self): # TODO
-    return self.children[0]
-  @property
-  def value(self): # TODO
-    return self.children[1]
+class ASTInputExpr(ASTNode):
+    def __init__(self, decl_list):
+        super().__init__()
+        self.children = decl_list
 
-class ASTEvalExpr(ASTNode): # TODO
-  def __init__(self, op, args=None):
-    super().__init__()
-    if args is None:
-      self.children = [op]
-    else:
-      self.children = [op] + args
 
-  @property
-  def op(self): # TODO
-    return self.children[0]
-  @property
-  def args(self): # TODO
-    return self.children[1:]
+class ASTOutputExpr(ASTNode):
+    def __init__(self, decl_list):
+        super().__init__()
+        self.children = decl_list
 
-# These are already complete.
+
+class ASTAssignmentExpr(ASTNode):
+    def __init__(self, id, expr):
+        super().__init__()
+        self.children = [id, expr]
+
+    @property
+    def binding(self):
+        return self.children[0]
+
+    @property
+    def value(self):
+        return self.children[1]
+
+
+class ASTEvalExpr(ASTNode):
+    def __init__(self, op, args=None):
+        super().__init__()
+        if args is None:
+            self.children = [op]
+        else:
+            self.children = [op] + args
+
+    @property
+    def op(self):
+        return self.children[0]
+
+    @property
+    def args(self):
+        return self.children[1:]
+
+
 class ASTID(ASTNode):
-  def __init__(self, name, typedecl=None):
-    super().__init__()
-    self.name = name
-    self.type = typedecl
+    def __init__(self, name, typedecl=None):
+        super().__init__()
+        self.name = name
+        self.type = typedecl
+
 
 class ASTLiteral(ASTNode):
-  def __init__(self, value):
-    super().__init__()
-    self.value = value
-    self.type = 'Scalar'
+    def __init__(self, value):
+        super().__init__()
+        self.value = value
+        self.type = 'Scalar'

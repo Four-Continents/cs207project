@@ -7,12 +7,12 @@ from .symtab import *
 ATTRIB_COMPONENT = '_pype_component'
 
 def component(func):
-    'Marks a functions as compatible for exposing as a component in PyPE.'
+    """Marks a functions as compatible for exposing as a component in PyPE."""
     # TODO
     return func
 
 def is_component(func):
-    'Checks whether the @component decorator was applied to a function.'
+    """Checks whether the @component decorator was applied to a function."""
     # TODO
 
 class LibraryImporter(object):
@@ -35,6 +35,7 @@ class LibraryImporter(object):
                 symtab.addsym( Symbol(name, SymbolType.libraryfunction, obj) )
             elif inspect.isclass(obj):
                 for (methodname,method) in inspect.getmembers(obj):
+                    pass
             # TODO:
             #   check if method was decorated like before
             #   add a symbol like before, but with type librarymethod
