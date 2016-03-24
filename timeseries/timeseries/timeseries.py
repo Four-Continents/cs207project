@@ -2,7 +2,6 @@ import reprlib
 import numpy as np
 from doctest import run_docstring_examples as dtest
 import numbers
-import lazy as lz
 import operator
 
 class TimeSeriesIterator:
@@ -699,4 +698,7 @@ class TimeSeries(object):
 
 
 if __name__ == '__main__':
+    import lazy as lz
     dtest(TimeSeries, globals(), verbose=True)
+else:
+    import timeseries.lazy as lz
