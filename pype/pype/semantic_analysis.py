@@ -16,11 +16,11 @@ class CheckSingleAssignment(ASTVisitor):
     if isinstance(node, ASTComponent):
      	self._curr_component = node.name.name
         self._component_frames[node.name.name] = set()
-        elif isinstance(node, ASTAssignmentExpr):
-        	if node.binding.name in self._component_frames[self._curr_component]:
-            	raise ValueError("Trying to assign a variable twice: " + node.binding.name)
-            else:
-                self._component_frames[self._curr_component].add(node.binding.name)
+    elif isinstance(node, ASTAssignmentExpr):
+    	if node.binding.name in self._component_frames[self._curr_component]:
+        	raise ValueError("Trying to assign a variable twice: " + node.binding.name)
+        else:
+        	self._component_frames[self._curr_component].add(node.binding.name)
 
 class CheckSingleIOExpression(ASTVisitor):
   def __init__(self):
