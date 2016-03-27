@@ -19,7 +19,7 @@ class SymbolTableVisitor(ASTVisitor):
 
     if isinstance(node, ASTInputExpr):
         for declaration in node.children:
-            self.symbol_table.addsym(Symbol(declaration.name, SymbolType.input, None), self._current_component
+            self.symbol_table.addsym(Symbol(declaration.name, SymbolType.input, None), self._current_component)
     if isinstance(node, ASTAssignmentExpr):
         if node.binding.name in self._component_dict[self._current_component]:
             raise ValueError("Assigning a variable twice: " + node.binding.name)
