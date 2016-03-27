@@ -3,6 +3,7 @@ import numpy as np
 from doctest import run_docstring_examples as dtest
 import numbers
 import operator
+import pype
 
 class TimeSeriesIterator:
     def __init__(self, values): 
