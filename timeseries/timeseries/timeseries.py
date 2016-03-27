@@ -440,6 +440,7 @@ class TimeSeries(object):
                                 self.values) for it in interp_times]
         return TimeSeries(interp_times, new_values)
 
+    @pype.lib_import.component
     def mean(self):
         """
         Computes mean of values in TimesSeries
@@ -454,11 +455,33 @@ class TimeSeries(object):
         ValueError
             Raises the error if there are no values in the TimesSeries
         """
-        if len(self.values) == 0:
+        if len(self._values) == 0:
             msg = "Cannot take mean of TimesSeries with no values"
             raise ValueError(msg)
         else:
-            return np.mean(self.values)
+            return np.mean(self._values)
+
+    @pype.lib_import.component
+    def std(self):
+
+        """
+        Computes standard deviation of values in TimesSeries
+
+        Returns
+        -------
+        float
+            Standard deviation of values in TimesSeries
+
+        Raises
+        ------
+        ValueError
+            Raises the error if there are no values in the TimesSeries
+        """
+        if len(self._values) == 0:
+            msg = "Cannot take standard deviation of TimesSeries with no values"
+            raise ValueError(msg)
+        else:
+            return np.std(self._values)
 
     def median(self):
         """
@@ -474,11 +497,11 @@ class TimeSeries(object):
         ValueError
             Raises the error if there are no values in the TimesSeries
         """
-        if len(self.values) == 0:
+        if len(self._values) == 0:
             msg = "Cannot take median of TimesSeries with no values"
             raise ValueError(msg)
         else:
-            return np.median(self.values)
+            return np.median(self._values)
 
     def _seq_equal(self, seqA, seqB):
         """
