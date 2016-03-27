@@ -7,7 +7,7 @@ from .symtab import *
 ATTRIB_COMPONENT = '_pype_component'
 
 def component(func):
-  'Marks a functions as compatible for exposing as a component in PyPE.'
+    'Marks a functions as compatible for exposing as a component in PyPE.'
     def ext_func(*args, **kwargs):
         return func(*args, **kwargs)
     ext_func._attributes = {ATTRIB_COMPONENT: True}
