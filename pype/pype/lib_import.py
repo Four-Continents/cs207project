@@ -14,7 +14,7 @@ def component(func):
     return ext_func
 
 def is_component(func):
-  'Checks whether the @component decorator was applied to a function.'
+    'Checks whether the @component decorator was applied to a function.'
     try:
         return func._attributes[ATTRIB_COMPONENT]
     except AttributeError:
