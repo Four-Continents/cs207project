@@ -50,6 +50,13 @@ def test_example1():
 
     parsed_data = read_sample('example1.ast').strip().split('\n')
 
+    # Semantic analysis
+    # Check to see if something in a component is assigned twice
+    ast.walk( CheckSingleAssignment() )
+    # Translation
+    syms = ast.walk( SymbolTableVisitor() )
+    return syms, ast
+
     print('\n'.join(ast_strs))
     for i, line in enumerate(parsed_data):
         assert line == ast_strs[i]

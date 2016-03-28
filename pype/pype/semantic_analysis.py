@@ -3,9 +3,9 @@ from .error import *
 
 class PrettyPrint(ASTVisitor):
   def __init__(self):
-    pass
+    super().__init__()
   def visit(self, node):
-        print(node.__class__.__name__)
+    print(node.__class__.__name__)
 
 class CheckSingleAssignment(ASTVisitor):
   def __init__(self):
