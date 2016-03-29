@@ -15,7 +15,6 @@ class TimeSeriesTest(unittest.TestCase):
         b[2] = 10
         self.assertTrue ( b[2]== 10 )
 
-
     def test_len(self):
         b = TimeSeries([1, 1.5, 2, 2.5, 10], [0, 2, -1, 0.5, 0])
         self.assertTrue( len(b) == 5)
