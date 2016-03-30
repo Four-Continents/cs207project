@@ -56,12 +56,8 @@ class TimeSeries(object):
     TimeSeries[(1, 4.0), (2, 5.5), (3, 6.5)]
     >>> [v for v in TimeSeries([0,1,2],[1,3,5])]
     [1, 3, 5]
-    >>> a.times
-    array([1, 2, 3])
-    >>> a.values
-    array([4. , 5.5 , 6.5])
     >>> print([x for x in a.items()])
-    [(1, 4.0), (2, 10.0), (3, 6.5)]
+    [(1, 4.0), (2, 5.5), (3, 6.5)]
     >>> x = TimeSeries([1,2,3,4],[1,4,9,16])
     >>> print(x)
     TimeSeries[(1, 1), (2, 4), (3, 9), (4, 16)]
