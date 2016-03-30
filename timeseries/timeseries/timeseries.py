@@ -3,7 +3,7 @@ import numpy as np
 from doctest import run_docstring_examples as dtest
 import numbers
 import operator
-import pype
+#import pype
 
 
 class TimeSeriesIterator:
@@ -54,43 +54,13 @@ class TimeSeries(object):
     >>> a = TimeSeries([1, 2, 3], [4, 5.5, 6.5])
     >>> print(a)
     TimeSeries[(1, 4.0), (2, 5.5), (3, 6.5)]
-    >>> len(a)
-    3
-    >>> a[6]
-    Traceback (most recent call last):
-        ...
-    IndexError: The index you are providing does not exist. Please enter a valid time index.
-    >>> a[2]
-    5.5
-    >>> a[2] = 10
-    >>> a[2]
-    10.0
     >>> [v for v in TimeSeries([0,1,2],[1,3,5])]
     [1, 3, 5]
-    >>> a.times
-    array([1, 2, 3])
-    >>> a.values
-    array([  4. ,  10. ,   6.5])
     >>> print([x for x in a.items()])
-    [(1, 4.0), (2, 10.0), (3, 6.5)]
-    >>> a = TimeSeries([0,5,10], [1,2,3])
-    >>> b = TimeSeries([2.5,7.5], [100, -100])
-    >>> print(a.interpolate([1]))
-    TimeSeries[(1, 1.2)]
-    >>> print(a.interpolate(b.times))
-    TimeSeries[(2.5, 1.5), (7.5, 2.5)]
-    >>> print(a.interpolate([-100, 100]))
-    TimeSeries[(-100, 1.0), (100, 3.0)]
+    [(1, 4.0), (2, 5.5), (3, 6.5)]
     >>> x = TimeSeries([1,2,3,4],[1,4,9,16])
     >>> print(x)
     TimeSeries[(1, 1), (2, 4), (3, 9), (4, 16)]
-    >>> print(x.lazy.eval())
-    TimeSeries[(1, 1), (2, 4), (3, 9), (4, 16)]
-    >>> x = TimeSeries([1,2,3,4],[4,5,6,7])
-    >>> print(x.mean())
-    5.5
-    >>> print(x.median())
-    5.5
     >>> x = TimeSeries([1,2,3,4],[1,4,9,16])
     >>> [v for v in x]
     [1, 4, 9, 16]
@@ -98,62 +68,23 @@ class TimeSeries(object):
     [1, 2, 3, 4]
     >>> [v for v in x.values]
     [1, 4, 9, 16]
-    >>> xit=x.itertimes()
-    >>> print(next(xit))
-    1
-    >>> print(next(xit))
-    2
-    >>> list(xit)
-    [3, 4]
-    >>> xit=iter(x)
-    >>> print(next(xit))
-    1
-    >>> xit2=iter(xit)
-    >>> next(xit),next(xit2)
-    (4, 9)
-    >>> combined_it=x.iteritems()
-    >>> print(next(combined_it))
-    (1, 1)
-    >>> print(next(combined_it))
-    (2, 4)
     >>> #Test for overloaded operators
     >>> x = TimeSeries([1,2,3,4],[1,4,9,16])
     >>> y = TimeSeries([1,2,3,4],[2,4.5,-1,20])
     >>> z = TimeSeries([1,2], [0,0.5])
     >>> z_ts = TimeSeries([1,2,3], [0,0,0])
-    >>> x + y
-    TimeSeries[(1, 3.0), (2, 8.5), (3, 8.0), (4, 36.0)]
-    >>> y - x
-    TimeSeries[(1, 1.0), (2, 0.5), (3, -10.0), (4, 4.0)]
-    >>> x - y
-    TimeSeries[(1, -1.0), (2, -0.5), (3, 10.0), (4, -4.0)]
-    >>> x * y
-    TimeSeries[(1, 2.0), (2, 18.0), (3, -9.0), (4, 320.0)]
-    >>> x * 5.0
-    TimeSeries[(1, 5.0), (2, 20.0), (3, 45.0), (4, 80.0)]
-    >>> y * 2.5
-    TimeSeries[(1, 5.0), (2, 11.25), (3, -2.5), (4, 50.0)]
     >>> x * [1, 2, 3, 4]
     Traceback (most recent call last):
         ...
     NotImplementedError
-
     >>> x == [1, 2, 3, 4]
     Traceback (most recent call last):
         ...
     NotImplementedError
-    >>> abs(x)
-    18.814887722226779
-    >>> bool(z_ts)
-    False
     >>> not x
     False
     >>> x2 = +x
     >>> x2 is x
-    False
-    >>> x2 == x
-    True
-    >>> x == y
     False
     >>> z + x
     Traceback (most recent call last):
@@ -437,7 +368,7 @@ class TimeSeries(object):
                                 self.values) for it in interp_times]
         return TimeSeries(interp_times, new_values)
 
-    @pype.lib_import.component
+    #@pype.lib_import.component
     def mean(self):
         """
         Computes mean of values in TimesSeries
@@ -458,7 +389,7 @@ class TimeSeries(object):
         else:
             return np.mean(self._values)
 
-    @pype.lib_import.component
+    #@component
     def std(self):
 
         """
@@ -720,5 +651,8 @@ class TimeSeries(object):
 if __name__ == '__main__':
     import lazy as lz
     dtest(TimeSeries, globals(), verbose=True)
+
 else:
-    import timeseries.lazy as lz
+     import timeseries.lazy as lz
+
+
