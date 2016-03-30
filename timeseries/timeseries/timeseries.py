@@ -59,7 +59,7 @@ class TimeSeries(object):
     >>> a.times
     array([1, 2, 3])
     >>> a.values
-    array([  4. ,  5.5 ,   6.5])
+    array([4. , 5.5 , 6.5])
     >>> print([x for x in a.items()])
     [(1, 4.0), (2, 10.0), (3, 6.5)]
     >>> x = TimeSeries([1,2,3,4],[1,4,9,16])
