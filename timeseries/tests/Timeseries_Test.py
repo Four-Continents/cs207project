@@ -19,6 +19,15 @@ class TimeSeriesTest(unittest.TestCase):
         b = TimeSeries([1, 1.5, 2, 2.5, 10], [0, 2, -1, 0.5, 0])
         self.assertTrue( len(b) == 5)
 
+
+    def test_times_values(self):
+        time = [1, 1.5, 2, 2.5, 10]
+        value = [0, 2, -1, 0.5, 0]
+        a = TimeSeries(time, value)
+        self.assertTrue ( a == TimeSeries([1, 1.5, 2, 2.5, 10], [0, 2, -1, 0.5, 0]) )
+        
+        
+
 # Test Operators
     def test_add(self):
         x = TimeSeries([1, 2, 3, 4],[1, 4, 9, 16])
