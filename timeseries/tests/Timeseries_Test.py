@@ -2,6 +2,8 @@ import unittest
 from timeseries.timeseries import TimeSeries
 import numpy as np
 
+# to run, type in command line: ```PYTHONPATH=. py.test -vv tests/Timeseries_Test.py```
+
 class TimeSeriesTest(unittest.TestCase):
 
     def test_init(self):
@@ -25,8 +27,9 @@ class TimeSeriesTest(unittest.TestCase):
         value = [0, 2, -1, 0.5, 0]
         a = TimeSeries(time, value)
         self.assertTrue ( a == TimeSeries([1, 1.5, 2, 2.5, 10], [0, 2, -1, 0.5, 0]) )
-        
-        
+        self.assertTrue( list(a.times) == time )
+        self.assertTrue ( list(a.values) == value )
+             
 
 # Test Operators
     def test_add(self):
