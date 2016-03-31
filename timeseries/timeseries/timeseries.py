@@ -3,7 +3,7 @@ import numpy as np
 from doctest import run_docstring_examples as dtest
 import numbers
 import operator
-#import pype
+from pype.lib_import import component
 
 
 class TimeSeriesIterator:
@@ -368,7 +368,7 @@ class TimeSeries(object):
                                 self.values) for it in interp_times]
         return TimeSeries(interp_times, new_values)
 
-    #@pype.lib_import.component
+    @component
     def mean(self):
         """
         Computes mean of values in TimesSeries
@@ -389,7 +389,7 @@ class TimeSeries(object):
         else:
             return np.mean(self._values)
 
-    #@component
+    @component
     def std(self):
 
         """
