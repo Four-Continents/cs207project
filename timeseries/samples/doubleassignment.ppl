@@ -1,0 +1,1 @@
+{ comp2 (input) (output) (:= a 2) (:= a 3) }
