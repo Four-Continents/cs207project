@@ -2,7 +2,7 @@ import unittest
 from timeseries.timeseries import TimeSeries
 import numpy as np
 
-# to run, type in command line: ```PYTHONPATH=. py.test -vv tests/Timeseries_Test.py```
+# to run, type in command line: ```PYTHONPATH=. py.test -vv tests/test_timeseries.py```
 
 class TimeSeriesTest(unittest.TestCase):
 
