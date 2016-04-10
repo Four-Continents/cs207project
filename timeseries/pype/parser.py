@@ -72,7 +72,7 @@ def p_declaration_list(p):
 def p_declaration(p):
     r'''declaration : LPAREN type ID RPAREN
                   | ID'''
-    if len(p) == 4:
+    if len(p) == 5:
         p[0] = ASTID(p[3], typedecl=p[2])
     else:
         p[0] = ASTID(p[1])
