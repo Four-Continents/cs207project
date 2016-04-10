@@ -513,6 +513,7 @@ class TimeSeries(object):
         except TypeError:
             raise NotImplementedError
 
+    @component
     def __add__(self, rhs):
         """
         Addition operator between the values of `self` and `rhs`. Operations are element-wise.
@@ -540,6 +541,7 @@ class TimeSeries(object):
         """
         return self + other
 
+    @component
     def __mul__(self, rhs):
         """
         Multiplication operator between the values of `self` and `rhs`. Operations are element-wise.
@@ -572,6 +574,25 @@ class TimeSeries(object):
         """
         return self * other
 
+    @component
+    def __truediv__(self, rhs):
+        """
+        Division operator between the values of `self` and `rhs`. Operations are element-wise.
+
+        Returns
+        -------
+        TimeSeries
+            Result of dividing `rhs` from the values of `self`.
+
+        Raises
+        -------
+        NotImplementedError
+            NotImplementedError is raised if the operation cannot be applied.
+        """
+        return self._elem_op(rhs, operator.truediv)
+
+
+    @component
     def __sub__(self, rhs):
         """
         Subtraction operator between the values of `self` and `rhs`. Operations are element-wise.

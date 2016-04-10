@@ -21,29 +21,38 @@ def is_component(func):
         return False
 
 class LibraryImporter(object):
-  def __init__(self, modname=None):
+  def __init__(self, modname=None, package=None):
+    self.package = package
     self.mod = None
     if modname is not None:
       self.import_module(modname)
 
   def import_module(self, modname):
-    self.mod = importlib.import_module(modname)
+    if self.package is None:
+        self.mod = importlib.import_module(modname)
+    else:
+        # dot makes it a relative instead of absolute import
+        self.mod = importlib.import_module('.'+modname, package=self.package)
 
   def add_symbols(self, symtab):
     assert self.mod is not None, 'No module specified or loaded'
     for (name,obj) in inspect.getmembers(self.mod):
+      # print('   '+name)
       if inspect.isroutine(obj) and is_component(obj):
-        # TODO: add a symbol to symtab
+        # DONE: add a symbol to symtab
         #       it should be named name
         #       its type should be a libraryfunction SymbolType
         #       its ref should be the object itself (obj)
+        # print('++ function: ' + name)
         symtab.addsym( Symbol(name, SymbolType.libraryfunction, obj) )
       elif inspect.isclass(obj):
         for (methodname,method) in inspect.getmembers(obj):
-           # TODO:
+           # DONE:
            #   check if method was decorated like before
            #   add a symbol like before, but with type librarymethod
            #   (the ref should be the method, not obj)
            if is_component(method):
-                symtab.addsym( Symbol(methodname, SymbolType.librarymethod, method) )
+              # print('++ method: ' + methodname)
+              symtab.addsym( Symbol(methodname, SymbolType.librarymethod, method) )
+
     return symtab
