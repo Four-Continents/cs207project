@@ -8,6 +8,7 @@ class Optimization(object):
 
 class FlowgraphOptimization(Optimization):
   '''Called on each flowgraph in a FGIR.
+
   May modify the flowgraph by adding or removing nodes (return a new Flowgraph).
   If you modify nodes, make sure inputs, outputs, and variables are all updated.
   May NOT add or remove flowgraphs.'''
@@ -15,6 +16,7 @@ class FlowgraphOptimization(Optimization):
 
 class NodeOptimization(Optimization):
   '''Called on each node in a FGIR.
+
   May modify the node (return a new Node object, and it will be assigned).
   May NOT remove or add nodes (use a component pass).'''
   pass
@@ -30,6 +32,7 @@ class PrintIR(TopologicalNodeOptimization):
 
 class AssignmentEllision(FlowgraphOptimization):
   '''Eliminates all assignment nodes.
+
   Assignment nodes are useful for the programmer to reuse the output of an
   expression multiple times, and the lowering transformation generates explicit
   flowgraph nodes for these expressions. However, they are not necessary for
@@ -43,6 +46,7 @@ class AssignmentEllision(FlowgraphOptimization):
 
 class DeadCodeElimination(FlowgraphOptimization):
   '''Eliminates unreachable expression statements.
+
   Statements which never affect any output are effectively useless, and we call
   these "dead code" blocks. This optimization removes any expressions which can
   be shown not to affect the output.
