@@ -40,7 +40,9 @@ class AssignmentEllision(FlowgraphOptimization):
   their pre- and post-dependencies.'''
 
   def visit(self, flowgraph):
-    for (nodeid, node) in flowgraph.nodes.items():
+
+    for nodeid in list(flowgraph.nodes.keys()):
+      node = flowgraph.nodes[nodeid]
       if node.type == FGNodeType.assignment:
         # There can only be one input for an assignment expression
         # Retrieve the nodeid for the input and output node
@@ -54,9 +56,12 @@ class AssignmentEllision(FlowgraphOptimization):
               flowgraph.nodes[a_nid].inputs[i] = before
 
         # Update the variable mapping table
-        for (m_str, m_nid) in flowgraph.variables:
+        for (m_str, m_nid) in flowgraph.variables.items():
           if m_nid == nodeid:
             flowgraph.variables[m_str] = before
+
+        # Delete the node
+        del flowgraph.nodes[nodeid]
     return flowgraph
 
 
@@ -90,7 +95,7 @@ class DeadCodeElimination(FlowgraphOptimization):
         else:
           req[curNode] = True
 
-        for parent in flowgraph.nodes[nodeid].inputs:
+        for parent in flowgraph.nodes[curNode].inputs:
           stack.append(parent)
 
     # For each node that was not marked as required, make sure it is not an input
@@ -107,18 +112,12 @@ class DeadCodeElimination(FlowgraphOptimization):
     # Go through the graph and fix references to deleted nodes
     # Fix the input and output lists for each node
     for (nodeid, node) in flowgraph.nodes.items():
-      updateInp, updateOut = [], []
-      for i, n in enumerate(flowgraph.nodes[nodeid].inputs):
+      updateInp = []
+      for n in flowgraph.nodes[nodeid].inputs:
         if n in flowgraph.nodes:
             updateInp.append(n)
 
       flowgraph.nodes[nodeid].inputs = updateInp
-
-      for i, n in enumerate(flowgraph.nodes[nodeid].outputs):
-        if n in flowgraph.nodes:
-            updateOut.append(n)
-
-      flowgraph.nodes[nodeid].outputs = updateOut
 
     # Fix the variable mappings
     for var_str in list(flowgraph.variables.keys()):

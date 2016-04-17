@@ -3,6 +3,7 @@ import pytest
 import os
 from pype.semantic_analysis import CheckSingleAssignment, CheckSingleIOExpression, CheckUndefinedVariables
 from pype.translate import SymbolTableVisitor, LoweringVisitor
+from pype.optimize import *
 
 # to run, type in command line: ```PYTHONPATH=. py.test -vv tests/test_lexer.py```
 
@@ -33,11 +34,24 @@ def test_example0():
     # Semantic analysis
     ast.walk( CheckSingleAssignment() )
     ast.walk( CheckSingleIOExpression() )
-    syms = ast.walk( SymbolTableVisitor() )
+    syms = ast.walk( SymbolTableVisitor(import_package='timeseries') )
     ast.walk( CheckUndefinedVariables(syms) )
 
     # Translation
     ir = ast.mod_walk( LoweringVisitor(syms) )
+    for c in ir:
+        print(ir[c].dotfile())
+
+    ir.flowgraph_pass( AssignmentEllision() )
+
+    for c in ir:
+        print(ir[c].dotfile())
+    ir.flowgraph_pass( DeadCodeElimination() )
+
+    for c in ir:
+        print(ir[c].dotfile())
+    # assert 0
+
 
 # def test_example1():
 #     lexer = pype.lexer.new_lexer()

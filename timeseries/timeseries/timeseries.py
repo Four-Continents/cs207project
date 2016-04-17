@@ -3,7 +3,8 @@ import numpy as np
 from doctest import run_docstring_examples as dtest
 import numbers
 import operator
-from pype.lib_import import component
+# from pype.lib_import import component
+import pype
 
 
 class TimeSeriesIterator:
@@ -368,7 +369,7 @@ class TimeSeries(object):
                                 self.values) for it in interp_times]
         return TimeSeries(interp_times, new_values)
 
-    @component
+    @pype.component
     def mean(self):
         """
         Computes mean of values in TimesSeries
@@ -389,7 +390,7 @@ class TimeSeries(object):
         else:
             return np.mean(self._values)
 
-    @component
+    @pype.component
     def std(self):
 
         """
@@ -513,7 +514,7 @@ class TimeSeries(object):
         except TypeError:
             raise NotImplementedError
 
-    @component
+    @pype.component
     def __add__(self, rhs):
         """
         Addition operator between the values of `self` and `rhs`. Operations are element-wise.
@@ -541,7 +542,7 @@ class TimeSeries(object):
         """
         return self + other
 
-    @component
+    @pype.component
     def __mul__(self, rhs):
         """
         Multiplication operator between the values of `self` and `rhs`. Operations are element-wise.
@@ -574,7 +575,7 @@ class TimeSeries(object):
         """
         return self * other
 
-    @component
+    @pype.component
     def __truediv__(self, rhs):
         """
         Division operator between the values of `self` and `rhs`. Operations are element-wise.
@@ -592,7 +593,7 @@ class TimeSeries(object):
         return self._elem_op(rhs, operator.truediv)
 
 
-    @component
+    @pype.component
     def __sub__(self, rhs):
         """
         Subtraction operator between the values of `self` and `rhs`. Operations are element-wise.
