@@ -3,6 +3,7 @@ from .parser import parser
 from .ast import *
 from .semantic_analysis import CheckSingleAssignment, CheckSingleIOExpression, CheckUndefinedVariables
 from .translate import SymbolTableVisitor, LoweringVisitor
+from .optimize import *
 
 class Pipeline(object):
   def __init__(self, source):
