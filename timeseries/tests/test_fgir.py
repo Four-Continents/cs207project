@@ -52,6 +52,27 @@ def test_example0():
         print(ir[c].dotfile())
     # assert 0
 
+def test_topsort():
+    lexer = pype.lexer.new_lexer()
+
+    data = read_sample('example1.ppl')
+
+    ast = pype.parser.parser.parse(data, lexer=lexer)
+
+    # Semantic analysis
+    ast.walk( CheckSingleAssignment() )
+    ast.walk( CheckSingleIOExpression() )
+    syms = ast.walk( SymbolTableVisitor(import_package='timeseries') )
+    ast.walk( CheckUndefinedVariables(syms) )
+
+    # Translation
+    ir = ast.mod_walk( LoweringVisitor(syms) )
+    for c in ir:
+        print(ir[c].dotfile())
+    ir.node_pass( PrintIR(), topological=True )
+
+    # assert 0
+
 
 # def test_example1():
 #     lexer = pype.lexer.new_lexer()
