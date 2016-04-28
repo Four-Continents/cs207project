@@ -1,3 +1,4 @@
+from .timeseries import *
 import pkg_resources
 
 try:
