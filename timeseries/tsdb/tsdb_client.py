@@ -23,11 +23,23 @@ class TSDBClient(object):
         self._send(msg)
         # your code here
 
-    def select(self, metadata_dict={}):
-        json_dict = typemap["select"](metadata_dict).to_json()
+    def select(self, metadata_dict={}, fields=None):
+        json_dict = typemap["select"](metadata_dict, fields).to_json()
         msg = serialize(json_dict)
         return self._send(msg)
-        # your code here
+        # YOUR CODE HERE
+
+    def add_trigger(self, proc, onwhat, target, arg):
+        json_dict = typemap["add_trigger"](proc, onwhat, target, arg).to_json()
+        msg = serialize(json_dict)
+        self._send(msg)
+        # YOUR CODE HERE
+
+    def remove_trigger(self, proc, onwhat):
+        json_dict = typemap["remove_trigger"](proc, onwhat).to_json()
+        msg = serialize(json_dict)
+        self._send(msg)
+        # YOUR CODE HERE
 
     # Feel free to change this to be completely synchronous
     # from here onwards. Return the status and the payload
