@@ -5,10 +5,8 @@ from .fgir import FGNodeType, FGNode, Flowgraph, FGIR
 from .error import *
 
 class SymbolTableVisitor(ASTVisitor):
-  def __init__(self, import_package=None):
-    self.import_package = import_package
+  def __init__(self):
     self.symbol_table = SymbolTable()
-    self._component_dict = {}
 
   def return_value(self):
     return self.symbol_table
@@ -16,26 +14,26 @@ class SymbolTableVisitor(ASTVisitor):
   def visit(self, node):
     if isinstance(node, ASTImport):
       # Import statements make library functions available to PyPE
-      imp = LibraryImporter(node.module, self.import_package)
+      imp = LibraryImporter(node.module)
       imp.add_symbols(self.symbol_table)
 
     if isinstance(node, ASTInputExpr):
-        for declaration in node.children:
-            self.symbol_table.addsym(Symbol(declaration.name, SymbolType.input, None), self._current_component)
+      for declaration in node.children:
+        self.symbol_table.addsym(Symbol(declaration.name, SymbolType.input, None), self._current_component)
     if isinstance(node, ASTAssignmentExpr):
-        if node.binding.name in self._component_dict[self._current_component]:
-            raise ValueError("Assigning a variable twice: " + node.binding.name)
-        else:
-            self._component_dict[self._current_component].add(node.binding.name)
-            self.symbol_table.addsym(Symbol(node.binding.name, SymbolType.var, None), self._current_component)
+      if node.binding.name in self._component_dict[self._current_component]:
+        raise ValueError("Assigning a variable twice: " + node.binding.name)
+      else:
+        self._component_dict[self._current_component].add(node.binding.name)
+        self.symbol_table.addsym(Symbol(node.binding.name, SymbolType.var, None), self._current_component)
     if isinstance(node, ASTComponent):
-        self._current_component = node.name.name
-        self._component_dict[self._current_component] = set()
-        self.symbol_table.addsym(Symbol(node.name.name, SymbolType.component, None))
+      self._current_component = node.name.name
+      self._component_dict[self._current_component] = set()
+      self.symbol_table.addsym(Symbol(node.name.name, SymbolType.component, None))
 
-    # TODO    
-    # Note, you'll need to track scopes again for some of these.
-    # You may need to add class state to handle this.
+      # TODO
+      # Note, you'll need to track scopes again for some of these.
+      # You may need to add class state to handle this.
 
 class LoweringVisitor(ASTModVisitor):
   'Produces FGIR from an AST.'
@@ -113,7 +111,7 @@ class LoweringVisitor(ASTModVisitor):
       if op is None:
         raise PypeSyntaxError('Undefined operator: '+str(node.op.name))
       if op.type==SymbolType.component:
-        n = fg.new_node(FGNodeType.component)
+        n = fg.new_node(FGNodeType.component, ref=op.name)
       elif op.type==SymbolType.libraryfunction:
         n = fg.new_node(FGNodeType.libraryfunction, ref=op.ref)
       elif op.type==SymbolType.librarymethod:
