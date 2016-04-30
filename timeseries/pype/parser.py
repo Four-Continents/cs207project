@@ -64,7 +64,8 @@ def p_declaration_list(p):
     r'''declaration_list : declaration_list declaration
                        | declaration'''
     if len(p) == 3:
-        p[0] = p[1].append(p[2])
+        p[1].append(p[2])
+        p[0] = p[1]
     else:
         p[0] = [p[1]]
 
