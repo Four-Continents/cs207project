@@ -5,8 +5,10 @@ from .fgir import FGNodeType, FGNode, Flowgraph, FGIR
 from .error import *
 
 class SymbolTableVisitor(ASTVisitor):
-  def __init__(self):
+  def __init__(self, import_package=None):
+    self.import_package = import_package
     self.symbol_table = SymbolTable()
+    self._component_dict = {}
 
   def return_value(self):
     return self.symbol_table
@@ -14,7 +16,7 @@ class SymbolTableVisitor(ASTVisitor):
   def visit(self, node):
     if isinstance(node, ASTImport):
       # Import statements make library functions available to PyPE
-      imp = LibraryImporter(node.module)
+      imp = LibraryImporter(node.module, self.import_package)
       imp.add_symbols(self.symbol_table)
 
     if isinstance(node, ASTInputExpr):

@@ -6,7 +6,7 @@ import pytest
 import os
 import timeseries
 
-# to run, type in command line: ```PYTHONPATH=. py.test -vv tests/test_semantic_analysis.py```
+# to run, type in command line: ```PYTHONPATH=. py.test -vv tests/test_translate.py```
 
 samples_dir = os.path.join(os.path.dirname(__file__), '../samples')
 
