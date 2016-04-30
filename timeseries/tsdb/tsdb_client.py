@@ -23,11 +23,15 @@ class TSDBClient(object):
         self._send(msg)
         # your code here
 
-    def select(self, metadata_dict={}, fields=None):
+    def select(self, metadata_dict={}, fields=None, additional=None):
         json_dict = typemap["select"](metadata_dict, fields).to_json()
         msg = serialize(json_dict)
         return self._send(msg)
         # YOUR CODE HERE
+
+    def augmented_select(self, proc, target, arg=None, metadata_dict={}, additional=None):
+        pass
+        # your code here
 
     def add_trigger(self, proc, onwhat, target, arg):
         json_dict = typemap["add_trigger"](proc, onwhat, target, arg).to_json()
