@@ -14,6 +14,7 @@ samples_dir = os.path.join(os.path.dirname(__file__), '../samples')
 def read_sample(filename):
     return open(os.path.join(samples_dir, filename)).read()
 
+
 def generate_ir(fName):
     lexer = pype.lexer.new_lexer()
 
