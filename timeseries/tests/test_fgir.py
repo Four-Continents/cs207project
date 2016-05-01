@@ -14,17 +14,6 @@ samples_dir = os.path.join(os.path.dirname(__file__), '../samples')
 def read_sample(filename):
     return open(os.path.join(samples_dir, filename)).read()
 
-
-def pprint_str(ast, indent=''):
-    '''Recursively prints a formatted string representation of the AST.'''
-    result = ''
-    result += indent+ast.__class__.__name__+'\n'
-    for child in ast.children:
-        result += pprint_str(child, indent+'  ')
-
-    return result
-
-
 def generate_ir(fName):
     lexer = pype.lexer.new_lexer()
 
