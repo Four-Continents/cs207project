@@ -1,6 +1,6 @@
 from tsdb import tsdb_error
+from collections import OrderedDict
 from timeseries import timeseries as ts
-
 #
 # def identity(x):
 #     return x
@@ -18,3 +18,8 @@ from timeseries import timeseries as ts
 # print(sel_rows)
 
 print(ts.TimeSeries([1, 2, 3], [1, 4, 9]).to_json())
+a = {"a": 1, "b": 2, "c": 3, "d": 4}
+b = zip(a.keys(), a.values())
+o_a = OrderedDict(sorted(a.items(), key=lambda t: t[1]))
+print({k: a[k] for k in ["a", "b"]})
+print(o_a)

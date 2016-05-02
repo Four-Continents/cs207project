@@ -3,25 +3,30 @@ import numpy as np
 import timeseries as ts
 from scipy.stats import norm
 
+
 def tsmaker(m, s, j):
-    meta={}
+    meta = {}
     meta['order'] = int(np.random.choice([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]))
     meta['blarg'] = int(np.random.choice([1, 2]))
     t = np.arange(0.0, 1.0, 0.01)
     v = norm.pdf(t, m, s) + j*np.random.randn(100)
     return meta, ts.TimeSeries(t, v)
 
+
 def random_ts(a):
     t = np.arange(0.0, 1.0, 0.01)
     v = a*np.random.random(100)
     return ts.TimeSeries(t, v)
 
+
 def stand(x, m, s):
     return (x-m)/s
 
+
 def ccor(ts1, ts2):
     "given two standardized time series, compute their cross-correlation using FFT"
-    #your code here
+    # your code here
+    return 1
 
 
 def max_corr_at_phase(ts1, ts2):
@@ -30,17 +35,19 @@ def max_corr_at_phase(ts1, ts2):
     maxcorr = ccorts[idx]
     return idx, maxcorr
 
+
 #The equation for the kernelized cross correlation is given at
 #http://www.cs.tufts.edu/~roni/PUB/ecml09-tskernels.pdf
 #normalize the kernel there by np.sqrt(K(x,x)K(y,y)) so that the correlation
-#of a time series with itself is 1.
+# of a time series with itself is 1.
 def kernel_corr(ts1, ts2, mult=1):
     "compute a kernelized correlation so that we can get a real distance"
-    #your code here.
+    return 1
+    # your code here.
 
 
 #this is for a quick and dirty test of these functions
-#you might need to add procs to pythonpath for this to work
+# you might need to add procs to pythonpath for this to work
 if __name__ == "__main__":
     print("HI")
     _, t1 = tsmaker(0.5, 0.1, 0.01)

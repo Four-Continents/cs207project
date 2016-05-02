@@ -89,7 +89,7 @@ class TSDBProtocol(asyncio.Protocol):
 
     def _run_trigger(self, opname, rowmatch):
         lot = self.server.triggers[opname]
-        print("S> list of triggers to run", lot)
+        # print("S> list of triggers to run", lot)
         for tname, t, arg, target in lot:
             for pk in rowmatch:
                 row = self.server.db.rows[pk]
@@ -108,7 +108,7 @@ class TSDBProtocol(asyncio.Protocol):
         calls database functionality, gets results if appropriate (for select)\
         and bundles them back to the client.
         """
-        print('S> data received ['+str(len(data))+']: '+str(data))
+        # print('S> data received ['+str(len(data))+']: '+str(data))
         self.deserializer.append(data)
         if self.deserializer.ready():
             msg = self.deserializer.deserialize()

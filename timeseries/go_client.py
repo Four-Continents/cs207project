@@ -3,8 +3,8 @@ from tsdb import TSDBClient
 import timeseries as ts
 import numpy as np
 import time
-
-from scipy.stats import norm
+import scipy.stats
+# from scipy.stats import norm
 
 
 # m is the mean, s is the standard deviation, and j is the jitter
@@ -15,13 +15,13 @@ def tsmaker(m, s, j):
     meta['order'] = int(np.random.choice([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]))
     meta['blarg'] = int(np.random.choice([1, 2]))
     t = np.arange(0.0, 1.0, 0.01)
-    v = norm.pdf(t, m, s) + j*np.random.randn(100)
+    v = scipy.stats.norm.pdf(t, m, s) + j*np.random.randn(100)
     return meta, ts.TimeSeries(t, v)
 
 
 def main():
     print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
-    client = TSDBClient(25000)
+    client = TSDBClient(30000)
 
     # add a trigger. notice the argument. It does not do anything here but
     # could be used to save a shlep of data from client to server.
@@ -54,10 +54,11 @@ def main():
     # Having set up the triggers, now insert the time series, and upsert the metadata
     for k in tsdict:
         client.insert_ts(k, tsdict[k])
+        time.sleep(1)
         client.upsert_meta(k, metadict[k])
 
     print("UPSERTS FINISHED")
-    time.sleep(2)
+    time.sleep(5)
     print('---------------------')
     print("STARTING SELECTS")
 
@@ -97,31 +98,31 @@ def main():
     for k in results:
         print(k, results[k])
 
-    print('------now computing vantage point stuff---------------------')
-    print("VPS", vpkeys)
-
-    # we first create a query time series.
-    _, query = tsmaker(0.5, 0.2, 0.1)
-
-    # your code here begins
-
-    # Step 1: in the vpdist key, get  distances from query to vantage points
-    # this is an augmented select
-
-    # 1b: choose the lowest distance vantage point
-    # you can do this in local code
-
-    # Step 2: find all time series within 2*d(query, nearest_vp_to_query)
-    # this is an augmented select to the same proc in correlation
-
-    # 2b: find the smallest distance amongst this ( or k smallest)
-    # you can do this in local code
-    # your code here ends
-    # plot the timeseries to see visually how we did.
-    import matplotlib.pyplot as plt
-    plt.plot(query)
-    plt.plot(tsdict[nearestwanted])
-    plt.show()
+    # print('------now computing vantage point stuff---------------------')
+    # print("VPS", vpkeys)
+    #
+    # # we first create a query time series.
+    # _, query = tsmaker(0.5, 0.2, 0.1)
+    #
+    # # your code here begins
+    #
+    # # Step 1: in the vpdist key, get  distances from query to vantage points
+    # # this is an augmented select
+    #
+    # # 1b: choose the lowest distance vantage point
+    # # you can do this in local code
+    #
+    # # Step 2: find all time series within 2*d(query, nearest_vp_to_query)
+    # # this is an augmented select to the same proc in correlation
+    #
+    # # 2b: find the smallest distance amongst this ( or k smallest)
+    # # you can do this in local code
+    # # your code here ends
+    # # plot the timeseries to see visually how we did.
+    # import matplotlib.pyplot as plt
+    # plt.plot(query)
+    # plt.plot(tsdict[nearestwanted])
+    # plt.show()
 
 
 if __name__ == '__main__':
