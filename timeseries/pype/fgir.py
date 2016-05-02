@@ -62,7 +62,6 @@ class Flowgraph(object):
     return [i for (i,n) in self.nodes.items() if nodeid in self.nodes[i].inputs]
 
   def topological_sort(self):
-    # TODO : implement a topological sort
     L = []
     nodes_to_visit = list(self.nodes.keys())
     while len(nodes_to_visit) > 0:
