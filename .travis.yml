@@ -1,11 +1,17 @@
 language: python
 python:
     - "3.5"
+virtualenv:
+    system_site_packages: true
+
+SITE_PKG_DIR=$VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/site-packages
+rm -f $VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/no-global-site-packages.txt  
+
 before_install:
     - pip install pytest pytest-cov
     - pip install coveralls
     - pip install ply
-    - conda install scipy
+    - apt-get install python-scipy
 script:
     - py.test
 after_success:
