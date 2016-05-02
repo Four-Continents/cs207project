@@ -8,11 +8,28 @@ from .pcode import PCodeGenerator
 
 class Pipeline(object):
   def __init__(self, source):
-      self.pcodes = {}
-      with open(source) as f:
-        self.compile(f)
+    """
+    Constructor for the Pipeline class. Takes a file, opens and calls compiled on it
+
+    Parameters
+    ----------
+    source: string
+          file path
+    """
+    self.pcodes = {}
+    with open(source) as f:
+      self.compile(f)
 
   def compile(self, file):
+    """
+    Parameters
+    ----------
+    file: file object
+
+    Returns
+    ----------
+    ir: FGIR class object
+    """
     input = file.read()
 
     # Lexing, parsing, AST construction
