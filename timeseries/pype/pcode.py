@@ -4,28 +4,6 @@ from .error import Warn
 
 import asyncio
 
-# a coroutine for every node in every flowgraph
-# a queue between every pair of dependent nodes
-
-# We'll solve the first one by using an abstract interface to handle creating coroutines for us. This class, PCodeOp,
-#  has two parts: first is a helper function (_node) to create a coroutine that waits for all of its input queues,
-# computes a function on the values, then writes that value on all of its output queues. You'll need to write this
-# function.
-
-# The second part is a set of functions corresponding to the type of nodes we find in FGIR. Each of these
-# are slightly different, but most do very little fancy stuff. We've provided most of them, but we'd like you to
-# write the libraryfunction method. It should be very similar to the librarymethod method. You should look back at
-# the .ref attribute of FGIR nodes if you're lost.
-
-# The second major part is constructing queues between all dependent nodes. We'll deal with this in two steps:
-# first, by iterating over all the edges in a flowgraph, creating a queue for each edge, and storing them in a table.
-
-# Second, when we iterate of all the nodes in the flowgraph, we'll pass these queues into the PCodeOp methods that
-# we wrote above. This will effectively link the queues to the coroutines.
-
-# All of this code will be run for us in a FlowgraphOptimization.
-
-
 class PCodeOp(object):
     '''A class interface for creating coroutines.
     This helps us keep track of valid computational elements. Every coroutine in
@@ -33,14 +11,15 @@ class PCodeOp(object):
 
     @staticmethod
     async def _node(in_qs, out_qs, func):
-        '''A helper function to create coroutines.
+        '''A helper function to create coroutines for every node in every flowgraph
+        create a coroutine that waits for all of its input queues, computes a function on the values,
+        then writes that value on all of its output queues
         `in_qs`: an ordered list of asyncio.Queues() which hold the node's inputs.
         `out_qs`: a list of asyncio.Queues() into which the function's output should go
         `func`: the function to apply to the inputs which produces the output value'''
         # hint: look at asyncio.gather
         # hint: the same return value of the function is put in every output queue
         alist = []
-        # TODO
 
         # create a coroutine that waits for all of its input queues
         for each in in_qs:
@@ -65,7 +44,6 @@ class PCodeOp(object):
     @staticmethod
     async def libraryfunction(in_qs, out_qs, function_ref):
         def f(*inputs):
-        # TODO
             return function_ref.__get__(inputs[0])(*inputs[1:])
         await PCodeOp._node(in_qs, out_qs, f)
 
@@ -126,6 +104,12 @@ class PCodeGenerator(FlowgraphOptimization):
         self.pcodes = {}
 
     def visit(self, flowgraph):
+        """
+        creates a queue between every pair of dependent nodes
+        iterate through all the nodes in the flowgraph and pass these queues into PCodeOp methods to link
+        queues to coroutines
+        All of this code will be run for us in a FlowgraphOptimization.
+        """
         pc = PCode()
 
         # Create asyncio queues for every edge
@@ -134,7 +118,6 @@ class PCodeGenerator(FlowgraphOptimization):
         qs = {} # { (src,dst)=>asyncio.Queue(), ... }
 
         # Populate qs by iterating over inputs of every node
-        # TODO
         # hint: destination nodes should be in flowgraph nodes
         # hint: sources are their inputs
         for nodeid, node in flowgraph.nodes.items():
