@@ -32,16 +32,17 @@ def ccor(ts1, ts2):
 
     # Get the values of the time series into a list
     ts1_p, ts2_p = list(ts1), list(ts2)
-    N = len(ts1_p) + len(ts2_p) - 1
+    # N = len(ts1_p) + len(ts2_p) - 1
 
     # Pad with zeros
-    ts1_p.extend([0.] * (N-len(ts1_p)))
-    ts2_p.extend([0.] * (N-len(ts2_p)))
+    # ts1_p.extend([0.] * (N-len(ts1_p)))
+    # ts2_p.extend([0.] * (N-len(ts2_p)))
 
     # print (ts1_p)
     # print (ts2_p)
     # Reverse the second time series
-    ts2_p = np.array(ts2_p[::-1])
+    # ts2_p = np.array(ts2_p[::-1])
+    ts2_p = np.array(ts2_p)
     ts1_p = np.array(ts1_p)
 
     print (ts2_p)
@@ -49,8 +50,9 @@ def ccor(ts1, ts2):
     # corr(a, b) = ifft(fft(a_and_zeros) * fft(b_and_zeros[reversed]))
     # print (type(nfft.fft(ts1_p) ))
     # print (type(nfft.fft(ts2_p)))
-    inter = nfft.fft(ts1_p) * nfft.fft(ts2_p)
+    inter = nfft.fft(ts1_p) * np.conjugate(nfft.fft(ts2_p))
     res = nfft.ifft( inter )
+    # res = res[len(ts1)-1:]
     print ((res))
     print(type(res))
     return res
@@ -61,8 +63,8 @@ def max_corr_at_phase(ts1, ts2):
     idx = np.argmax(ccorts)
     print ('Cand:', ccorts)
     print ('Size:', len(ccorts))
-    npc = np.correlate(ts1, ts2, 'full')
-    print ('NPCorr:', npc, 'Max:', max(npc))
+    npc = np.correlate(ts1, ts2, 'same')
+    print ('NPCorr:', npc, 'Max:', max(npc), 'Len:', len(npc), 'Arg:', np.argmax(npc))
     maxcorr = ccorts[idx]
     return idx, maxcorr
 
@@ -73,14 +75,16 @@ def rotate(l, x):
     return l[-x:] + l[:-x]
 
 def calcK(ts1, ts2, mult):
-    N = len(ts1)
-    res = 0.
-    for i in range(1, N+1):
-        y = np.array(rotate(list(ts2), i))
-        x = np.array(ts1)
-        res += np.exp( mult * np.inner(x, y) )
+    # N = len(ts1)
+    ret_c = np.sum( np.exp( mult * ccor(ts1, ts2) ) )
 
-    return res
+    # res = 0.
+    # for i in range(1, N+1):
+    #     y = np.array(rotate(list(ts2), i))
+    #     x = np.array(ts1)
+    #     res += np.exp( mult * np.inner(x, y) )
+
+    return ret_c
 
 #The equation for the kernelized cross correlation is given at
 #http://www.cs.tufts.edu/~roni/PUB/ecml09-tskernels.pdf
@@ -92,6 +96,9 @@ def kernel_corr(ts1, ts2, mult=1):
     Kx, Ky = calcK(ts1, ts1, mult), calcK(ts2, ts2, mult)
     print (ts1)
     print ('KxKy:', Kx, Ky)
+    cX = ccor(ts1, ts1)
+    # cX = np.correlate(ts1, ts1, 'full')
+    print ('XX', cX, 'Len:', len(cX), 'Argmax:', np.argmax(cX), 'Max:', max(cX))
     ret = calcK(ts1, ts2, mult)
     return ret / (np.sqrt(Kx * Ky))
 
