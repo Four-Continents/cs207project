@@ -38,7 +38,9 @@ class SymbolTableVisitor(ASTVisitor):
       # You may need to add class state to handle this.
 
 class LoweringVisitor(ASTModVisitor):
-  'Produces FGIR from an AST.'
+  """
+  Produces FGIR from an AST.
+  """
   def __init__(self,symtab):
     self.symtab = symtab
     self.ir = FGIR()
