@@ -2,12 +2,11 @@ language: python
 python:
     - "3.5"
 virtualenv:
-    system_site_packages: true
-
-SITE_PKG_DIR=$VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/site-packages
-rm -f $VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/no-global-site-packages.txt  
+    system_site_packages: true 
 
 before_install:
+    - SITE_PKG_DIR=$VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/site-packages
+    - rm -f $VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/no-global-site-packages.txt  
     - pip install pytest pytest-cov
     - pip install coveralls
     - pip install ply
