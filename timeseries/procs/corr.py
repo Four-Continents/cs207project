@@ -16,7 +16,7 @@ def proc_main(pk, row, arg):
     # for each row in our select/etc, standardize the time series
     stand_rowts = stand(row['ts'], row['ts'].mean(), row['ts'].std())
     # compute the normalozed kernelized cross-correlation
-    kerncorr = kernel_corr(stand_rowts, stand_argts, 5)
+    kerncorr = kernel_corr(stand_rowts, stand_argts, 1)
     # compute a distance from it.
     # The distance is given by np.sqrt(K(x,x) + K(y,y) - 2*K(x,y))
     # since we are normalized the autocorrs are 1

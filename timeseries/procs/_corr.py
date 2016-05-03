@@ -45,7 +45,7 @@ def ccor(ts1, ts2):
     ts2_p = np.array(ts2_p)
     ts1_p = np.array(ts1_p)
 
-    print (ts2_p)
+    # print (ts2_p)
 
     # corr(a, b) = ifft(fft(a_and_zeros) * fft(b_and_zeros[reversed]))
     # print (type(nfft.fft(ts1_p) ))
@@ -53,18 +53,18 @@ def ccor(ts1, ts2):
     inter = nfft.fft(ts1_p) * np.conjugate(nfft.fft(ts2_p))
     res = nfft.ifft( inter )
     # res = res[len(ts1)-1:]
-    print ((res))
-    print(type(res))
+    # print ((res))
+    # print(type(res))
     return res
 
 
 def max_corr_at_phase(ts1, ts2):
     ccorts = ccor(ts1, ts2)
     idx = np.argmax(ccorts)
-    print ('Cand:', ccorts)
-    print ('Size:', len(ccorts))
+    # print ('Cand:', ccorts)
+    # print ('Size:', len(ccorts))
     npc = np.correlate(ts1, ts2, 'same')
-    print ('NPCorr:', npc, 'Max:', max(npc), 'Len:', len(npc), 'Arg:', np.argmax(npc))
+    # print ('NPCorr:', npc, 'Max:', max(npc), 'Len:', len(npc), 'Arg:', np.argmax(npc))
     maxcorr = ccorts[idx]
     return idx, maxcorr
 
@@ -94,13 +94,13 @@ def kernel_corr(ts1, ts2, mult=1):
     "compute a kernelized correlation so that we can get a real distance"
     # your code here.
     Kx, Ky = calcK(ts1, ts1, mult), calcK(ts2, ts2, mult)
-    print (ts1)
-    print ('KxKy:', Kx, Ky)
+    # print (ts1)
+    # print ('KxKy:', Kx, Ky)
     cX = ccor(ts1, ts1)
     # cX = np.correlate(ts1, ts1, 'full')
-    print ('XX', cX, 'Len:', len(cX), 'Argmax:', np.argmax(cX), 'Max:', max(cX))
+    # print ('XX', cX, 'Len:', len(cX), 'Argmax:', np.argmax(cX), 'Max:', max(cX))
     ret = calcK(ts1, ts2, mult)
-    return ret / (np.sqrt(Kx * Ky))
+    return np.linalg.norm(ret) / np.linalg.norm((np.sqrt(Kx * Ky)))
 
 
 

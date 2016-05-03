@@ -60,6 +60,7 @@ class TSDBProtocol(asyncio.Protocol):
         # values from proc_main
         mod = import_module('procs.'+proc)
         storedproc = getattr(mod, 'proc_main')
+        # print ('Target:', target)
         results = []
         for pk in loids:
             row = self.server.db.rows[pk]

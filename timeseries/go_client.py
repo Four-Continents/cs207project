@@ -99,30 +99,54 @@ def main():
         print(k, results[k])
 
     # print('------now computing vantage point stuff---------------------')
-    # print("VPS", vpkeys)
+    print("VPS", vpkeys)
     #
     # # we first create a query time series.
-    # _, query = tsmaker(0.5, 0.2, 0.1)
+    _, query = tsmaker(0.5, 0.2, 0.1)
+    # query = tsdict['ts-6']
     #
     # # your code here begins
     #
     # # Step 1: in the vpdist key, get  distances from query to vantage points
     # # this is an augmented select
-    #
+    res = client.augmented_select('corr', ['dist'], query, {'vp': True})
+    print (res)
     # # 1b: choose the lowest distance vantage point
     # # you can do this in local code
-    #
+    d_res = res[1]
+    sorted_res = []
+    for k, v in d_res.items():
+        sorted_res.append( (v['dist'], k) )
+
+    sorted_res.sort()
+    D = sorted_res[0][0]
+    D_vp = vpkeys.index(sorted_res[0][1])
+    print (sorted_res, 'D = ', D)
+
     # # Step 2: find all time series within 2*d(query, nearest_vp_to_query)
     # # this is an augmented select to the same proc in correlation
-    #
+    res2 = client.augmented_select('corr', ['dist'], query, {'d_vp-{}'.format(D_vp): {'<=': 2*D}})
+    print (res2)
     # # 2b: find the smallest distance amongst this ( or k smallest)
+    d_res = res[1]
+    sorted_res = []
+    for k, v in d_res.items():
+        sorted_res.append( (v['dist'], k) )
+
+    sorted_res.sort()
+    D = sorted_res[0][0]
+    D_k = sorted_res[0][1]
+    print (sorted_res, 'D = ', D, 'D_k = ', D_k)
+    nearestwanted = D_k
     # # you can do this in local code
     # # your code here ends
     # # plot the timeseries to see visually how we did.
-    # import matplotlib.pyplot as plt
-    # plt.plot(query)
-    # plt.plot(tsdict[nearestwanted])
-    # plt.show()
+    import matplotlib
+    matplotlib.use('qt4agg')
+    import matplotlib.pyplot as plt
+    plt.plot(query, label='')
+    plt.plot(tsdict[nearestwanted])
+    plt.show()
 
 
 if __name__ == '__main__':
