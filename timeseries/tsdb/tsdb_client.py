@@ -2,6 +2,7 @@ import asyncio
 from .tsdb_serialization import serialize, LENGTH_FIELD_LENGTH, Deserializer
 from .tsdb_ops import *
 from .tsdb_error import *
+import time
 
 
 class TSDBClient(object):
@@ -19,15 +20,22 @@ class TSDBClient(object):
 
     def upsert_meta(self, primary_key, metadata_dict):
         json_dict = typemap["upsert_meta"](primary_key, metadata_dict).to_json()
+        print("C> msg", json_dict)
         msg = serialize(json_dict)
         self._send(msg)
         # your code here
 
-    def select(self, metadata_dict={}, fields=None):
-        json_dict = typemap["select"](metadata_dict, fields).to_json()
+    def select(self, metadata_dict={}, fields=None, additional=None):
+        json_dict = typemap["select"](metadata_dict, fields, additional).to_json()
         msg = serialize(json_dict)
         return self._send(msg)
         # YOUR CODE HERE
+
+    def augmented_select(self, proc, target, arg=None, metadata_dict={}, additional=None):
+        json_dict = typemap["augmented_select"](proc, target, arg, metadata_dict, additional).to_json()
+        msg = serialize(json_dict)
+        return self._send(msg)
+        # your code here
 
     def add_trigger(self, proc, onwhat, target, arg):
         json_dict = typemap["add_trigger"](proc, onwhat, target, arg).to_json()
@@ -58,11 +66,15 @@ class TSDBClient(object):
             data_json = deserializer.deserialize()
         status = data_json["status"]
         payload = data_json["payload"]
+        if payload is not None:
+            payload_keys = payload.keys()
+        else:
+            payload_keys = payload
         writer.close()
         print('C> status: ' + str(TSDBStatus(status)))
-        print('C> payload: ' + str(payload))
+        print('C> payload: ' + str(payload_keys))
         print('-----------')
-        print("writing")
+        # print("writing")
         # your code here - remember to figure out the async part
         return TSDBStatus(status), payload
 

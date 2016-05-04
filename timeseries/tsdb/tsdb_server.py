@@ -1,7 +1,7 @@
 import asyncio
 from .dictdb import DictDB
 from importlib import import_module
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from .tsdb_serialization import Deserializer, serialize
 from .tsdb_error import *
 from .tsdb_ops import *
@@ -41,12 +41,32 @@ class TSDBProtocol(asyncio.Protocol):
 
     def _select(self, op):
         "server function for select"
-        loids, fields = self.server.db.select(op['md'], op['fields'])
+        loids, fields = self.server.db.select(op['md'], op['fields'], op['additional'])
         self._run_trigger('select', loids)
         if fields is not None:
-            return TSDBOp_Return(TSDBStatus.OK, op['op'], dict(zip(loids, fields)))
+            d = OrderedDict(zip(loids, fields))
+            return TSDBOp_Return(TSDBStatus.OK, op['op'], d)
         else:
-            return TSDBOp_Return(TSDBStatus.OK, op['op'], {k: {} for k in loids})
+            d = OrderedDict((k, {}) for k in loids)
+            return TSDBOp_Return(TSDBStatus.OK, op['op'], d)
+
+    def _augmented_select(self, op):
+        "run a select and then synchronously run some computation on it"
+        loids, fields = self.server.db.select(op['md'], None, op['additional'])
+        proc = op['proc']  # the module in procs
+        arg = op['arg']  # an additional argument, could be a constant
+        target = op['target']  # not used to upsert any more, but rather to
+        # return results in a dictionary with the targets mapped to the return
+        # values from proc_main
+        mod = import_module('procs.'+proc)
+        storedproc = getattr(mod, 'proc_main')
+        # print ('Target:', target)
+        results = []
+        for pk in loids:
+            row = self.server.db.rows[pk]
+            result = storedproc(pk, row, arg)
+            results.append(dict(zip(target, result)))
+        return TSDBOp_Return(TSDBStatus.OK, op['op'], dict(zip(loids, results)))
 
     def _add_trigger(self, op):
         trigger_proc = op['proc']  # the module in procs
@@ -70,7 +90,7 @@ class TSDBProtocol(asyncio.Protocol):
 
     def _run_trigger(self, opname, rowmatch):
         lot = self.server.triggers[opname]
-        print("S> list of triggers to run", lot)
+        # print("S> list of triggers to run", lot)
         for tname, t, arg, target in lot:
             for pk in rowmatch:
                 row = self.server.db.rows[pk]
@@ -89,7 +109,7 @@ class TSDBProtocol(asyncio.Protocol):
         calls database functionality, gets results if appropriate (for select)\
         and bundles them back to the client.
         """
-        print('S> data received ['+str(len(data))+']: '+str(data))
+        # print('S> data received ['+str(len(data))+']: '+str(data))
         self.deserializer.append(data)
         if self.deserializer.ready():
             msg = self.deserializer.deserialize()
@@ -107,6 +127,8 @@ class TSDBProtocol(asyncio.Protocol):
                     response = self._upsert_meta(op)
                 elif isinstance(op, TSDBOp_Select):
                     response = self._select(op)
+                elif isinstance(op, TSDBOp_AugmentedSelect):
+                    response = self._augmented_select(op)
                 elif isinstance(op, TSDBOp_AddTrigger):
                     response = self._add_trigger(op)
                 elif isinstance(op, TSDBOp_RemoveTrigger):
@@ -130,6 +152,7 @@ class TSDBServer(object):
         self.port = port
         self.db = db
         self.triggers = defaultdict(list)  # for later
+        self.trigger_arg_cache = defaultdict(dict)
         self.autokeys = {}
 
     def exception_handler(self, loop, context):

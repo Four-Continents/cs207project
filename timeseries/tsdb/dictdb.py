@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from operator import and_
 from functools import reduce
 import operator
@@ -12,6 +12,18 @@ OPMAP = {
     '<=': operator.le,
     '>=': operator.ge
 }
+
+# Not using this code
+# def metafiltered(d, schema, fieldswanted):
+#     d2 = {}
+#     if len(fieldswanted) == 0:
+#         keys = [k for k in d.keys() if k != 'ts']
+#     else:
+#         keys = [k for k in d.keys() if k in fieldswanted]
+#     for k in keys:
+#         if k in schema:
+#             d2[k] = schema[k]['convert'](d[k])
+#     return d2
 
 
 class DictDB:
@@ -37,6 +49,7 @@ class DictDB:
         else:
             raise ValueError('Duplicate primary key found during insert')
         self.rows[pk]['ts'] = ts
+        # should below be a coroutine so we dont block?
         self.update_indices(pk)
 
     def upsert_meta(self, pk, meta):
@@ -49,7 +62,7 @@ class DictDB:
                 self.rows[pk][k] = v
         # your code here
         self.update_indices(pk)
-        print("S> D> ROW", self.rows[pk])
+        # print("S> D> ROW", self.rows[pk])
 
     def index_bulk(self, pks=[]):
         if len(pks) == 0:
@@ -79,36 +92,81 @@ class DictDB:
         else:
             return set(self.indexes[meta_variable][filter_v])
 
-    def select(self, meta, fields):
-        sel_values = set(self.rows.keys())
-        for meta_variable, filter_v in meta.items():
-            filtered_values = self._filter_data(meta_variable, filter_v, sel_values)
-            sel_values = sel_values & filtered_values
-        sel_values = list(sel_values)
+    def _sort_and_limit(self, select_keys, additional):
+        select_rows = {key: self.rows[key] for key in select_keys}
+        # sorting
+        if additional is not None:
+            if "sort_by" in additional:
+                if additional["sort_by"][0] == "+":
+                    isDescending = False
+                else:
+                    isDescending = True
+                ordered_select_rows = OrderedDict(sorted(select_rows.items(),
+                                                  key=lambda t:
+                                                  t[1][additional["sort_by"][1:]],
+                                                  reverse=isDescending))
+        else:
+            ordered_select_rows = select_rows
+        # limiting
+        if additional is not None:
+            if "limit" in additional:
+                select_keys_return = []
+                for i in range(additional["limit"]):
+                    select_keys_return.append(list(ordered_select_rows.keys())[i])
+            else:
+                select_keys_return = list(ordered_select_rows.keys())
+        else:
+            select_keys_return = list(ordered_select_rows.keys())
+        return select_keys_return
+
+    def select(self, meta, fields, additional):
+        # sanity checks on sort and limit criteria
+        if additional is not None:
+            add_keys = additional.keys()
+            if len([key for key in add_keys if key not in ["sort_by", "limit"]]) > 0:
+                raise ValueError('Currently support only sort and limit operations')
+            elif len(add_keys) > 2:
+                raise ValueError('Currently support only one sort and one limit operation')
+            elif "sort_by" in add_keys:
+                if not isinstance(additional["sort_by"], str):
+                    raise ValueError('Sort by field must be a string')
+                if additional["sort_by"][1:] not in self.schema.keys() or \
+                   self.schema[additional["sort_by"][1:]]["index"] is None:
+                    raise ValueError('Sort by field must exist in schema with index')
+        # Apply filters
+        select_values = set(self.rows.keys())
+        if meta is not None:
+            for meta_variable, filter_v in meta.items():
+                filtered_values = self._filter_data(meta_variable, filter_v, select_values)
+                select_values = select_values & filtered_values
+            select_values = list(select_values)
+        # sorting and limit
+        select_values = self._sort_and_limit(list(select_values), additional)
+        # choose fields to display
         if fields is None:
             print('S> D> NO FIELDS')
-            return sel_values, None
+            return select_values, None
         elif len(fields) == 0:
             print('S> D> ALL FIELDS')  # except for the 'ts' field
             field_return = []
-            for row in sel_values:
+            for row in select_values:
                 fields_to_pick = list(self.rows[row].keys())
                 fields_to_pick.remove('ts')
                 row_field = dict()
                 for k in fields_to_pick:
                     row_field[k] = self.rows[row][k]
                 field_return.append(row_field)
-            return sel_values, field_return
+            return select_values, field_return
         else:
-            print('S> D> FIELDS', fields, sel_values)
+            print('S> D> FIELDS', fields)
             field_return = []
-            for row in sel_values:
+            for row in select_values:
                 fields_to_pick = set(fields) & set(self.rows[row].keys())
                 row_field = dict()
                 for k in fields_to_pick:
                     row_field[k] = self.rows[row][k]
                 field_return.append(row_field)
-            return sel_values, field_return
+            return select_values, field_return
 
         # your code here
         # if fields is None: return only pks
@@ -120,4 +178,8 @@ class DictDB:
         # acceptable field and can be used to just return time series.
         # see tsdb_server to see how this return
         # value is used
-        # return pks, matchedfielddicts
+        # additional is a dictionary. It has two possible keys:
+        # (a){'sort_by':'-order'} or {'sort_by':'+order'} where order
+        # must be in the schema AND have an index. (b) limit: 'limit':10
+        # which will give you the top 10 in the current sort order.
+        # your code here
