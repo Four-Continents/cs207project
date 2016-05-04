@@ -1,0 +1,15 @@
+(import timeseries)
+
+{ mul
+    (input x y)
+    (:= z (* x y))
+    (output z)
+}
+{ mul6
+    (input a)
+    (:= m mul)
+    (:= b (mul a 2))
+    (:= c (mul a 4))
+    (:= d (+ b c))
+    (output d)
+}
