@@ -64,7 +64,8 @@ def p_declaration_list(p):
     r'''declaration_list : declaration_list declaration
                        | declaration'''
     if len(p) == 3:
-        p[0] = p[1].append(p[2])
+        p[1].append(p[2])
+        p[0] = p[1]
     else:
         p[0] = [p[1]]
 
@@ -143,13 +144,13 @@ def p_params_list(p):
         p[0] = [p[1]]
 
 
-# TODO: Write an error handling function. You should attempt to make the error
-#       message sensible. For instance, print out the line and column numbers to
-#       help find your error.
 # NOTE: You do NOT need to write production rules with error tokens in them.
 #       If you're interested, read section 6.8, but it requires a fairly deep
 #       understanding of LR parsers and the language specification.
 def p_error(p):
+    """
+    error handling function that prints out line number and column numbers of error location
+    """
     if p is None:
         print('Unexpected, EOF!')
     else:
