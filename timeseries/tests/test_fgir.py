@@ -57,9 +57,8 @@ def test_optimize_example0():
 def test_optimize_example1():
     optimize_file('example1.ppl')
 
-# def test_optimize_example1():
-#     optimize_file('six.ppl')
-
+def test_optimize_example1():
+    optimize_file('six.ppl')
 
 def topsort_validate(componentir, res):
     # Test whether top sorted list is correctly formed

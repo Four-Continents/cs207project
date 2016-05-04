@@ -9,8 +9,9 @@ class TSDBClient(object):
     """
     The client. This could be used in a python program, web server, or REPL!
     """
-    def __init__(self, port=9999):
+    def __init__(self, port=9999, test=False):
         self.port = port
+        self.test = test
 
     def insert_ts(self, primary_key, ts):
         json_dict = typemap["insert_ts"](primary_key, ts).to_json()
@@ -51,7 +52,9 @@ class TSDBClient(object):
 
     # Feel free to change this to be completely synchronous
     # from here onwards. Return the status and the payload
-    async def _send_coro(self, msg, loop):
+    async def _send_coro(self, msg, loop, test=False):
+        if self.test:
+            return TSDBStatus(0), {}
         # set up connection with server
         reader, writer = await asyncio.open_connection('localhost', self.port, loop=loop)
         # send data across
