@@ -1,9 +1,9 @@
 import timeseries as ts
 import numpy as np
 import time
-import matplotlib
-matplotlib.use('qt4agg')
-import matplotlib.pyplot as plt
+# import matplotlib
+# matplotlib.use('qt4agg')
+# import matplotlib.pyplot as plt
 
 from procs._corr import *
 
@@ -16,8 +16,8 @@ def test_vp_random():
 
     print(t1.times)
     print(t1.values)
-    plt.plot(t1.times, t1.values)
-    plt.plot(t2.times, t2.values)
+    # plt.plot(t1.times, t1.values)
+    # plt.plot(t2.times, t2.values)
     # plt.plot([1, 3, 5], [10, 12, 18])
     # plt.show()
     standts1 = stand(t1, t1.mean(), t1.std())
@@ -31,8 +31,8 @@ def test_vp_random():
 def test_vp_random2():
     t3 = random_ts(2)
     t4 = random_ts(3)
-    plt.plot(t3)
-    plt.plot(t4)
+    # plt.plot(t3)
+    # plt.plot(t4)
     # plt.show()
     standts3 = stand(t3, t3.mean(), t3.std())
     standts4 = stand(t4, t4.mean(), t4.std())
