@@ -18,7 +18,7 @@ schema = {
 
 
 def test_db_init():
-    client = TSDBClient(25000)
+    client = TSDBClient(25000, test=True)
     assert client.port == 25000
     return client
 
@@ -26,21 +26,22 @@ def test_db_init():
 # def set_up_server():
 #     db = DictDB(schema, 'pk')
 #     server = TSDBServer(db, 25000)
-#     server.run()
+#     return server
 
-
-# def test_client():
-#     client = test_db_init()
-#     # test adding triggers
-#     client.add_trigger('junk', 'insert_ts', None, 23)
-#     # test insert
-#     client.insert_ts('one', ts.TimeSeries([1, 2, 3], [1, 4, 9]))
-#     # test removing triggers
-#     client.remove_trigger('junk', 'insert_ts')
-#     # test upsert
-#     client.upsert_meta('one', {'order': 1, 'blarg': 1})
-#     # test select
-#     assert client.select({'order': 1, 'blarg': 1}) == "(<TSDBStatus.OK: 0>, {'one': {}})"
+# does not actually send and receive messages from the server.
+# Its just a mock test for now.
+def test_client():
+    client = test_db_init()
+    # test adding triggers
+    assert client.add_trigger('junk', 'insert_ts', None, 23) is None
+    # test insert
+    assert client.insert_ts('one', ts.TimeSeries([1, 2, 3], [1, 4, 9])) is None
+    # test removing triggers
+    assert client.remove_trigger('junk', 'insert_ts') is None
+    # test upsert
+    assert client.upsert_meta('one', {'order': 1, 'blarg': 1}) is None
+    # test select
+    assert client.select({'order': 1, 'blarg': 1}) == (TSDBStatus(0), {})
 
 # set_up_server()
 # test_client()
