@@ -94,8 +94,8 @@ class ASTComponent(ASTNode):
         super().__init__()
         self.children = [name] + expressions
 
-     # NOTE this allows you to print .p without () or without exposing property. Advantage: disallows user to set attribute
-     # use name.setter to allow setting with some checking or other auxiliary functions like setting parent to self
+        # NOTE this allows you to print .p without () or without exposing property. Advantage: disallows user to set attribute
+        # use name.setter to allow setting with some checking or other auxiliary functions like setting parent to self
     @property
     def name(self):
         return self.children[0]
