@@ -60,7 +60,6 @@ def test_optimize_example1():
 def test_optimize_example1():
     optimize_file('six.ppl')
 
-
 def topsort_validate(componentir, res):
     # Test whether top sorted list is correctly formed
     # There are multiple possible valid lists (which are not deterministically generated)
