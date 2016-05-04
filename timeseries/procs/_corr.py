@@ -22,7 +22,6 @@ def random_ts(a):
 def stand(x, m, s):
     return (x-m)/s
 
-
 def ccor(ts1, ts2):
     "given two standardized time series, compute their cross-correlation using FFT"
     # your code here
@@ -55,6 +54,10 @@ def ccor(ts1, ts2):
     # res = res[len(ts1)-1:]
     # print ((res))
     # print(type(res))
+    # print ('ts1:', ts1_p, np.mean(ts1_p))
+    # print ('ts2:', ts2_p, np.mean(ts2_p))
+    # print ('IP:', np.inner(ts1_p, ts1_p))
+    # print ('FFT_res:', res)
     return res
 
 
@@ -108,38 +111,38 @@ def kernel_corr(ts1, ts2, mult=1):
 
 #this is for a quick and dirty test of these functions
 # you might need to add procs to pythonpath for this to work
-if __name__ == "__main__":
-    print("HI")
-    _, t1 = tsmaker(0.5, 0.1, 0.01)
-    _, t2 = tsmaker(0.5, 0.1, 0.01)
-    print(t1.mean(), t1.std(), t2.mean(), t2.std())
-
-    import matplotlib
-    matplotlib.use('qt4agg')
-    import matplotlib.pyplot as plt
-
-    print(t1.times)
-    print(t1.values)
-    plt.plot(t1.times, t1.values)
-    plt.plot(t2.times, t2.values)
-    # plt.plot([1, 3, 5], [10, 12, 18])
-    # plt.show()
-    standts1 = stand(t1, t1.mean(), t1.std())
-    standts2 = stand(t2, t2.mean(), t2.std())
-
-    idx, mcorr = max_corr_at_phase(standts1, standts2)
-    print(idx, mcorr)
-
-    sumcorr = kernel_corr(standts1, standts2, mult=1)
-    print(sumcorr)
-    t3 = random_ts(2)
-    t4 = random_ts(3)
-    plt.plot(t3)
-    plt.plot(t4)
-    plt.show()
-    standts3 = stand(t3, t3.mean(), t3.std())
-    standts4 = stand(t4, t4.mean(), t4.std())
-    idx, mcorr = max_corr_at_phase(standts3, standts4)
-    print(idx, mcorr)
-    sumcorr = kernel_corr(standts3, standts4, mult=1)
-    print(sumcorr)
+# if __name__ == "__main__":
+#     print("HI")
+#     _, t1 = tsmaker(0.5, 0.1, 0.01)
+#     _, t2 = tsmaker(0.5, 0.1, 0.01)
+#     print(t1.mean(), t1.std(), t2.mean(), t2.std())
+#
+#     import matplotlib
+#     matplotlib.use('qt4agg')
+#     import matplotlib.pyplot as plt
+#
+#     print(t1.times)
+#     print(t1.values)
+#     plt.plot(t1.times, t1.values)
+#     plt.plot(t2.times, t2.values)
+#     # plt.plot([1, 3, 5], [10, 12, 18])
+#     # plt.show()
+#     standts1 = stand(t1, t1.mean(), t1.std())
+#     standts2 = stand(t2, t2.mean(), t2.std())
+#
+#     idx, mcorr = max_corr_at_phase(standts1, standts2)
+#     print(idx, mcorr)
+#
+#     sumcorr = kernel_corr(standts1, standts2, mult=1)
+#     print(sumcorr)
+#     t3 = random_ts(2)
+#     t4 = random_ts(3)
+#     plt.plot(t3)
+#     plt.plot(t4)
+#     plt.show()
+#     standts3 = stand(t3, t3.mean(), t3.std())
+#     standts4 = stand(t4, t4.mean(), t4.std())
+#     idx, mcorr = max_corr_at_phase(standts3, standts4)
+#     print(idx, mcorr)
+#     sumcorr = kernel_corr(standts3, standts4, mult=1)
+#     print(sumcorr)
