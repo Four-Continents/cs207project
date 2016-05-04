@@ -673,8 +673,12 @@ class TimeSeries(object):
 
 
 if __name__ == '__main__':
-    import lazy as lz
+    from lazy import lazy as lz
     dtest(TimeSeries, globals(), verbose=True)
-
 else:
-     import timeseries.lazy as lz
+    import timeseries.lazy as lz
+
+try:
+    __version__ = pkg_resources.get_distribution(__name__).version
+except:
+    __version__ = 'unknown'

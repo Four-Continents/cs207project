@@ -21,7 +21,7 @@ import argparse
 import sys
 import logging
 
-from timeseries import __version__
+from .timeseries import __version__
 
 __author__ = "vinayps"
 __copyright__ = "vinayps"

@@ -1,4 +1,5 @@
 from .timeseries import *
+from .lazy import *
 import pkg_resources
 
 try:

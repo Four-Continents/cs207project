@@ -13,17 +13,17 @@ OPMAP = {
     '>=': operator.ge
 }
 
-
-def metafiltered(d, schema, fieldswanted):
-    d2 = {}
-    if len(fieldswanted) == 0:
-        keys = [k for k in d.keys() if k != 'ts']
-    else:
-        keys = [k for k in d.keys() if k in fieldswanted]
-    for k in keys:
-        if k in schema:
-            d2[k] = schema[k]['convert'](d[k])
-    return d2
+# Not using this code
+# def metafiltered(d, schema, fieldswanted):
+#     d2 = {}
+#     if len(fieldswanted) == 0:
+#         keys = [k for k in d.keys() if k != 'ts']
+#     else:
+#         keys = [k for k in d.keys() if k in fieldswanted]
+#     for k in keys:
+#         if k in schema:
+#             d2[k] = schema[k]['convert'](d[k])
+#     return d2
 
 
 class DictDB:
@@ -128,6 +128,8 @@ class DictDB:
             elif len(add_keys) > 2:
                 raise ValueError('Currently support only one sort and one limit operation')
             elif "sort_by" in add_keys:
+                if not isinstance(additional["sort_by"], str):
+                    raise ValueError('Sort by field must be a string')
                 if additional["sort_by"][1:] not in self.schema.keys() or \
                    self.schema[additional["sort_by"][1:]]["index"] is None:
                     raise ValueError('Sort by field must exist in schema with index')
