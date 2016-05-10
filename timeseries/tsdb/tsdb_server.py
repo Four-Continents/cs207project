@@ -18,6 +18,9 @@ def trigger_callback_maker(pk, target, calltomake):
 
 
 class TSDBProtocol(asyncio.Protocol):
+    """
+    to run server: PYTHONPATH=. python -m tsdb.tsdb_server from parent directory
+    """
     def __init__(self, server):
         self.server = server
         self.deserializer = Deserializer()
@@ -180,7 +183,11 @@ class TSDBServer(object):
             listener.close()
             loop.close()
 
+
 if __name__ == '__main__':
-    empty_schema = {'pk': {'convert': lambda x: x, 'index': None}}
+    empty_schema = {
+        'pk': {'convert': lambda x: x, 'index': None},
+        'ts': {'convert': lambda x: x, 'index': None},
+    }
     db = DictDB(empty_schema, 'pk')
     TSDBServer(db).run()
