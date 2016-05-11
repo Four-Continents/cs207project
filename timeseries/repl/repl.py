@@ -16,62 +16,23 @@ from .ast import AST_proc
 
 class DumbREPL(cmd.Cmd):
     """
-    DEMO - show help function (help) shows docstrings
+    TODO
+    tests
+    docstrings for everything
+    clean up code and defensive coding checks
+    prepare demo, understand! (ply vs. hand parsers)
+    leverage from json parser - in ply would have required delimiters to wrap, then would have had to define lexer
+    to understand escaping to deal with delimiters
+    upsert - hand hack index and
+    two approach in ply:
+    1) write JSON grammar with all the productions and understand all of JSON. JSON dict and key-value pairs
+    2) alternative use delimiters to send a raw string to ply, then do json loads in parser to parse everything in the
+    delimiter, but then have to deal with escaping or have to specify in the docs can't include that delimiter which
+    restricts users from using certain json values
 
-    Must run server first
+    with upsert, just defined syntax to just chop off beginning and do JSON loads.
 
-    re-prepend first word back after get it
-    instantiate a lexer and pull out pieces (using ply)
-    then pass through to tsdb_client.py
-    start wtih really simple dumb thing...like list of integers
-    can define own things like dump
-    just use dumb hand coded parsers... simple languages. Get it simple things. Can add fancier things
-    integrate ply to have fancier grammar
-    dumb command: insert takes a list.
-
-    insert [1, 2, 3, ... ] into whatever;
-    dump whatever; # print all the points (will do a select)
-
-    select field1, field2, ... from whatever;
-    slice out fields part from select statements, do string split, these become field names
-    select has a fields argument, and by default Fields gets None, pass list of fields into fields
-
-    select ... from whatever order by f1 (order by becomes the additional argument, is the sorting key
-    select ... from whatever order by f1 {"sort_by": "+f1"} - see documention of select of dictdb.py
-
-    select ... from whatever order by f1 limit 10. see docs at bottom of dictdb.py
-
-    in order to get self off the ground in simplest way possible, write REPL so first it instantiates client
-    then inserts some hardcoded data by using insert from client
-    then starts command loop
-    then command loop will implement one command just dump, because simplest
-    that way don't have write insert parser first
-
-    in main, will connect to a server
-    REPL: separately start a server process, start REPL,then point it to server address (port)
-    tsdb_server.py see in main of tsdb_server.py, runs on localhost
-    start server, then start REPL
-    or write a shell script that starts server, then starts REPL
-    or just have user start server, then have user start up REPL
-
-    Parts
-    1. write a parser for command language (cmd.cmd looks at first word of command line, dispatches to methods do_...method)
-    in parser, going to want to write something that can parse the rest of the comamnd
-    see parser.py - what do I want my command language to look like.
-    1. Writing parser for command language, 2. hooking up REPL to the tsdb_client.py
-    Make it SQL-like. Dumb easier parse variant of SQL SELECT FROM TIMESERIES NAME
-    understand functions offered by TSDB. One command for each of TSDB Client API, 1 command type for each
-    make up syntax for how to do arguments
-    insert_ts takes primary key and time series... see Google Hangout
-    Write pype grammar
-    Set up separate module for Pype - set up lexer and parser.py
-    set up one directory for REPL
-    do one command at a time. Do insert and select
-    instantiate lexer and parser
-    lexer, parser, repl that uses cmd
-
-    Can only use insert_ts, upsert_meta, select
-    maybe augmented_select - procedures??
+    select, helpful to have ply, because pretty complicated custom syntax
     """
     def __init__(self, client):
         super(DumbREPL, self).__init__()
