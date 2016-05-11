@@ -7,6 +7,10 @@ reserved = { # pattern : token-name
              'into': 'INTO',
              'select': 'SELECT',
              'from': 'FROM',
+             'order': 'ORDER',
+             'by': 'BY',
+             'asc': 'ASC',
+             'desc': 'DESC'
              }
 
 # 'tokens' is a special word in ply's lexers.

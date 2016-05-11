@@ -124,6 +124,8 @@ class DumbREPL(cmd.Cmd):
         ast = self.parser.parse('insert ' + arg, lexer=lex)
         print(ast)
 
+        self.print('OK!')
+
     def do_select(self, arg):
         lex = lexer.new_lexer()
         ast = self.parser.parse('select ' + arg, lexer=lex)
@@ -131,10 +133,24 @@ class DumbREPL(cmd.Cmd):
             fields = ast.exprs
         else:
             fields = []
-        self.print_select_result(self.client.select(metadata_dict={'pk': ast.pk}, fields=fields))
+
+        if ast.pk:
+            metadata_dict = {'pk': ast.pk}
+        else:
+            metadata_dict = None
+
+        if ast.orderby:
+            # + for ascending, - for descending
+            if ast.ascending:
+                additional = {'sort_by': '+' + ast.orderby}
+            else:
+                additional = {'sort_by': '-' + ast.orderby}
+        else:
+            additional = None
+
+        self.print_select_result(self.client.select(metadata_dict=metadata_dict, fields=fields, additional=additional))
 
     def do_dump(self, arg):
-        # TODO make printing better
         self.print_select_result(self.client.select(fields=['ts']))
 
     def do_upsert(self, arg):
@@ -167,6 +183,7 @@ class DumbREPL(cmd.Cmd):
 if __name__ == '__main__':
     client = TSDBClient()
     r = DumbREPL(client)
-    r.onecmd("insert [1,2,3] @ [4, 5, 6] into something")
+    r.onecmd("insert [1,2,3] @ [4, 5, 6] into tabby")
+    r.onecmd("insert [8,9,10] @ [11, 12, 13] into ginger")
     r.cmdloop()
 

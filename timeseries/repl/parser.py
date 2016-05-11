@@ -8,15 +8,25 @@ def p_insert_command(p):
     p[0] = AST_insert(p[6], p[4], p[2])
 
 
-def p_select_command(p):
+def p_select_from(p):
     r'''command : SELECT FROM ID
                 | SELECT expr_list FROM ID'''
     if len(p) == 4:
-        p[0] = AST_select(p[3])
+        p[0] = AST_select(pk=p[3])
     elif len(p) == 5:
-        p[0] = AST_select(p[4], exprs=p[2])
+        p[0] = AST_select(pk=p[4], exprs=p[2])
     else:
         raise SyntaxError
+
+
+def p_select_multi(p):
+    r'''command : SELECT expr_list ORDER BY ID
+                | SELECT expr_list ORDER BY ID ASC
+                | SELECT expr_list ORDER BY ID DESC'''
+    if len(p) == 6:
+        p[0] = AST_select(exprs=p[2], orderby=p[5])
+    else:
+        p[0] = AST_select(exprs=p[2], orderby=p[5], ascending=(p[6]=='ASC'))
 
 
 def p_bracketed_number_list(p):

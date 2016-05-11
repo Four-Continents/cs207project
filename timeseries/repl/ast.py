@@ -29,7 +29,10 @@ class AST_ID():
 
 class AST_select():
     """
+    default is to sort in ascending order when orderby is not none
     """
-    def __init__(self, pk, exprs=None):
+    def __init__(self, pk=None, exprs=None, orderby=None, ascending=True):
         self.pk = pk
         self.exprs = exprs or []
+        self.orderby = orderby
+        self.ascending = ascending
