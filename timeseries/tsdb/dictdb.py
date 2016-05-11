@@ -95,26 +95,22 @@ class DictDB:
     def _sort_and_limit(self, select_keys, additional):
         select_rows = {key: self.rows[key] for key in select_keys}
         # sorting
-        if additional is not None:
-            if "sort_by" in additional:
-                if additional["sort_by"][0] == "+":
-                    isDescending = False
-                else:
-                    isDescending = True
-                ordered_select_rows = OrderedDict(sorted(select_rows.items(),
-                                                  key=lambda t:
-                                                  t[1][additional["sort_by"][1:]],
-                                                  reverse=isDescending))
+        if additional is not None and "sort_by" in additional:
+            if additional["sort_by"][0] == "+":
+                isDescending = False
+            else:
+                isDescending = True
+            ordered_select_rows = OrderedDict(sorted(select_rows.items(),
+                                              key=lambda t:
+                                              t[1][additional["sort_by"][1:]],
+                                              reverse=isDescending))
         else:
             ordered_select_rows = select_rows
         # limiting
-        if additional is not None:
-            if "limit" in additional:
-                select_keys_return = []
-                for i in range(additional["limit"]):
-                    select_keys_return.append(list(ordered_select_rows.keys())[i])
-            else:
-                select_keys_return = list(ordered_select_rows.keys())
+        if additional is not None and "limit" in additional:
+            select_keys_return = []
+            for i in range(additional["limit"]):
+                select_keys_return.append(list(ordered_select_rows.keys())[i])
         else:
             select_keys_return = list(ordered_select_rows.keys())
         return select_keys_return
