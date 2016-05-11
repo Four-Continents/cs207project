@@ -186,7 +186,7 @@ class TSDBServer(object):
 
 if __name__ == '__main__':
     empty_schema = {
-        'pk': {'convert': lambda x: x, 'index': None},
+        'pk': {'convert': lambda x: x, 'index': 1},
         'ts': {'convert': lambda x: x, 'index': None},
     }
     db = DictDB(empty_schema, 'pk')
