@@ -1,3 +1,4 @@
+
 \documentclass[11pt]{article}
 \usepackage{fullpage,amsmath,amsfonts,mathpazo,microtype,nicefrac}
 \usepackage{graphicx}
@@ -56,7 +57,7 @@ As a first step, we implemented a K-means clustering algorithm using Numpy. The 
 		\end{figure}
 \noindent The process starts by randomly sampling the cluster centers. Next, the points are assigned to each cluster using the minimum Euclidean distance and the centers are then re-evaluated. A while loop is used to ensure the process is iterative until the cluster barycentre's do not update anymore and remain the same.\\
 
-\noindent To ensure validity of the algorithm, random data (of size 5000) is generated and the K-means naive implementation results are compared to the Scikit-Learn results\footnote{Example taken from:http://scikit-learn.org/stable/auto-examples/cluster/plot-mini-batch-kmeans.html}, which are plotted in figure \ref{results}. The results from the naively implemented algorithm are similar to the sklearn packages results. We must note that the sklearn algorithm includes two implementation: The Kmeans and MiniBatch Kmeans, which differences will be discussed later on.
+\noindent To ensure validity of the algorithm, random data (of size 5000) is generated and the K-means naive implementation results are compared to the Scikit-Learn results\footnote{Example taken from:http://scikit-learn.org/stable/auto-examples/cluster/plot-mini-batch-kmeans.html}, which are plotted in figure \ref{results}. We must note that the sklearn algorithm includes two implementation: The Kmeans and MiniBatch Kmeans, which differences will be discussed later on.
 
 	\begin{figure}[ht!] 
 		\centering
@@ -67,9 +68,24 @@ As a first step, we implemented a K-means clustering algorithm using Numpy. The 
 
 \section*{Comparison}
 
-We compare the performance of our naive implemented algorithm and the Scikit-Learn module on a several randomly generated datasets of increasing size. Our naive implementation is inherently slower as illustrated in the figure\ref{comp} below: \\
+We compare the performance of our naively implemented algorithm and the Scikit-Learn modules (both KMeans and MiniBatch KMeans) on several randomly generated datasets of increasing size. To ensure consistency in our comparison, we initialize all input similarly: The standard deviation is equal across each clustering, three clusters are generated and the batch size is always 45 for the miniBatch algorithm. A discussion of the best input parameter is  beyond the score of the paper.  Our naive implementation is inherently slower, and the difference grows exponentially with the size of the dataset,  as illustrated in the figure \ref{comp} below. Two figures are shown as the full figure on the left hand side does not clearly illustrate the difference in time for smaller datasets due to its scale.
 
-MISSING FIGURE TO ADD
+\begin{figure}[h!]
+	\centering 
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\textwidth]{Figures/Comparison2.png}
+		\caption{Small datasets}
+	\end{subfigure}
+	\quad
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\textwidth]{Figures/Comparison.png}
+		\caption{Bigger Datasets}
+	\end{subfigure} 
+	\caption{Comparison between Naive Implementation and Scikit K-Means}
+	\label{comp}
+\end{figure}
+
+	
 
 \section*{Optimization}
 When comparing both Scikit-Learn implementations, which primary module is \verb|k_means_.py|, with our naive Python implementation, their performance has clearly been more efficient.
@@ -94,8 +110,23 @@ Cython is an optimising static compiler that creates an interface between Python
 \subsection*{Mini Batch Kmeans}
 The MiniBatchKMeans is a different version of the KMeans algorithm which uses the same function to be minimized but samples subsets of the input data to reduce the computation time. These subsets are called mini-batches, and are randomly sampled in each iteration. The MiniBatchKmeans algorithm steps are as follows: Samples are extracted from the dataset (this is a mini-batch) and are allocated to the closest centroid. The centroids are then updated but each sample. As explained in the Scikit Learn documentation\footnote{SKLearn Clustering Documentation: http://scikit-learn.org/stable/modules/clustering.html}:
 "For each sample in the mini-batch, the assigned centroid is updated by taking the streaming average of the sample and all previous samples assigned to that centroid". 
-This leads to a important decrease in the rate of change for a centroid over time. This algorithm therefore converges faster than the standard KMeans as the amount of computation that leads to a local minimum converges is diminished.\\
+This leads to a important decrease in the rate of change for a centroid over time. This algorithm therefore converges faster than the standard KMeans as the amount of computation that leads to a local minimum converges is diminished. The difference in convergence time is negligible for small datasets ($\leq 10^5$), as seen in figure \ref{minibatch} but becomes drastic when the size increases, as seen in figure \ref{minibatch2}.\\
 
+\begin{figure}[h!]
+	\centering 
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\textwidth]{Figures/minibatch.png}
+		\caption{Small datasets}
+		\label{minibatch}
+	\end{subfigure}
+	\quad
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\textwidth]{Figures/minibatch2.png}
+		\caption{Bigger Datasets}
+			\label{minibatch2}
+	\end{subfigure} 
+	\caption{Mini Batch KMeans Agorithm Convergence time}
+\end{figure}
 \noindent We must however note that convergence time is reduced at a certain cost: The mini batch KMeans results are slightly worse than the ones generated by KMeans.
 
 
