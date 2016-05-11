@@ -11,7 +11,8 @@ reserved = { # pattern : token-name
              'by': 'BY',
              'asc': 'ASC',
              'desc': 'DESC',
-             'limit': 'LIMIT'
+             'limit': 'LIMIT',
+             'as': 'AS',
              }
 
 # 'tokens' is a special word in ply's lexers.
@@ -21,6 +22,8 @@ tokens = [
              'ID', # a sequence of letters, numbers, and underscores. Must not start with a number.
              'AT', # for timeseries timestamps associated with values
              'COMMA', # to separate items in lists
+             'LPAREN',
+             'RPAREN',
          ] + list(reserved.values())
 
 t_LBRACK = r'\['
@@ -28,6 +31,8 @@ t_RBRACK = r'\]'
 t_NUMBER = r'[0-9]+'
 t_AT = r'@'
 t_COMMA = r','
+t_LPAREN = r'\('
+t_RPAREN = r'\)'
 
 t_ignore = '\t '
 

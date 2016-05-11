@@ -31,9 +31,18 @@ class AST_select():
     """
     default is to sort in ascending order when orderby is not none
     """
-    def __init__(self, pk=None, exprs=None, orderby=None, ascending=True, limit=None):
+    def __init__(self, pk=None, selector=None, orderby=None, ascending=True, limit=None):
         self.pk = pk
-        self.exprs = exprs or []
+        self.selector = selector or []
         self.orderby = orderby
         self.ascending = ascending
         self.limit = limit
+
+
+class AST_proc():
+    """
+    for stored procedure calls
+    """
+    def __init__(self, id, targets):
+        self.id = id
+        self.targets = targets

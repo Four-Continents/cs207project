@@ -2,6 +2,7 @@
 
 import cmd
 import sys
+import re
 from . import lexer
 from . import parser
 from tsdb.tsdb_client import TSDBClient
@@ -9,6 +10,7 @@ from tsdb.tsdb_error import TSDBStatus
 import timeseries as ts
 import json
 from collections import OrderedDict
+from .ast import AST_proc
 
 # https://docs.python.org/3/library/cmd.html#cmd.Cmd.cmdloop
 
@@ -126,10 +128,15 @@ class DumbREPL(cmd.Cmd):
             print('Error!')
             return
 
-
         self.print('OK!')
 
     def do_select(self, arg):
+        """
+        TODO see console for command used
+
+        look in procs directory for available procs
+            - stats(): returns means and std
+        """
         lex = lexer.new_lexer()
 
         ast = self.parser.parse('select ' + arg, lexer=lex)
@@ -137,11 +144,6 @@ class DumbREPL(cmd.Cmd):
         if ast is None:
             print('Error!')
             return
-
-        if ast.exprs:
-            fields = ast.exprs
-        else:
-            fields = []
 
         if ast.pk:
             metadata_dict = {'pk': ast.pk}
@@ -159,21 +161,62 @@ class DumbREPL(cmd.Cmd):
         if ast.limit is not None:
             additional['limit'] = ast.limit
 
-        self.print_select_result(self.client.select(
-            metadata_dict=metadata_dict,
-            fields=fields,
-            additional=(additional or None))
-        )
+        if isinstance(ast.selector, AST_proc):
+            self.print_select_result(self.client.augmented_select(
+                proc=ast.selector.id,
+                target=ast.selector.targets,
+                metadata_dict=metadata_dict,
+                additional=(additional or None))
+            )
+        else:
+            if ast.selector:
+                fields = ast.selector
+            else:
+                fields = []
+
+            self.print_select_result(self.client.select(
+                    metadata_dict=metadata_dict,
+                    fields=fields,
+                    additional=(additional or None))
+                    )
 
     def do_dump(self, arg):
         self.print_select_result(self.client.select(fields=['ts']))
 
     def do_upsert(self, arg):
         """
-        insert if primary key doesn't exist
-        update if primary key does exist
+        UPSERT pk {'hi': 'bye'}
+
+        NOT case insensitive
+
+        attaches metadata to an existing TimeSeries
+        dict keys must be strings
         """
-        pass
+        arg = arg.strip()
+
+        try:
+            firstbrace_idx = arg.index('{')
+        except ValueError:
+            self.print('Bad syntax!')
+            return
+
+        json_str = arg[firstbrace_idx:]
+
+        try:
+            d = json.loads(json_str)
+        except json.decoder.JSONDecodeError:
+            self.print('Bad syntax!')
+            return
+
+        pk = arg[:firstbrace_idx].strip()
+        if not pk:
+            self.print('Bad syntax!')
+            return
+
+        self.client.upsert_meta(pk, d)
+
+        self.print('OK!')
+
 
     def print_select_result(self, result):
         status, payload = result
@@ -191,9 +234,6 @@ class DumbREPL(cmd.Cmd):
                 else:
                     self.print('   ', vkey, ': ', vvalues)
 
-
-
-    # TODO do augmented select
 
 if __name__ == '__main__':
     client = TSDBClient()
