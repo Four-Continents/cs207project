@@ -107,12 +107,13 @@ class DictDB:
         else:
             ordered_select_rows = select_rows
         # limiting
+        a = list(ordered_select_rows.keys())
         if additional is not None and "limit" in additional:
             select_keys_return = []
-            for i in range(additional["limit"]):
-                select_keys_return.append(list(ordered_select_rows.keys())[i])
+            for i in range(min(len(a), additional["limit"])):
+                select_keys_return.append(a[i])
         else:
-            select_keys_return = list(ordered_select_rows.keys())
+            select_keys_return = a
         return select_keys_return
 
     def select(self, meta, fields, additional):
