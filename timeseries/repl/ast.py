@@ -25,3 +25,11 @@ class AST_ID():
     """
     def __init__(self, id):
         self.id = id
+
+
+class AST_select():
+    """
+    """
+    def __init__(self, pk, exprs=None):
+        self.pk = pk
+        self.exprs = exprs or []

@@ -5,6 +5,8 @@ import ply.lex
 reserved = { # pattern : token-name
              'insert': 'INSERT',
              'into': 'INTO',
+             'select': 'SELECT',
+             'from': 'FROM',
              }
 
 # 'tokens' is a special word in ply's lexers.
@@ -30,6 +32,11 @@ def t_ID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
     t.type = reserved.get(t.value, t.type)    # Check for reserved words
     return t
+
+
+# Error handling rule
+def t_error(t):
+    print("Error: %r" % t)
 
 
 def new_lexer():

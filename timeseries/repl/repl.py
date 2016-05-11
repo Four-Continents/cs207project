@@ -5,8 +5,10 @@ import sys
 from . import lexer
 from . import parser
 from tsdb.tsdb_client import TSDBClient
+from tsdb.tsdb_error import TSDBStatus
 import timeseries as ts
 import json
+from collections import OrderedDict
 
 # https://docs.python.org/3/library/cmd.html#cmd.Cmd.cmdloop
 
@@ -73,6 +75,7 @@ class DumbREPL(cmd.Cmd):
         super(DumbREPL, self).__init__()
         self.client = client
         self.print = print
+        self.parser = parser.new_parser()
 
     def do_hello(self, arg):
         arg_list = [a for a in arg.split(' ') if a.strip() != '']
@@ -118,13 +121,21 @@ class DumbREPL(cmd.Cmd):
 
     def do_newinsert(self, arg):
         lex = lexer.new_lexer()
-        par = parser.new_parser()
-        ast = par.parse('insert ' + arg, lexer=lex)
+        ast = self.parser.parse('insert ' + arg, lexer=lex)
         print(ast)
+
+    def do_select(self, arg):
+        lex = lexer.new_lexer()
+        ast = self.parser.parse('select ' + arg, lexer=lex)
+        if ast.exprs:
+            fields = ast.exprs
+        else:
+            fields = []
+        self.print_select_result(self.client.select(metadata_dict={'pk': ast.pk}, fields=fields))
 
     def do_dump(self, arg):
         # TODO make printing better
-        self.print(self.client.select(fields=['ts']))
+        self.print_select_result(self.client.select(fields=['ts']))
 
     def do_upsert(self, arg):
         """
@@ -133,6 +144,29 @@ class DumbREPL(cmd.Cmd):
         """
         pass
 
+    def print_select_result(self, result):
+        status, payload = result
+        if status is not TSDBStatus.OK:
+            self.print('Error! %r' % payload)
+            return
+
+        for key, values in payload.items():
+            self.print(key)
+            for vkey, vvalues in values.items():
+                if isinstance(vvalues, OrderedDict):
+                    self.print('    ', vkey)
+                    for hkey, hvalues in vvalues.items():
+                        self.print('      ', hkey, ': ', hvalues)
+                else:
+                    self.print('   ', vkey, ': ', vvalues)
+
+
+
+    # TODO do augmented select
+
 if __name__ == '__main__':
     client = TSDBClient()
-    DumbREPL(client).cmdloop()
+    r = DumbREPL(client)
+    r.onecmd("insert [1,2,3] @ [4, 5, 6] into something")
+    r.cmdloop()
+
