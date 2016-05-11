@@ -132,7 +132,7 @@ class DictDB:
                     raise ValueError('Sort by field must be a string')
                 if additional["sort_by"][1:] not in self.schema.keys() or \
                    self.schema[additional["sort_by"][1:]]["index"] is None:
-                    raise ValueError('Sort by field must exist in schema with index')
+                    raise ValueError('Sort by field %s must exist in schema with index' % additional['sort_by'][1:])
         # Apply filters
         select_values = set(self.rows.keys())
         if meta is not None:
