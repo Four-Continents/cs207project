@@ -34,7 +34,6 @@ def setup():
     return t
 
 
-# Then, in your test:
 def test_whatever():
     t = setup()
     t.daemon = True

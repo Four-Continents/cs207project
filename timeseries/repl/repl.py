@@ -2,77 +2,43 @@
 
 import cmd
 import sys
+import re
 from . import lexer
 from . import parser
 from tsdb.tsdb_client import TSDBClient
+from tsdb.tsdb_error import TSDBStatus
 import timeseries as ts
 import json
+from collections import OrderedDict
+from .ast import AST_proc
 
 # https://docs.python.org/3/library/cmd.html#cmd.Cmd.cmdloop
 
 class DumbREPL(cmd.Cmd):
     """
-    DEMO - show help function (help) shows docstrings
+    TODO
+    tests
+    docstrings for everything
+    clean up code and defensive coding checks
+    prepare demo, understand! (ply vs. hand parsers)
+    leverage from json parser - in ply would have required delimiters to wrap, then would have had to define lexer
+    to understand escaping to deal with delimiters
+    upsert - hand hack index and
+    two approach in ply:
+    1) write JSON grammar with all the productions and understand all of JSON. JSON dict and key-value pairs
+    2) alternative use delimiters to send a raw string to ply, then do json loads in parser to parse everything in the
+    delimiter, but then have to deal with escaping or have to specify in the docs can't include that delimiter which
+    restricts users from using certain json values
 
-    Must run server first
+    with upsert, just defined syntax to just chop off beginning and do JSON loads.
 
-    re-prepend first word back after get it
-    instantiate a lexer and pull out pieces (using ply)
-    then pass through to tsdb_client.py
-    start wtih really simple dumb thing...like list of integers
-    can define own things like dump
-    just use dumb hand coded parsers... simple languages. Get it simple things. Can add fancier things
-    integrate ply to have fancier grammar
-    dumb command: insert takes a list.
-
-    insert [1, 2, 3, ... ] into whatever;
-    dump whatever; # print all the points (will do a select)
-
-    select field1, field2, ... from whatever;
-    slice out fields part from select statements, do string split, these become field names
-    select has a fields argument, and by default Fields gets None, pass list of fields into fields
-
-    select ... from whatever order by f1 (order by becomes the additional argument, is the sorting key
-    select ... from whatever order by f1 {"sort_by": "+f1"} - see documention of select of dictdb.py
-
-    select ... from whatever order by f1 limit 10. see docs at bottom of dictdb.py
-
-    in order to get self off the ground in simplest way possible, write REPL so first it instantiates client
-    then inserts some hardcoded data by using insert from client
-    then starts command loop
-    then command loop will implement one command just dump, because simplest
-    that way don't have write insert parser first
-
-    in main, will connect to a server
-    REPL: separately start a server process, start REPL,then point it to server address (port)
-    tsdb_server.py see in main of tsdb_server.py, runs on localhost
-    start server, then start REPL
-    or write a shell script that starts server, then starts REPL
-    or just have user start server, then have user start up REPL
-
-    Parts
-    1. write a parser for command language (cmd.cmd looks at first word of command line, dispatches to methods do_...method)
-    in parser, going to want to write something that can parse the rest of the comamnd
-    see parser.py - what do I want my command language to look like.
-    1. Writing parser for command language, 2. hooking up REPL to the tsdb_client.py
-    Make it SQL-like. Dumb easier parse variant of SQL SELECT FROM TIMESERIES NAME
-    understand functions offered by TSDB. One command for each of TSDB Client API, 1 command type for each
-    make up syntax for how to do arguments
-    insert_ts takes primary key and time series... see Google Hangout
-    Write pype grammar
-    Set up separate module for Pype - set up lexer and parser.py
-    set up one directory for REPL
-    do one command at a time. Do insert and select
-    instantiate lexer and parser
-    lexer, parser, repl that uses cmd
-
-    Can only use insert_ts, upsert_meta, select
-    maybe augmented_select - procedures??
+    select, helpful to have ply, because pretty complicated custom syntax
     """
     def __init__(self, client):
         super(DumbREPL, self).__init__()
         self.client = client
         self.print = print
+        self.parser = parser.new_parser()
 
     def do_hello(self, arg):
         arg_list = [a for a in arg.split(' ') if a.strip() != '']
@@ -118,21 +84,122 @@ class DumbREPL(cmd.Cmd):
 
     def do_newinsert(self, arg):
         lex = lexer.new_lexer()
-        par = parser.new_parser()
-        ast = par.parse('insert ' + arg, lexer=lex)
-        print(ast)
+        ast = self.parser.parse('insert ' + arg, lexer=lex)
+        if ast is None:
+            print('Error!')
+            return
+
+        self.print('OK!')
+
+    def do_select(self, arg):
+        """
+        TODO see console for command used
+
+        look in procs directory for available procs
+            - stats(): returns means and std
+        """
+        lex = lexer.new_lexer()
+
+        ast = self.parser.parse('select ' + arg, lexer=lex)
+        # catch parse error condition
+        if ast is None:
+            print('Error!')
+            return
+
+        if ast.pk:
+            metadata_dict = {'pk': ast.pk}
+        else:
+            metadata_dict = None
+
+        additional = {}
+        if ast.orderby:
+            # + for ascending, - for descending
+            if ast.ascending:
+                additional['sort_by'] = '+' + ast.orderby
+            else:
+                additional['sort_by'] = '-' + ast.orderby
+
+        if ast.limit is not None:
+            additional['limit'] = ast.limit
+
+        if isinstance(ast.selector, AST_proc):
+            self.print_select_result(self.client.augmented_select(
+                proc=ast.selector.id,
+                target=ast.selector.targets,
+                metadata_dict=metadata_dict,
+                additional=(additional or None))
+            )
+        else:
+            if ast.selector:
+                fields = ast.selector
+            else:
+                fields = []
+
+            self.print_select_result(self.client.select(
+                    metadata_dict=metadata_dict,
+                    fields=fields,
+                    additional=(additional or None))
+                    )
 
     def do_dump(self, arg):
-        # TODO make printing better
-        self.print(self.client.select(fields=['ts']))
+        self.print_select_result(self.client.select(fields=['ts']))
 
     def do_upsert(self, arg):
         """
-        insert if primary key doesn't exist
-        update if primary key does exist
+        UPSERT pk {'hi': 'bye'}
+
+        NOT case insensitive
+
+        attaches metadata to an existing TimeSeries
+        dict keys must be strings
         """
-        pass
+        arg = arg.strip()
+
+        try:
+            firstbrace_idx = arg.index('{')
+        except ValueError:
+            self.print('Bad syntax!')
+            return
+
+        json_str = arg[firstbrace_idx:]
+
+        try:
+            d = json.loads(json_str)
+        except json.decoder.JSONDecodeError:
+            self.print('Bad syntax!')
+            return
+
+        pk = arg[:firstbrace_idx].strip()
+        if not pk:
+            self.print('Bad syntax!')
+            return
+
+        self.client.upsert_meta(pk, d)
+
+        self.print('OK!')
+
+
+    def print_select_result(self, result):
+        status, payload = result
+        if status is not TSDBStatus.OK:
+            self.print('Error! %r' % payload)
+            return
+
+        for key, values in payload.items():
+            self.print(key)
+            for vkey, vvalues in values.items():
+                if isinstance(vvalues, OrderedDict):
+                    self.print('    ', vkey)
+                    for hkey, hvalues in vvalues.items():
+                        self.print('      ', hkey, ': ', hvalues)
+                else:
+                    self.print('   ', vkey, ': ', vvalues)
+
 
 if __name__ == '__main__':
     client = TSDBClient()
-    DumbREPL(client).cmdloop()
+    r = DumbREPL(client)
+    r.onecmd("insert [1,2,3] @ [4, 5, 6] into tabby")
+    r.onecmd("insert [8,9,10] @ [11, 12, 13] into ginger")
+    r.cmdloop()
+
