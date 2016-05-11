@@ -122,13 +122,22 @@ class DumbREPL(cmd.Cmd):
     def do_newinsert(self, arg):
         lex = lexer.new_lexer()
         ast = self.parser.parse('insert ' + arg, lexer=lex)
-        print(ast)
+        if ast is None:
+            print('Error!')
+            return
+
 
         self.print('OK!')
 
     def do_select(self, arg):
         lex = lexer.new_lexer()
+
         ast = self.parser.parse('select ' + arg, lexer=lex)
+        # catch parse error condition
+        if ast is None:
+            print('Error!')
+            return
+
         if ast.exprs:
             fields = ast.exprs
         else:
@@ -139,16 +148,22 @@ class DumbREPL(cmd.Cmd):
         else:
             metadata_dict = None
 
+        additional = {}
         if ast.orderby:
             # + for ascending, - for descending
             if ast.ascending:
-                additional = {'sort_by': '+' + ast.orderby}
+                additional['sort_by'] = '+' + ast.orderby
             else:
-                additional = {'sort_by': '-' + ast.orderby}
-        else:
-            additional = None
+                additional['sort_by'] = '-' + ast.orderby
 
-        self.print_select_result(self.client.select(metadata_dict=metadata_dict, fields=fields, additional=additional))
+        if ast.limit is not None:
+            additional['limit'] = ast.limit
+
+        self.print_select_result(self.client.select(
+            metadata_dict=metadata_dict,
+            fields=fields,
+            additional=(additional or None))
+        )
 
     def do_dump(self, arg):
         self.print_select_result(self.client.select(fields=['ts']))

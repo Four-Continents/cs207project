@@ -20,13 +20,23 @@ def p_select_from(p):
 
 
 def p_select_multi(p):
-    r'''command : SELECT expr_list ORDER BY ID
-                | SELECT expr_list ORDER BY ID ASC
-                | SELECT expr_list ORDER BY ID DESC'''
-    if len(p) == 6:
+    r'''command : SELECT expr_list LIMIT NUMBER
+                | SELECT expr_list ORDER BY ID
+                | SELECT expr_list ORDER BY ID order_direction
+                | SELECT expr_list ORDER BY ID LIMIT NUMBER
+                | SELECT expr_list ORDER BY ID order_direction LIMIT NUMBER'''
+    if len(p) == 5:
+        p[0] = AST_select(exprs=p[2], limit=int(p[4]))
+    elif len(p) == 6:
         p[0] = AST_select(exprs=p[2], orderby=p[5])
-    else:
+    elif len(p) == 7:
         p[0] = AST_select(exprs=p[2], orderby=p[5], ascending=(p[6]=='ASC'))
+    elif len(p) == 8:
+        p[0] = AST_select(exprs=p[2], orderby=p[5], limit=int(p[7]))
+    elif len(p) == 9:
+        p[0] = AST_select(exprs=p[2], orderby=p[5], ascending=(p[6]=='ASC'), limit=int(p[8]))
+    else:
+        raise SyntaxError
 
 
 def p_bracketed_number_list(p):
@@ -54,6 +64,12 @@ def p_expr_list(p):
         p[0] = p[1]
     else:
         p[0] = [p[1]]
+
+
+def p_order_direction(p):
+    r'''order_direction : ASC
+                        | DESC'''
+    p[0] = p[1]
 
 
 def p_error(p):
