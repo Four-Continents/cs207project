@@ -217,8 +217,15 @@ class TSDBClient(object):
         deserializer = Deserializer()
         deserializer.append(data)
         data_json = {}
-        if deserializer.ready():
-            data_json = deserializer.deserialize()
+
+        sleep_count = 0
+        while not deserializer.ready():
+            time.sleep(0.05)
+            sleep_count += 1
+            if sleep_count > 30:
+                raise TimeoutError
+
+        data_json = deserializer.deserialize()
         status = data_json["status"]
         payload = data_json["payload"]
         if payload is not None:
