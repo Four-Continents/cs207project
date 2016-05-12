@@ -62,7 +62,7 @@ class REPL(cmd.Cmd):
     def do_select(self, arg):
         """
         Returns all or selected named fields from all or selected primary keys with options to
-        limit number of rows returns, sort in ascending or descending order, or run procedures on data.
+        limit number of rows returned, sort in ascending or descending order, or run procedures on data.
 
         Use Cases:
 
