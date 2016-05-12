@@ -289,6 +289,10 @@ class DBDB(object):
             v = row[field]
             if self._schema[field]['index'] is not None:
                 idx = self.indexes[field]
+                # flush pk from old indices
+                for each_value in idx.keys():
+                    if pk in idx[each_value]:
+                        idx[each_value].remove(pk)
                 idx[v].add(pk)
 
     def _filter_data(self, meta_variable, filter_v):
