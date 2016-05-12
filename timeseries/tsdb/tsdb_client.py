@@ -64,6 +64,20 @@ class TSDBClient(object):
         self._send(msg)
         # your code here, construct from the code in tsdb_ops.py
 
+    def delete(self, primary_key):
+        """
+        Deletes a timeseries in the database
+
+        Parameters
+        ----------
+        primary_key: string
+            PK for the row being deleted
+        """
+        json_dict = typemap["delete_ts"](primary_key).to_json()
+        msg = serialize(json_dict)
+        print ('Deleting:', msg)
+        self._send(msg)
+
     def upsert_meta(self, primary_key, metadata_dict):
         """
         Upserts data columns corresponding to the PK in the database

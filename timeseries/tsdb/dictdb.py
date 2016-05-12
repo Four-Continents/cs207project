@@ -111,17 +111,19 @@ class DictDB(object):
         self.commit()
         # print("S> D> ROW", self.rows[pk])
 
-    def update_indices(self, pk, row):
+    def update_indices(self, pk, row, adding = True):
         # row = self.rows[pk]
         for field in row:
             v = row[field]
             if self._schema[field]['index'] is not None:
                 idx = self.indexes[field]
+
                 # flush pk from old indices
                 for each_value in idx.keys():
                     if pk in idx[each_value]:
                         idx[each_value].remove(pk)
-                idx[v].add(pk)
+                if adding:
+                    idx[v].add(pk)
 
     def _filter_data(self, meta_variable, filter_v):
         if isinstance(filter_v, dict):
@@ -193,6 +195,7 @@ class DictDB(object):
             # as limit might have been specified)
             # use filter that picks all keys to do this
             select_values = self.select({'order': {">": float("-inf")}}, fields=None, additional=None, Verbose=False)[0]
+
         # sorting and limit
         select_values = self._sort_and_limit(list(select_values), additional)
         # choose fields to display
@@ -223,9 +226,16 @@ class DictDB(object):
                 field_return.append(row_field)
             return select_values, field_return
 
-    def delete(self, key):
+    def delete_ts(self, key):
         self._assert_not_closed()
-        return self._tree.delete(key)
+
+        ts = self._de_stringify(self.get(key))
+        print ('Deleting:', ts)
+        self.update_indices(key, ts, adding=False)
+        print ('Updating indices...')
+        ref = self._tree.delete(key)
+        self.commit()
+        return ref
 
 
 def connect(dbname, db_idx_name, schema):
