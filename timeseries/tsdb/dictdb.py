@@ -256,13 +256,32 @@ class DBDB(object):
     def insert_ts(self, pk, ts):
         "given a pk and a timeseries, insert them; if pk already exists, value \
          will be overwritten"
-        value = self._initialize_defaults({'ts': ts, 'pk': pk})
+
+        value = self._initialize_defaults({'ts': ts.to_json(), 'pk': pk})
         self.set(pk, self._stringify(value))
         # self.rows[pk] = {'pk': pk}
         # self.rows[pk]['ts'] = ts
         # should below be a coroutine so we dont block?
         self.update_indices(pk, value)
         self.commit()
+
+    def upsert_meta(self, pk, meta):
+        "implement upserting field values, as long as the fields are in \
+        the schema."
+        try:
+            value = self._de_stringify(self.get(pk))
+        except:
+            raise ValueError('Insert value into DB before attempting upsert of metadata')
+
+        for k, v in meta.items():
+            if k in self._schema.keys():
+                value[k] = v
+
+        self.set(pk, self._stringify(value))
+        # your code here
+        self.update_indices(pk, value)
+        self.commit()
+        # print("S> D> ROW", self.rows[pk])
 
     def update_indices(self, pk, row):
         # row = self.rows[pk]
