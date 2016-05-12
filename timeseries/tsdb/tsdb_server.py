@@ -76,7 +76,8 @@ class TSDBProtocol(asyncio.Protocol):
         # print ('Target:', target)
         results = []
         for pk in loids:
-            row = self.server.db.rows[pk]
+            row = self.server.db._de_stringify(self.server.db.get(pk))
+            # row = self.server.db.rows[pk]
             result = storedproc(pk, row, arg)
             results.append(dict(zip(target, result)))
         return TSDBOp_Return(TSDBStatus.OK, op['op'], dict(zip(loids, results)))
@@ -106,12 +107,13 @@ class TSDBProtocol(asyncio.Protocol):
         # print("S> list of triggers to run", lot)
         for tname, t, arg, target in lot:
             for pk in rowmatch:
-                row = self.server.db.rows[pk]
+                row = self.server.db._de_stringify(self.server.db.get(pk))
+                # print(row['ts']['values'])
                 task = asyncio.ensure_future(t(pk, row, arg))
                 task.add_done_callback(trigger_callback_maker(pk, target, self.server.db.upsert_meta))
 
     def connection_made(self, conn):
-        "callback for when the conection is made."
+        "callback for when the connection is made."
         # connection or transport is saved as an instance variable
         print('S> connection made')
         self.conn = conn

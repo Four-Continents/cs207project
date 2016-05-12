@@ -82,7 +82,7 @@ def test_corr_small():
 
     ts_l = [10, 22, 26, 4, 18]
     ts_l_x = range(len(ts_l))
-    ts_ts = ts.TimeSeries(ts_l_x, ts_l)
+    ts_ts = ts.TimeSeries(ts_l_x, ts_l).to_json()
     # print (ts_ts)
     res = proc_main(None, {'ts':ts_ts}, {'times':ts_l_x, 'values':ts_l})
     # print (res)

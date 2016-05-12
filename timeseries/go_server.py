@@ -23,7 +23,7 @@ def main():
     for i in range(NUMVPS):
         schema["d_vp-{}".format(i)] = {'convert': float, 'index': 1}
     # db = DictDB(schema, 'pk')
-    db = connect("/tmp/test2.dbdb", "/tmp/test2_idx.dbdb", schema)
+    db = connect("/tmp/four_continents.dbdb", "/tmp/four_continents_idx.dbdb", schema)
     server = TSDBServer(db, 30000)
     server.run()
 
