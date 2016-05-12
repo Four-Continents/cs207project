@@ -4,7 +4,7 @@ import time
 from repl import repl
 from tsdb.tsdb_client import TSDBClient
 from tsdb.tsdb_server import TSDBServer
-from tsdb.dictdb import DictDB
+from tsdb.dictdb import DictDB, connect
 import timeseries as ts
 
 
@@ -28,7 +28,7 @@ def setup():
         'pk': {'convert': lambda x: x, 'index': None},
         'ts': {'convert': lambda x: x, 'index': None},
     }
-    db = DictDB(empty_schema, 'pk')
+    db = connect("/tmp/four_continents.dbdb", "/tmp/four_continents_idx.dbdb", empty_schema)
     s = TSDBServer(db) # Create a server
     t = ServerThread(s)
     return t

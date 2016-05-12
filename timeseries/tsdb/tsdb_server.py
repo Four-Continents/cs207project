@@ -36,6 +36,16 @@ class TSDBProtocol(asyncio.Protocol):
         self._run_trigger('insert_ts', [op['pk']])
         return TSDBOp_Return(TSDBStatus.OK, op['op'])
 
+    def _delete_ts(self, op):
+        "Sever function for deleting a timeseries by primary key"
+        try:
+            self.server.db.delete_ts(op['pk'])
+        except ValueError as e:
+            print(e)
+            return TSDBOp_Return(TSDBStatus.INVALID_KEY, op['op'])
+
+        return TSDBOp_Return(TSDBStatus.OK, op['op'])
+
     def _upsert_meta(self, op):
         "server function for upserting metadata corresponding to a time series"
         self.server.db.upsert_meta(op['pk'], op['md'])
@@ -66,9 +76,8 @@ class TSDBProtocol(asyncio.Protocol):
         print('LOIDS:', loids)
         results = []
         for pk in loids:
-            print("PK",pk)
-            row = self.server.db.rows[pk]
-            print("ROW", row)
+            row = self.server.db._de_stringify(self.server.db.get(pk))
+            # row = self.server.db.rows[pk]
             result = storedproc(pk, row, arg)
             print("RESULT", result)
             results.append(dict(zip(target, result)))
@@ -100,12 +109,13 @@ class TSDBProtocol(asyncio.Protocol):
         # print("S> list of triggers to run", lot)
         for tname, t, arg, target in lot:
             for pk in rowmatch:
-                row = self.server.db.rows[pk]
+                row = self.server.db._de_stringify(self.server.db.get(pk))
+                # print(row['ts']['values'])
                 task = asyncio.ensure_future(t(pk, row, arg))
                 task.add_done_callback(trigger_callback_maker(pk, target, self.server.db.upsert_meta))
 
     def connection_made(self, conn):
-        "callback for when the conection is made."
+        "callback for when the connection is made."
         # connection or transport is saved as an instance variable
         print('S> connection made')
         self.conn = conn
@@ -116,7 +126,7 @@ class TSDBProtocol(asyncio.Protocol):
         calls database functionality, gets results if appropriate (for select)\
         and bundles them back to the client.
         """
-        # print('S> data received ['+str(len(data))+']: '+str(data))
+        print('S> data received ['+str(len(data))+']: '+str(data))
         self.deserializer.append(data)
         if self.deserializer.ready():
             msg = self.deserializer.deserialize()
@@ -140,6 +150,9 @@ class TSDBProtocol(asyncio.Protocol):
                     response = self._add_trigger(op)
                 elif isinstance(op, TSDBOp_RemoveTrigger):
                     response = self._remove_trigger(op)
+                elif isinstance(op, TSDBOp_DeleteTS):
+                    print('running delete')
+                    response = self._delete_ts(op)
                 else:
                     response = TSDBOp_Return(TSDBStatus.UNKNOWN_ERROR,
                                              op['op'])
