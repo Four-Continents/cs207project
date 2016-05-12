@@ -95,28 +95,25 @@ class DictDB:
     def _sort_and_limit(self, select_keys, additional):
         select_rows = {key: self.rows[key] for key in select_keys}
         # sorting
-        if additional is not None:
-            if "sort_by" in additional:
-                if additional["sort_by"][0] == "+":
-                    isDescending = False
-                else:
-                    isDescending = True
-                ordered_select_rows = OrderedDict(sorted(select_rows.items(),
-                                                  key=lambda t:
-                                                  t[1][additional["sort_by"][1:]],
-                                                  reverse=isDescending))
+        if additional is not None and "sort_by" in additional:
+            if additional["sort_by"][0] == "+":
+                isDescending = False
+            else:
+                isDescending = True
+            ordered_select_rows = OrderedDict(sorted(select_rows.items(),
+                                              key=lambda t:
+                                              t[1][additional["sort_by"][1:]],
+                                              reverse=isDescending))
         else:
             ordered_select_rows = select_rows
         # limiting
-        if additional is not None:
-            if "limit" in additional:
-                select_keys_return = []
-                for i in range(additional["limit"]):
-                    select_keys_return.append(list(ordered_select_rows.keys())[i])
-            else:
-                select_keys_return = list(ordered_select_rows.keys())
+        a = list(ordered_select_rows.keys())
+        if additional is not None and "limit" in additional:
+            select_keys_return = []
+            for i in range(min(len(a), additional["limit"])):
+                select_keys_return.append(a[i])
         else:
-            select_keys_return = list(ordered_select_rows.keys())
+            select_keys_return = a
         return select_keys_return
 
     def select(self, meta, fields, additional):
@@ -132,7 +129,7 @@ class DictDB:
                     raise ValueError('Sort by field must be a string')
                 if additional["sort_by"][1:] not in self.schema.keys() or \
                    self.schema[additional["sort_by"][1:]]["index"] is None:
-                    raise ValueError('Sort by field must exist in schema with index')
+                    raise ValueError('Sort by field %s must exist in schema with index' % additional['sort_by'][1:])
         # Apply filters
         select_values = set(self.rows.keys())
         if meta is not None:
