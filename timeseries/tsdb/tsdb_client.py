@@ -4,7 +4,7 @@ from .tsdb_ops import *
 from .tsdb_error import *
 import time
 import numpy as np
-import scipy
+import scipy.stats
 
 """
 Constructor for the TimeSeries class.
