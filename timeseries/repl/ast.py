@@ -1,11 +1,12 @@
 class AST_insert():
-    """
-    create class for every node in the language, just abstract syntax tree, can ignore "into"
-
-    identifier primary key
-    2 number lists
-    """
     def __init__(self, pk, timestamps, values):
+        """
+        Parameters
+        ----------
+        pk: AST_ID
+        timestamps: AST_numlist
+        values: AST_numlist
+        """
         self.pk = pk
         self.timestamps = timestamps
         self.values = values
@@ -14,24 +15,50 @@ class AST_insert():
         return '{%r %r %r}' % (self.pk, self.timestamps, self.values)
 
 class AST_numlist():
-    """
-    """
     def __init__(self, elements):
+        """
+        Parameters
+        ----------
+        elements: list of int or float
+        """
         self.elements = elements
+
+    def __len__(self):
+        """
+        returns the length of elements
+        """
+        return len(self.elements)
 
 
 class AST_ID():
-    """
-    """
     def __init__(self, id):
+        """
+        Parameters
+        ----------
+        id: str
+        """
         self.id = id
 
 
 class AST_select():
-    """
-    default is to sort in ascending order when orderby is not none
-    """
     def __init__(self, pk=None, selector=None, orderby=None, ascending=True, limit=None):
+        """
+        Parameters
+        ----------
+        pk: AST_ID node
+        selector: AST_proc node or list of AST_ID nodes
+            optional argument
+        orderby: AST_ID
+            optional argument
+            field name to sort results by
+        ascending: bool
+            optional argument
+            ignored when orderby is None
+            descending if False; default is True
+        limit: int
+            optional argument
+            limits number of rows returned
+        """
         self.pk = pk
         self.selector = selector or []
         self.orderby = orderby
@@ -40,9 +67,16 @@ class AST_select():
 
 
 class AST_proc():
-    """
-    for stored procedure calls
-    """
     def __init__(self, id, targets):
+        """
+        for stored procedure calls
+
+        Parameters
+        ----------
+        id: AST_ID
+            proc name from procs directory
+        targets: list of AST_ID
+            names of fields that the results of the proc will be assigned to
+        """
         self.id = id
         self.targets = targets
