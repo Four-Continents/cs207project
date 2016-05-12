@@ -1,5 +1,5 @@
 import unittest
-from timeseries.timeseries import TimeSeries
+from timeseries import TimeSeries
 import numpy as np
 
 # to run, type in command line: ```PYTHONPATH=. py.test -vv tests/test_timeseries.py```
@@ -29,7 +29,7 @@ class TimeSeriesTest(unittest.TestCase):
         self.assertTrue ( a == TimeSeries([1, 1.5, 2, 2.5, 10], [0, 2, -1, 0.5, 0]) )
         self.assertTrue( list(a.times) == time )
         self.assertTrue ( list(a.values) == value )
-             
+
 
 # Test Operators
     def test_add(self):
@@ -47,7 +47,7 @@ class TimeSeriesTest(unittest.TestCase):
     def test_mul(self):
         x = TimeSeries([1, 2, 3, 4],[1, 4, 9, 16])
         y = TimeSeries([1, 2, 3, 4],[2, 4.5, -1, 20])
-        self.assertTrue( x*y == TimeSeries([1, 2, 3, 4], [2.0, 18.0, -9.0, 320.0]) ) 
+        self.assertTrue( x*y == TimeSeries([1, 2, 3, 4], [2.0, 18.0, -9.0, 320.0]) )
         self.assertTrue( 5.0*x == TimeSeries([1, 2, 3, 4],[5.0, 20.0, 45.0, 80.0]) )
 
 # Lazy Evaluation
@@ -57,9 +57,9 @@ class TimeSeriesTest(unittest.TestCase):
 
 # Test mean and Standard Deviation
     def test_mean(self):
-        x = TimeSeries([1, 2, 3, 4],[1, 4, 9, 16])  
+        x = TimeSeries([1, 2, 3, 4],[1, 4, 9, 16])
         self.assertTrue ( x.mean() == 7.5)
-    
+
     def test_median(self):
         x = TimeSeries([1,2,3,4],[4,5,6,7])
         self.assertTrue (x.median()==5.5)
@@ -117,11 +117,14 @@ class TimeSeriesTest(unittest.TestCase):
         self.assertTrue ( nextt == (2, 4) )
         self.assertTrue (len(nextt) ==2 )
 
-    #def test_contains(self):
-     #   b = TimeSeries([1, 1.5, 2, 2.5, 10], [0, 2, -1, 0.5, 0])
-      #  self.assertTrue(10 in b == True)
-    
+    def test_contains(self):
+        b = TimeSeries([1, 1.5, 2, 2.5, 10], [0, 2, -1, 0.5, 0])
+        self.assertTrue(10 in b)
+
+    def test_to_json(self):
+        b = TimeSeries([1, 1.5, 2, 2.5, 10], [0, 2, -1, 0.5, 0])
+        self.assertTrue(b.to_json() == {"times": [1, 1.5, 2, 2.5, 10],
+                                        "values": [0, 2, -1, 0.5, 0]})
 
 if __name__=='__main__':
     unittest.main()
-

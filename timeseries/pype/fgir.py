@@ -1,6 +1,6 @@
 import enum
 
-FGNodeType = enum.Enum('FGNodeType','component libraryfunction librarymethod input output assignment literal unknown')
+FGNodeType = enum.Enum('FGNodeType','component libraryfunction librarymethod input output assignment literal forward unknown')
 
 class FGNode(object):
   def __init__(self, nodeid, nodetype, ref=None, inputs=[]):
@@ -53,7 +53,7 @@ class Flowgraph(object):
       s+= '  "'+str(nid)+'" [ color = "red" ]\n'
     s+= '}\n'
     return s
-    
+
 
   def pre(self, nodeid):
     return self.nodes[nodeid].inputs
@@ -62,8 +62,25 @@ class Flowgraph(object):
     return [i for (i,n) in self.nodes.items() if nodeid in self.nodes[i].inputs]
 
   def topological_sort(self):
-    # TODO : implement a topological sort
-    return [] # should return a list of node ids in sorted order
+    L = []
+    nodes_to_visit = list(self.nodes.keys())
+    while len(nodes_to_visit) > 0:
+      nodeid = nodes_to_visit[0]
+      self.visit(nodes_to_visit, nodeid, L)
+    return L
+
+  #Helper function
+  def visit(self, nodes_to_visit, nodeid, L):
+    if nodeid in L:
+      return
+    else:
+      if len(self.nodes[nodeid].inputs)!=0:
+        for i in self.nodes[nodeid].inputs:
+          self.visit(nodes_to_visit, i, L)
+
+    nodes_to_visit.remove(nodeid)
+    L.append(nodeid)
+    return
 
 class FGIR(object):
   def __init__(self):
@@ -99,3 +116,21 @@ class FGIR(object):
 
   def topological_node_pass(self, topo_optimizer):
     self.node_pass(topo_optimizer, topological=True)
+
+  def _topo_helper(self, name, deps, order=[]):
+    for dep in deps[name]:
+      if dep not in order:
+        order = self._topo_helper(dep, deps, order)
+    return order+[name]
+
+  def topological_flowgraph_pass(self, topo_flowgraph_optimizer):
+    deps = {}
+    for (name,fg) in self.graphs.items():
+      deps[name] = [n.ref for n in fg.nodes.values() if n.type==FGNodeType.component]
+    order = []
+    for name in self.graphs:
+      order = self._topo_helper(name, deps, order)
+    for name in order:
+      fg = topo_flowgraph_optimizer.visit(self.graphs[name])
+      if fg is not None:
+        self.graphs[name] = fg

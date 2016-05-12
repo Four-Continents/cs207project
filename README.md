@@ -4,6 +4,9 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/Four-Continents/cs207project/badge.svg?branch=master)](https://coveralls.io/github/Four-Continents/cs207project?branch=master)
 
+In order to run tests locally, type command:
+PYTHONPATH=. py.test --cov pype --cov-report term-missing
+(otherwise pytest will only show timeseries, and not pype - likely some bug because the parent directory is the same name as the timeseries module. Note that changing the source in .coveragerc does not help)
 
 ## Branch Instructions
 ### How to git branch
@@ -22,32 +25,3 @@
 
 ## Collaboration Docs
 1. [Trello](https://trello.com/b/WRhE0pgH/four-continents)
-2. Slack Channel
-3. Project Leader Rotation Assignment
-
-| Date  | Weekday | Lead |
-| ------------- | ------------- |------------- |
-| Feb 22  | Mon  | Fanny  |
-| Feb 24  | Wed  | Vinay  |
-| Feb 26  | Fri  | Amy  |
-| Feb 29  | Mon  | Isa  |
-| Mar 2  | Wed  | Victor  |
-| Mar 4  | Fri  | Fanny  |
-| Mar 7  | Mon  | Vinay  |
-| Mar 9  | Wed  | Amy  |
-| Mar 11  | Fri  | Isa  |
-| Mar 21  | Mon  | Victor  |
-| Mar 23  | Wed  | Fanny  |
-| Mar 25  | Fri  | Vinay  |
-| Mar 28  | Mon  | Amy  |
-| Mar 30  | Wed  | Isa  |
-| Apr 1  | Fri  | Victor  |
-| Apr 4  | Mon  | Fanny  |
-| Apr 6  | Wed  | Vinay  |
-| Apr 8  | Fri  | Amy  |
-| Apr 11  | Mon  | Isa  |
-| Apr 13  | Wed  | Victor  |
-| Apr 15  | Fri  | Fanny  |
-| Apr 18  | Mon  | Vinay  |
-| Apr 20  | Wed  | Amy  |
-| Apr 22  | Fri  | Isa  |

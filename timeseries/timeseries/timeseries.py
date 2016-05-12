@@ -3,11 +3,12 @@ import numpy as np
 from doctest import run_docstring_examples as dtest
 import numbers
 import operator
-from pype.lib_import import component
+# from pype.lib_import import component
+import pype
 
 
 class TimeSeriesIterator:
-    def __init__(self, values): 
+    def __init__(self, values):
         self._values = values
         self.index = 0
 
@@ -137,7 +138,6 @@ class TimeSeries(object):
 
         self._times = convert_to_np_array(times)
         self._values = convert_to_np_array(values)
-
 
     def __iter__(self):
          """
@@ -368,7 +368,7 @@ class TimeSeries(object):
                                 self.values) for it in interp_times]
         return TimeSeries(interp_times, new_values)
 
-    @component
+    @pype.component
     def mean(self):
         """
         Computes mean of values in TimesSeries
@@ -389,7 +389,7 @@ class TimeSeries(object):
         else:
             return np.mean(self._values)
 
-    @component
+    @pype.component
     def std(self):
 
         """
@@ -453,7 +453,7 @@ class TimeSeries(object):
         """
         return len(seqA) == len(seqB)
 
-    def _check_length_helper(self , rhs):
+    def _check_length_helper(self, rhs):
         """
         Helper function to determine whether two sequences have an equal number of elements
 
@@ -507,13 +507,13 @@ class TimeSeries(object):
                 self._check_length_helper(rhs)
                 self._check_times_helper(rhs)
                 pairs = zip(self, rhs)
-                return TimeSeries( self.times, [op(a, b) for a, b in pairs] )
+                return TimeSeries(self.times, [op(a, b) for a, b in pairs])
             else:
                 raise NotImplementedError
         except TypeError:
             raise NotImplementedError
 
-    @component
+    @pype.component
     def __add__(self, rhs):
         """
         Addition operator between the values of `self` and `rhs`. Operations are element-wise.
@@ -541,7 +541,7 @@ class TimeSeries(object):
         """
         return self + other
 
-    @component
+    @pype.component
     def __mul__(self, rhs):
         """
         Multiplication operator between the values of `self` and `rhs`. Operations are element-wise.
@@ -574,7 +574,7 @@ class TimeSeries(object):
         """
         return self * other
 
-    @component
+    @pype.component
     def __truediv__(self, rhs):
         """
         Division operator between the values of `self` and `rhs`. Operations are element-wise.
@@ -591,8 +591,7 @@ class TimeSeries(object):
         """
         return self._elem_op(rhs, operator.truediv)
 
-
-    @component
+    @pype.component
     def __sub__(self, rhs):
         """
         Subtraction operator between the values of `self` and `rhs`. Operations are element-wise.
@@ -664,16 +663,22 @@ class TimeSeries(object):
         """
         return TimeSeries(self.times, self.values)
 
+    def to_json(self):
+        json_dict_ts = {"times": self._times.tolist(), "values": self._values.tolist()}
+        return json_dict_ts
+
     @property
     def lazy(self):
         return lz.lazy(lambda x: x)(self)
 
 
 if __name__ == '__main__':
-    import lazy as lz
+    from lazy import lazy as lz
     dtest(TimeSeries, globals(), verbose=True)
-
 else:
-     import timeseries.lazy as lz
+    import timeseries.lazy as lz
 
-
+try:
+    __version__ = pkg_resources.get_distribution(__name__).version
+except:
+    __version__ = 'unknown'

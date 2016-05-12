@@ -5,9 +5,9 @@ _tabversion = '3.8'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'E1FCB2EDDF1216D4CA039394CC93A7CE'
+_lr_signature = '55C53B9434ED5FC68BBE31AE8D09ED67'
     
-_lr_action_items = {'ASSIGN':([12,],[19,]),'LPAREN':([0,1,2,3,7,8,10,13,14,15,16,17,18,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,37,38,39,40,41,42,43,45,46,47,50,51,52,53,54,55,56,58,],[4,-4,4,-5,-3,-2,12,-26,-27,12,-9,-28,-6,12,12,36,12,36,12,12,-8,-7,12,12,-30,-21,12,-15,-17,-11,36,12,-13,36,12,12,-29,-20,-24,-14,-10,-25,-12,-23,-22,-19,-16,]),'ID':([5,9,10,12,13,14,15,16,17,19,20,21,22,23,24,25,26,27,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,45,46,47,48,49,50,51,52,53,54,55,56,58,],[10,11,13,20,-26,-27,13,-9,-28,29,13,13,35,13,35,13,13,-8,13,13,-30,-21,13,-15,-17,49,-11,35,13,-13,35,13,13,-29,-20,-24,57,-18,-14,-10,-25,-12,-23,-22,-19,-16,]),'OP_ADD':([12,],[26,]),'RPAREN':([11,13,14,17,20,22,24,30,31,32,33,34,35,37,38,39,40,41,42,43,44,45,46,47,50,51,52,53,54,55,56,57,58,],[18,-26,-27,-28,32,37,40,46,-30,-21,47,-15,-17,-11,51,52,-13,53,54,55,56,-29,-20,-24,-14,-10,-25,-12,-23,-22,-19,58,-16,]),'OP_MUL':([12,],[21,]),'INPUT':([12,],[22,]),'NUMBER':([10,13,14,15,16,17,20,21,23,25,26,27,29,30,31,32,33,37,39,40,42,43,45,46,47,51,52,53,54,55,56,],[14,-26,-27,14,-9,-28,14,14,14,14,14,-8,14,14,-30,-21,14,-11,14,-13,14,14,-29,-20,-24,-10,-25,-12,-23,-22,-19,]),'STRING':([10,13,14,15,16,17,20,21,23,25,26,27,29,30,31,32,33,37,39,40,42,43,45,46,47,51,52,53,54,55,56,],[17,-26,-27,17,-9,-28,17,17,17,17,17,-8,17,17,-30,-21,17,-11,17,-13,17,17,-29,-20,-24,-10,-25,-12,-23,-22,-19,]),'$end':([1,2,3,6,7,8,18,28,],[-4,-1,-5,0,-3,-2,-6,-7,]),'OP_SUB':([12,],[25,]),'OUTPUT':([12,],[24,]),'LBRACE':([0,1,2,3,7,8,18,28,],[5,-4,5,-5,-3,-2,-6,-7,]),'OP_DIV':([12,],[23,]),'RBRACE':([13,14,15,16,17,27,32,37,40,46,47,51,52,53,54,55,56,],[-26,-27,28,-9,-28,-8,-21,-11,-13,-20,-24,-10,-25,-12,-23,-22,-19,]),'IMPORT':([4,],[9,]),}
+_lr_action_items = {'$end':([1,2,3,4,7,8,18,28,],[-5,-1,-4,0,-2,-3,-7,-6,]),'RBRACE':([11,12,13,14,15,19,35,38,42,44,46,47,49,52,53,54,57,],[18,-27,-28,-9,-26,-8,-11,-21,-13,-24,-22,-23,-10,-20,-25,-12,-19,]),'ASSIGN':([16,],[27,]),'OP_DIV':([16,],[25,]),'RPAREN':([12,13,15,17,23,24,26,29,30,31,32,33,34,35,36,38,39,40,41,42,44,45,46,47,48,49,52,53,54,55,56,57,58,],[-27,-28,-26,28,35,38,42,44,-30,46,47,49,-15,-11,-17,-21,52,53,54,-13,-24,-29,-22,-23,-14,-10,-20,-25,-12,57,58,-19,-16,]),'NUMBER':([9,11,12,13,14,15,19,20,21,22,24,25,29,30,31,32,35,38,39,40,42,43,44,45,46,47,49,52,53,54,57,],[12,12,-27,-28,-9,-26,-8,12,12,12,12,12,12,-30,12,12,-11,-21,12,12,-13,12,-24,-29,-22,-23,-10,-20,-25,-12,-19,]),'OUTPUT':([16,],[26,]),'OP_SUB':([16,],[22,]),'IMPORT':([6,],[10,]),'INPUT':([16,],[23,]),'OP_ADD':([16,],[21,]),'OP_MUL':([16,],[20,]),'ID':([5,9,10,11,12,13,14,15,16,19,20,21,22,23,24,25,26,27,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,57,58,],[9,15,17,15,-27,-28,-9,-26,24,-8,15,15,15,36,15,15,36,43,15,-30,15,15,36,-15,-11,-17,50,-21,15,15,36,-13,15,-24,-29,-22,-23,-14,-10,-18,56,-20,-25,-12,-19,-16,]),'STRING':([9,11,12,13,14,15,19,20,21,22,24,25,29,30,31,32,35,38,39,40,42,43,44,45,46,47,49,52,53,54,57,],[13,13,-27,-28,-9,-26,-8,13,13,13,13,13,13,-30,13,13,-11,-21,13,13,-13,13,-24,-29,-22,-23,-10,-20,-25,-12,-19,]),'LBRACE':([0,1,2,3,7,8,18,28,],[5,-5,5,-4,-2,-3,-7,-6,]),'LPAREN':([0,1,2,3,7,8,9,11,12,13,14,15,18,19,20,21,22,23,24,25,26,28,29,30,31,32,33,34,35,36,38,39,40,41,42,43,44,45,46,47,48,49,52,53,54,57,58,],[6,-5,6,-4,-2,-3,16,16,-27,-28,-9,-26,-7,-8,16,16,16,37,16,16,37,-6,16,-30,16,16,37,-15,-11,-17,-21,16,16,37,-13,16,-24,-29,-22,-23,-14,-10,-20,-25,-12,-19,-16,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -16,7 +16,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'import_statement':([0,2,],[1,7,]),'statement_list':([0,],[2,]),'component':([0,2,],[3,8,]),'expression':([10,15,20,21,23,25,26,29,30,33,39,42,43,],[16,27,31,31,31,31,31,44,45,45,45,45,45,]),'declaration':([22,24,38,41,],[34,34,50,50,]),'type':([36,],[48,]),'parameter_list':([20,21,23,25,26,],[30,33,39,42,43,]),'program':([0,],[6,]),'expression_list':([10,],[15,]),'declaration_list':([22,24,],[38,41,]),}
+_lr_goto_items = {'parameter_list':([20,21,22,24,25,],[29,31,32,39,40,]),'component':([0,2,],[1,7,]),'expression_list':([9,],[11,]),'statement_list':([0,],[2,]),'declaration_list':([23,26,],[33,41,]),'declaration':([23,26,33,41,],[34,34,48,48,]),'expression':([9,11,20,21,22,24,25,29,31,32,39,40,43,],[14,19,30,30,30,30,30,45,45,45,45,45,55,]),'type':([37,],[51,]),'program':([0,],[4,]),'import_statement':([0,2,],[3,8,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -41,19 +41,19 @@ _lr_productions = [
   ('expression -> LPAREN OUTPUT RPAREN','expression',3,'p_expression_output','parser.py',56),
   ('declaration_list -> declaration_list declaration','declaration_list',2,'p_declaration_list','parser.py',64),
   ('declaration_list -> declaration','declaration_list',1,'p_declaration_list','parser.py',65),
-  ('declaration -> LPAREN type ID RPAREN','declaration',4,'p_declaration','parser.py',73),
-  ('declaration -> ID','declaration',1,'p_declaration','parser.py',74),
-  ('type -> ID','type',1,'p_type','parser.py',82),
-  ('expression -> LPAREN ASSIGN ID expression RPAREN','expression',5,'p_expression_assign','parser.py',87),
-  ('expression -> LPAREN ID parameter_list RPAREN','expression',4,'p_expression_eval','parser.py',93),
-  ('expression -> LPAREN ID RPAREN','expression',3,'p_expression_eval','parser.py',94),
-  ('expression -> LPAREN OP_ADD parameter_list RPAREN','expression',4,'p_expression_add','parser.py',102),
-  ('expression -> LPAREN OP_SUB parameter_list RPAREN','expression',4,'p_expression_subtract','parser.py',107),
-  ('expression -> LPAREN OP_MUL parameter_list RPAREN','expression',4,'p_expression_mult','parser.py',112),
-  ('expression -> LPAREN OP_DIV parameter_list RPAREN','expression',4,'p_expression_div','parser.py',117),
-  ('expression -> ID','expression',1,'p_expression_id','parser.py',122),
-  ('expression -> NUMBER','expression',1,'p_expression_num','parser.py',127),
-  ('expression -> STRING','expression',1,'p_expression_str','parser.py',132),
-  ('parameter_list -> parameter_list expression','parameter_list',2,'p_params_list','parser.py',137),
-  ('parameter_list -> expression','parameter_list',1,'p_params_list','parser.py',138),
+  ('declaration -> LPAREN type ID RPAREN','declaration',4,'p_declaration','parser.py',74),
+  ('declaration -> ID','declaration',1,'p_declaration','parser.py',75),
+  ('type -> ID','type',1,'p_type','parser.py',83),
+  ('expression -> LPAREN ASSIGN ID expression RPAREN','expression',5,'p_expression_assign','parser.py',88),
+  ('expression -> LPAREN ID parameter_list RPAREN','expression',4,'p_expression_eval','parser.py',94),
+  ('expression -> LPAREN ID RPAREN','expression',3,'p_expression_eval','parser.py',95),
+  ('expression -> LPAREN OP_ADD parameter_list RPAREN','expression',4,'p_op_add_expression','parser.py',103),
+  ('expression -> LPAREN OP_SUB parameter_list RPAREN','expression',4,'p_op_sub_expression','parser.py',108),
+  ('expression -> LPAREN OP_MUL parameter_list RPAREN','expression',4,'p_op_mul_expression','parser.py',113),
+  ('expression -> LPAREN OP_DIV parameter_list RPAREN','expression',4,'p_op_div_expression','parser.py',118),
+  ('expression -> ID','expression',1,'p_expression_id','parser.py',123),
+  ('expression -> NUMBER','expression',1,'p_expression_num','parser.py',128),
+  ('expression -> STRING','expression',1,'p_expression_str','parser.py',133),
+  ('parameter_list -> parameter_list expression','parameter_list',2,'p_params_list','parser.py',138),
+  ('parameter_list -> expression','parameter_list',1,'p_params_list','parser.py',139),
 ]
