@@ -4,21 +4,6 @@ from timeseries import timeseries as ts
 from tsdb import *
 
 
-def identity(x):
-    return x
-
-
-# schema = {
-#   'pk': {'convert': identity, 'index': None},  # will be indexed anyways
-#   'ts': {'convert': identity, 'index': None},
-#   'order': {'convert': int, 'index': 1},
-#   'blarg': {'convert': int, 'index': 1},
-#   'useless': {'convert': identity, 'index': None},
-#   'mean': {'convert': float, 'index': 1},
-#   'std': {'convert': float, 'index': 1},
-#   'vp': {'convert': bool, 'index': 1}
-# }
-
 schema = {
   'pk': {'convert': str, 'index': None},  # will be indexed anyways
   'ts': {'convert': str, 'index': None},
@@ -40,7 +25,6 @@ def main():
     # db = DictDB(schema, 'pk')
     db = connect("/tmp/test2.dbdb", "/tmp/test2_idx.dbdb", schema)
     server = TSDBServer(db, 30000)
-    # print(schema)
     server.run()
 
 if __name__ == '__main__':

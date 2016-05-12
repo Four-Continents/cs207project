@@ -19,7 +19,7 @@ OPMAP = {
 }
 
 
-class DBDB(object):
+class DictDB(object):
 
     def __init__(self, f, f_idx, schema):
         self._storage = Storage(f)
@@ -239,4 +239,4 @@ def connect(dbname, db_idx_name, schema):
     except IOError:
         fd_idx = os.open(db_idx_name, os.O_RDWR | os.O_CREAT)
         f_idx = os.fdopen(fd_idx, 'r+b')
-    return DBDB(f, f_idx, schema)
+    return DictDB(f, f_idx, schema)
