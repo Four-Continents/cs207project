@@ -289,14 +289,17 @@ class DBDB(object):
             v = row[field]
             if self._schema[field]['index'] is not None:
                 idx = self.indexes[field]
-                if add:
-                    idx[v].add(pk)
-                else:
-                    del idx[v]
 
-    def _filter_data(self, meta_variable, filter_v, sel_values):
+                # flush pk from old indices
+                for each_value in idx.keys():
+                    if pk in idx[each_value]:
+                        idx[each_value].remove(pk)
+                if adding:
+                    idx[v].add(pk)
+
+    def _filter_data(self, meta_variable, filter_v):
         if isinstance(filter_v, dict):
-            filtered_values = {}  # sel_values
+            filtered_values = set()  # sel_values
             for _operator, operand in filter_v.items():
                 filtered_values_op = set()
                 filtered_indices = [x for x in list(self.indexes[meta_variable].keys())
@@ -353,7 +356,7 @@ class DBDB(object):
         select_values = set()  # set(self.rows.keys())
         if meta is not None:
             for meta_variable, filter_v in meta.items():
-                filtered_values = self._filter_data(meta_variable, filter_v, select_values)
+                filtered_values = self._filter_data(meta_variable, filter_v)
                 if select_values != set():
                     select_values = select_values & filtered_values
                 else:
@@ -362,7 +365,8 @@ class DBDB(object):
         else:
             # pull everything as no filters have been specified (not optimal \
             # as limit might have been specified)
-            select_values = set()
+            # use filter that picks all keys to do this
+            select_values = self.select({'order': {">": float("-inf")}}, fields=None, additional=None)[0]
         # sorting and limit
         select_values = self._sort_and_limit(list(select_values), additional)
         # choose fields to display
@@ -394,8 +398,8 @@ class DBDB(object):
 
     def delete(self, key):
         self._assert_not_closed()
-
-        self.update_indices(key)
+        ts = self._de_stringify(self.get(key))
+        self.update_indices(key, ts)
         ref = self._tree.delete(key)
         self.commit()
         return ref

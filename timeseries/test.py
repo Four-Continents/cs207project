@@ -21,14 +21,17 @@ schema = {
 client = TSDBClient(30000)
 client.insert_ts("fifty", ts.TimeSeries([1, 2, 3], [2, 4, 9]))
 client.upsert_meta('fifty', {'order': 1, 'blarg': 1})
-client.select({'order': 1}, fields=['order', 'ts'], additional={'sort_by': '-order'})
-print("done")
+res = client.select({}, fields=['order', 'ts'], additional={'sort_by': '-order'})
+print(res)
+
+
 # db = connect("/tmp/test2.dbdb", "/tmp/test2_idx.dbdb", schema)
 #
-# db.insert_ts("two", ts.TimeSeries([1, 2, 3], [2, 4, 9]).to_json())
+# db.insert_ts("two", ts.TimeSeries([1, 2, 3], [2, 4, 9]))
 # print(db.select({'order': -1}, fields=['order', 'ts'], additional={'sort_by': '-order'}))
-# print(db.get("three"))
-# time.sleep(500)
+# # # print(db.get("three"))
+# # time.sleep(500)
+# print(db.select({'order': -1}, fields=['order', 'ts'], additional={''}))
 # db.close()
 
 # print("Test one")
@@ -44,7 +47,7 @@ print("done")
 #     print(db.get("rahul"))
 # except:
 #     print("failed like it was supposed to")
-#
+
 # print("Test two")
 # db.set("rahul", "aged")
 # db.set("pavlos", "aged")
@@ -53,7 +56,7 @@ print("done")
 # db.close()
 # db = connect("/tmp/test2.dbdb")
 # print(db.get("rahul"))
-#
+
 # print("Test three")
 # db.set("rahul", "young")
 # print(db.get("rahul"))

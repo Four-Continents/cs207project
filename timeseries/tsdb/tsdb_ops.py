@@ -92,6 +92,19 @@ class TSDBOp_UpsertMeta(TSDBOp):
     def from_json(cls, json_dict):
         return cls(json_dict['pk'], json_dict['md'])
 
+class TSDBOp_Select(TSDBOp):
+
+    def __init__(self, md, fields, additional):
+        # print("select")
+        super().__init__('select')
+        # we abuse the metadata dict to carry the payload for `select`
+        self['md'] = md
+        self['fields'] = fields
+        self['additional'] = additional
+
+    @classmethod
+    def from_json(cls, json_dict):
+        return cls(json_dict['md'], json_dict['fields'], json_dict['additional'])
 
 class TSDBOp_AugmentedSelect(TSDBOp):
     """
@@ -143,6 +156,7 @@ class TSDBOp_RemoveTrigger(TSDBOp):
 # This simplifies reconstructing TSDBOp instances from network data.
 typemap = {
   'insert_ts': TSDBOp_InsertTS,
+  'delete_ts': TSDBOp_DeleteTS,
   'upsert_meta': TSDBOp_UpsertMeta,
   'select': TSDBOp_Select,
   'augmented_select': TSDBOp_AugmentedSelect,
