@@ -20,7 +20,7 @@
 \pagenumbering{arabic}
 
 \section*{Introduction}
-K-means is an unsupervised learning algorithms that solve the clustering problem by partitioning and classifying $n$ observations of a given data set into a fixed number $k$ of clusters\footnote{Data Clustering algorithm at https://sites.google.com/site/dataclusteringalgorithms/k-means-clustering-algorithm}.
+K-means is an unsupervised learning algorithms that solves the clustering problem by partitioning and classifying $n$ observations of a given data set into a fixed number $k$ of clusters\footnote{Data Clustering algorithm at https://sites.google.com/site/dataclusteringalgorithms/k-means-clustering-algorithm}.
 It defines $k$ centroids, one for each cluster and each observation belongs to the cluster with the nearest mean $\mu_k$. The clusters tend to be of comparable spatial extent and this process results in a partitioning of the data space into Voronoi cells \footnote{A Voronoi diagram is a partitioning of a plane into regions based on distance to points in a specific subset of the plane}. The objective function to be minimized for the algorithm is a squared error function:
 \begin{gather}
 \sum_{k=1}^{K}\sum_{x_i \in c_k}\Big|\Big|x_i-\mu_k\Big|\Big|^2 \\
@@ -55,7 +55,7 @@ As a first step, we implemented a K-means clustering algorithm using Numpy. The 
 			\caption{Python and Numpy naive implementation}
 			\label{naive}
 		\end{figure}
-\noindent The process starts by randomly sampling the cluster centers. Next, the points are assigned to each cluster using the minimum Euclidean distance and the centers are then re-evaluated. A while loop is used to ensure the process is iterative until the cluster barycentre's do not update anymore and remain the same.\\
+\noindent The process starts by randomly sampling the cluster centers. Next, the points are assigned to each cluster using the minimum Euclidean distance and the centers are then re-evaluated. A while loop is used to ensure the process is iterative until the cluster barycenters do not update anymore and remain the same.\\
 
 \noindent To ensure validity of the algorithm, a dataset of size 5000 is generated using the \verb|make_blobs| function, which generates isotropic Gaussian blobs for clustering around centers chosen by the user (in this case three centers at (1, 1), (-1, -1) and (1,-1)). The centroids resulting from the naive implementation match these centers.
 The Scikit-Learn results\footnote{Example taken from:http://scikit-learn.org/stable/auto-examples/cluster/plot-mini-batch-kmeans.html}, are plotted in figure \ref{results}. We must note that the sklearn algorithm includes two implementation: The Kmeans and MiniBatch Kmeans, which differences will be discussed later on.
@@ -69,7 +69,7 @@ The Scikit-Learn results\footnote{Example taken from:http://scikit-learn.org/sta
 
 \section*{Comparison}
 
-We compare the performance of our naively implemented algorithm and the Scikit-Learn modules (both KMeans and MiniBatch KMeans) on several generated datasets of increasing size using again the \verb|make_blobs function| function with the same three centers. To ensure consistency in our comparison, we initialize all input similarly: The standard deviation is equal across each clustering, three clusters are generated and the batch size is always 45 for the miniBatch algorithm. A discussion of the best input parameter is  beyond the score of the paper.  Our naive implementation is inherently slower, and the difference grows exponentially with the size of the dataset,  as illustrated in figure \ref{comp} below. Two figures are shown as the full figure on the left hand side does not clearly illustrate the difference in time for smaller datasets due to its scale.
+We compare the performance of our naively implemented algorithm and the Scikit-Learn modules (both KMeans and MiniBatch KMeans) on several generated datasets of increasing size using again the \verb|make_blobs function| function with the same three centers. To ensure consistency in our comparison, we initialize all input similarly: the standard deviation is equal across each clustering, three clusters are generated and the batch size is always 45 for the miniBatch algorithm. A discussion of the best input parameter is  beyond the scope of the paper.  Our naive implementation is inherently slower, and the difference grows exponentially with the size of the dataset,  as illustrated in figure \ref{comp} below. Two figures are shown as the full figure on the left hand side does not clearly illustrate the difference in time for smaller datasets due to its scale.
 
 \begin{figure}[h!]
 	\centering 
