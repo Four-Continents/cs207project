@@ -8,20 +8,39 @@ In order to run tests locally, type command:
 PYTHONPATH=. py.test --cov pype --cov-report term-missing
 (otherwise pytest will only show timeseries, and not pype - likely some bug because the parent directory is the same name as the timeseries module. Note that changing the source in .coveragerc does not help)
 
-## Branch Instructions
-### How to git branch
-1. First: git clone the repo
-2. Make sure to do a ```git pull``` to get the latest from the master branch
-3. To create a new branch copy from master: ```git checkout -b yourbranchname```
-4. Once you have added and committed something, you can push up the branch with: ```git push --set-upstream origin yourbranchname```
-5. To view all the available branches: ```git branch```
-6. To switch back to master: ```git checkout master```. (Note: You will need to make sure any uncommitted changes are committed in your current branch before switching.)
+==========
+Timeseries
+==========
 
-### How to update your branch with master branch
-1. First update master: ```git checkout master```
-2. Pull into master ```git pull``` from master branch
-3. Check back into your branch: ```git checkout yourbranchname```
-4. To merge master into your current branch: ```git merge master``` (NOTE BE CAREFUL. If any of the same files were changed concurrently on your branch and master, you will need to manually resolve merge conflicts). 
 
-## Collaboration Docs
-1. [Trello](https://trello.com/b/WRhE0pgH/four-continents)
+Add a short description here!
+
+
+Description
+===========
+
+### REPL
+
+For the additional feature, we chose to implement a new database language with a REPL as a client for the database because we were interested in tying together concepts learned from all three major modules of CS207: timeseries, pype, and databases. The REPL leverages Python's cmd library while the database language uses the ply library covered in the pype module to manage some of the production rules and grammars. Though this may not be the "purist" approach, we made an explicit design choice to implement the language using a hybrid approach in which simpler database commands were parsed and executed directly in the Python code for the REPL, whereas more complex commands such as SELECT involving a wide permutation of optional arguments such as limit, order by ascending and descending order, and procs were handled by ply with separate scripts housing the AST classes, lexer, and parser.  
+
+As an example of why we felt this was a justifiable design choice, consider the example of `upsert_meta`, which could have involved 3 possible approaches: 1) write JSON grammar with all production rules to understand the various types of valid JSON, 2) use delimiters to send a raw string to ply to then handle the json loads within the parser, or 3) define a simple yet effective syntax to simply chop off the beginning and leverage the JSON parser directly within the REPL script. The issue with the second option is that it would require the use of delimiters, which would restrict the user from using certain json values unless we were to then introduce the concept of escaping and escape characters to our grammars. Ultimately, we chose approach #3 over #1 and #2 for simplicity over introducing unnecessary complexity that still efficiently satisfies the database API specs provided to us by our customer.  
+
+The REPL also has a help feature similar to man-pages that allows users to look up help pages for the commands and syntax rules of the database language.  
+
+
+Instructions and Technical Details
+=================================
+### Install
+The package can be installed by running `python setup.py install`.  
+
+### Instructions on how to run the database REPL: 
+1. From the parent directory above the tsdb directory, launch the server by entering into the command line `PYTHONPATH=. python –m tsdb.tsdb_server`  
+2. From the parent directoy above the tsdb directory, launch the repl by entering into the command line `PYTHONPATH=. python -m repl.repl`  
+3. To get started on what commands are available, type `help`. To read documentation on specific commands, type `help <command name>`.  
+
+
+Note
+====
+
+This project has been set up using PyScaffold 2.5.5. For details and usage
+information on PyScaffold see http://pyscaffold.readthedocs.org/.
