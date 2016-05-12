@@ -19,21 +19,21 @@ schema = {
   'vp': {'convert': bool, 'index': 1}
 }
 client = TSDBClient(30000)
-client.insert_ts("fifty", ts.TimeSeries([1, 2, 3], [2, 4, 9]))
-client.upsert_meta('fifty', {'order': 1, 'blarg': 1})
-
-client.insert_ts("sixty", ts.TimeSeries([1, 2, 3], [2, 4, 9]))
-client.upsert_meta('sixty', {'order': 2, 'blarg': 1})
-
-client.insert_ts("seventy", ts.TimeSeries([1, 2, 3], [2, 4, 9]))
-client.upsert_meta('seventy', {'order': 3, 'blarg': 1})
-
-# res = client.select({'order':{'>':float('-inf')}}, fields=['order', 'ts'])
-res = client.select(fields=['order', 'ts'])
-print(res)
-
-res = client.delete('fifty')
-print(res)
+# client.insert_ts("fifty", ts.TimeSeries([1, 2, 3], [2, 4, 9]))
+# client.upsert_meta('fifty', {'order': 1, 'blarg': 1})
+#
+# client.insert_ts("sixty", ts.TimeSeries([1, 2, 3], [2, 4, 9]))
+# client.upsert_meta('sixty', {'order': 2, 'blarg': 1})
+#
+# client.insert_ts("seventy", ts.TimeSeries([1, 2, 3], [2, 4, 9]))
+# client.upsert_meta('seventy', {'order': 3, 'blarg': 1})
+#
+# # res = client.select({'order':{'>':float('-inf')}}, fields=['order', 'ts'])
+# res = client.select(fields=['order', 'ts'])
+# print(res)
+#
+# res = client.delete('fifty')
+# print(res)
 
 res = client.select(fields=['order', 'ts'], additional={'sort_by':'+order'})
 print (res)
