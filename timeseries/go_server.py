@@ -12,7 +12,7 @@ schema = {
   'useless': {'convert': str, 'index': None},
   'mean': {'convert': float, 'index': 1},
   'std': {'convert': float, 'index': 1},
-  'vp': {'convert': bool, 'index': 1}
+  'vp': {'convert': int, 'index': 1}
 }
 
 NUMVPS = 5

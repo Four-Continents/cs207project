@@ -35,8 +35,27 @@ client = TSDBClient(30000)
 # res = client.delete('fifty')
 # print(res)
 
-res = client.select(fields=['order', 'ts'], additional={'sort_by':'+order'})
-print (res)
+# res = client.select(fields=['vp'], additional={'sort_by':'+vp'})
+# res = client.populate_db()
+# print (res)
+
+res = client.select({'vp':{'>=':0}}, ['vp'])
+print ('Finding all VPs:', res)
+
+
+def tsmaker(m, s, j):
+    "returns metadata and a time series in the shape of a jittered normal"
+    meta = {}
+    meta['order'] = int(np.random.choice([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]))
+    meta['blarg'] = int(np.random.choice([1, 2]))
+    t = np.arange(0.0, 1.0, 0.01)
+    v = scipy.stats.norm.pdf(t, m, s) + j*np.random.randn(100)
+    return meta, ts.TimeSeries(t, v)
+
+
+_, q = tsmaker(0.5, 0.2, 0.1)
+res = client.find_similar(q, 5)
+print ('Result for most similar time-series:', res)
 
 # db = connect("/tmp/test2.dbdb", "/tmp/test2_idx.dbdb", schema)
 #
