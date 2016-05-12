@@ -42,15 +42,14 @@ def test_db_ops():
     db.upsert_meta('two', {'order': 2, 'blarg': 2})
     assert db._de_stringify(db.get("one"))["order"] == 1
     assert db._de_stringify(db.get("two"))["blarg"] == 2
-    print("done")
     # test select
-    sel_values, field_return = db.select({}, fields=None, additional=None)
-    print(sel_values)
+    sel_values, field_return = db.select(None, fields=None, additional=None)
     assert len(sel_values) == 2
     assert field_return is None
-    # sel_values, field_return = db.select({}, fields=[], additional={"sort_by": "+order", "limit": 1})
-    # assert len(sel_values) == 1
-    # assert field_return == [{'blarg': 1, 'order': 1, 'pk': 'one'}]
+    sel_values, field_return = db.select(None, fields=[], additional={"sort_by": "+order", "limit": 1})
+    assert len(sel_values) == 1
+    assert field_return == [{'pk': 'one', 'std': -1, 'blarg': 1, 'mean': -1, 'order': 1, 'vp': False, 'useless': 'null'}]
+    print("done")
     # sel_values, field_return = db.select({}, fields=None, additional={"sort_by": "+order", "limit": 1})
     # assert list(sel_values) == ['one']
     # assert field_return is None
