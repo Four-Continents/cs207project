@@ -283,13 +283,16 @@ class DBDB(object):
         self.commit()
         # print("S> D> ROW", self.rows[pk])
 
-    def update_indices(self, pk, row):
+    def update_indices(self, pk, row, adding = True):
         # row = self.rows[pk]
         for field in row:
             v = row[field]
             if self._schema[field]['index'] is not None:
                 idx = self.indexes[field]
-                idx[v].add(pk)
+                if add:
+                    idx[v].add(pk)
+                else:
+                    del idx[v]
 
     def _filter_data(self, meta_variable, filter_v, sel_values):
         if isinstance(filter_v, dict):
@@ -391,7 +394,11 @@ class DBDB(object):
 
     def delete(self, key):
         self._assert_not_closed()
-        return self._tree.delete(key)
+
+        self.update_indices(key)
+        ref = self._tree.delete(key)
+        self.commit()
+        return ref
 
 
 def connect(dbname, db_idx_name, schema):

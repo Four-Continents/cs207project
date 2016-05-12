@@ -61,6 +61,15 @@ class TSDBOp_InsertTS(TSDBOp):
     def from_json(cls, json_dict):
         return cls(json_dict['pk'], ts.TimeSeries(**(json_dict['ts'])))
 
+class TSDBOp_DeleteTS(TSDBOp):
+
+    def __init__(self, pk):
+        super().__init__('insert_ts')
+        self['pk'] = pk
+
+    @classmethod
+    def from_json(cls, json_dict):
+        return cls(json_dict['pk'])
 
 class TSDBOp_Return(TSDBOp):
 
@@ -82,21 +91,6 @@ class TSDBOp_UpsertMeta(TSDBOp):
     @classmethod
     def from_json(cls, json_dict):
         return cls(json_dict['pk'], json_dict['md'])
-
-
-class TSDBOp_Select(TSDBOp):
-
-    def __init__(self, md, fields, additional):
-        # print("select")
-        super().__init__('select')
-        # we abuse the metadata dict to carry the payload for `select`
-        self['md'] = md
-        self['fields'] = fields
-        self['additional'] = additional
-
-    @classmethod
-    def from_json(cls, json_dict):
-        return cls(json_dict['md'], json_dict['fields'], json_dict['additional'])
 
 
 class TSDBOp_AugmentedSelect(TSDBOp):

@@ -36,6 +36,16 @@ class TSDBProtocol(asyncio.Protocol):
         self._run_trigger('insert_ts', [op['pk']])
         return TSDBOp_Return(TSDBStatus.OK, op['op'])
 
+    def _delete_ts(self, pk):
+        "Sever function for deleting a timeseries by primary key"
+        try:
+            self.server.db.delete_ts(op['pk'])
+        except ValueError as e:
+            print(e)
+            return TSDBOp_Return(TSDBStatus.INVALID_KEY, op['op'])
+
+        return TSDBOp_Return(TSDBStatus.OK, op['op'])
+
     def _upsert_meta(self, op):
         "server function for upserting metadata corresponding to a time series"
         self.server.db.upsert_meta(op['pk'], op['md'])
@@ -136,6 +146,8 @@ class TSDBProtocol(asyncio.Protocol):
                     response = self._add_trigger(op)
                 elif isinstance(op, TSDBOp_RemoveTrigger):
                     response = self._remove_trigger(op)
+                elif isinstance(op, TSDBOP_DeleteTS):
+                    response = self._delete_ts(op)
                 else:
                     response = TSDBOp_Return(TSDBStatus.UNKNOWN_ERROR,
                                              op['op'])
