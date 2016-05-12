@@ -356,8 +356,6 @@ class DBDB(object):
                 else:
                     select_values = filtered_values
             select_values = list(select_values)
-            print("select_values")
-            print(select_values)
         else:
             # pull everything as no filters have been specified (not optimal \
             # as limit might have been specified)
