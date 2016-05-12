@@ -27,6 +27,7 @@ PRE: times is sorted in monotonically increasing order and has \
 matching indices to values
 """
 
+
 class TSDBClient(object):
     """
     The client. This could be used in a python program, web server, or REPL!
