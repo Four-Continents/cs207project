@@ -16,7 +16,7 @@ schema = {
 
 
 def test_db_init():
-    db = connect("/tmp/four_continents.dbdb", "/tmp/four_continents_idx.dbdb", schema)
+    db = connect("/tmp/four_continents_test.dbdb", "/tmp/four_continents_idx_test.dbdb", schema)
     assert db._schema == schema
     return db
 

@@ -68,12 +68,15 @@ class DictDB(object):
         return self._tree.set(key, value)
 
     def _initialize_defaults(self, payload):
-        payload['order'] = -1
-        payload['blarg'] = -1
-        payload['useless'] = "null"
-        payload['mean'] = -1
-        payload['std'] = -1
-        payload['vp'] = False
+        for field, value in self._schema.items():
+            if field is "pk" or field is "ts":
+                continue
+            elif value["convert"] == str:
+                payload[field] = "null"
+            elif value["convert"] == bool:
+                payload[field] = False
+            elif value["convert"] == float or value["convert"] == int:
+                payload[field] = -1
         return payload
 
     def _stringify(self, json_dict):
@@ -88,9 +91,6 @@ class DictDB(object):
 
         value = self._initialize_defaults({'ts': ts.to_json(), 'pk': pk})
         self.set(pk, self._stringify(value))
-        # self.rows[pk] = {'pk': pk}
-        # self.rows[pk]['ts'] = ts
-        # should below be a coroutine so we dont block?
         self.update_indices(pk, value)
         self.commit()
 
@@ -105,7 +105,6 @@ class DictDB(object):
         for k, v in meta.items():
             if k in self._schema.keys():
                 value[k] = v
-
         self.set(pk, self._stringify(value))
         # your code here
         self.update_indices(pk, value)
@@ -165,7 +164,7 @@ class DictDB(object):
             select_keys_return = a
         return select_keys_return
 
-    def select(self, meta, fields, additional):
+    def select(self, meta, fields, additional, Verbose=True):
         # sanity checks on sort and limit criteria
         if additional is not None:
             add_keys = additional.keys()
@@ -181,7 +180,7 @@ class DictDB(object):
                     raise ValueError('Sort by field %s must exist in schema with index' % additional['sort_by'][1:])
         # Apply filters
         select_values = set()  # set(self.rows.keys())
-        if meta is not None:
+        if meta:
             for meta_variable, filter_v in meta.items():
                 filtered_values = self._filter_data(meta_variable, filter_v)
                 if select_values != set():
@@ -193,12 +192,13 @@ class DictDB(object):
             # pull everything as no filters have been specified (not optimal \
             # as limit might have been specified)
             # use filter that picks all keys to do this
-            select_values = self.select({'order': {">": float("-inf")}}, fields=None, additional=None)[0]
+            select_values = self.select({'order': {">": float("-inf")}}, fields=None, additional=None, Verbose=False)[0]
         # sorting and limit
         select_values = self._sort_and_limit(list(select_values), additional)
         # choose fields to display
-        if fields is None:
-            print('S> D> NO FIELDS')
+        if fields is None and fields != []:
+            if Verbose:
+                print('S> D> NO FIELDS')
             return select_values, None
         elif len(fields) == 0:
             print('S> D> ALL FIELDS')  # except for the 'ts' field
