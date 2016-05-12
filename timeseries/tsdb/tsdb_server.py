@@ -36,7 +36,7 @@ class TSDBProtocol(asyncio.Protocol):
         self._run_trigger('insert_ts', [op['pk']])
         return TSDBOp_Return(TSDBStatus.OK, op['op'])
 
-    def _delete_ts(self, pk):
+    def _delete_ts(self, op):
         "Sever function for deleting a timeseries by primary key"
         try:
             self.server.db.delete_ts(op['pk'])
@@ -122,7 +122,7 @@ class TSDBProtocol(asyncio.Protocol):
         calls database functionality, gets results if appropriate (for select)\
         and bundles them back to the client.
         """
-        # print('S> data received ['+str(len(data))+']: '+str(data))
+        print('S> data received ['+str(len(data))+']: '+str(data))
         self.deserializer.append(data)
         if self.deserializer.ready():
             msg = self.deserializer.deserialize()
@@ -146,7 +146,8 @@ class TSDBProtocol(asyncio.Protocol):
                     response = self._add_trigger(op)
                 elif isinstance(op, TSDBOp_RemoveTrigger):
                     response = self._remove_trigger(op)
-                elif isinstance(op, TSDBOP_DeleteTS):
+                elif isinstance(op, TSDBOp_DeleteTS):
+                    print('running delete')
                     response = self._delete_ts(op)
                 else:
                     response = TSDBOp_Return(TSDBStatus.UNKNOWN_ERROR,

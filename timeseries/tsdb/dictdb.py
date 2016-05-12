@@ -183,7 +183,7 @@ class DictDB(object):
                     raise ValueError('Sort by field %s must exist in schema with index' % additional['sort_by'][1:])
         # Apply filters
         select_values = set()  # set(self.rows.keys())
-        if meta is not None:
+        if meta:
             for meta_variable, filter_v in meta.items():
                 filtered_values = self._filter_data(meta_variable, filter_v)
                 if select_values != set():
@@ -196,6 +196,7 @@ class DictDB(object):
             # as limit might have been specified)
             # use filter that picks all keys to do this
             select_values = self.select({'order': {">": float("-inf")}}, fields=None, additional=None)[0]
+
         # sorting and limit
         select_values = self._sort_and_limit(list(select_values), additional)
         # choose fields to display
@@ -225,10 +226,13 @@ class DictDB(object):
                 field_return.append(row_field)
             return select_values, field_return
 
-    def delete(self, key):
+    def delete_ts(self, key):
         self._assert_not_closed()
+
         ts = self._de_stringify(self.get(key))
-        self.update_indices(key, ts)
+        print ('Deleting:', ts)
+        self.update_indices(key, ts, adding=False)
+        print ('Updating indices...')
         ref = self._tree.delete(key)
         self.commit()
         return ref
