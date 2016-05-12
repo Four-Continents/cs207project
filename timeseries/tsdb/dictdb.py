@@ -256,13 +256,12 @@ class DBDB(object):
     def insert_ts(self, pk, ts):
         "given a pk and a timeseries, insert them; if pk already exists, value \
          will be overwritten"
-        value = self._initialize_defaults({'ts': ts})
+        value = self._initialize_defaults({'ts': ts, 'pk': pk})
         self.set(pk, self._stringify(value))
         # self.rows[pk] = {'pk': pk}
         # self.rows[pk]['ts'] = ts
         # should below be a coroutine so we dont block?
         self.update_indices(pk, value)
-        print(self.indexes)
         self.commit()
 
     def update_indices(self, pk, row):
@@ -282,7 +281,7 @@ class DBDB(object):
                                     if OPMAP[_operator](x, operand)]
                 for index in filtered_indices:
                     filtered_values_op = filtered_values_op | set(self.indexes[meta_variable][index])
-            if filtered_values != {}:
+            if filtered_values != set():
                 filtered_values = filtered_values & filtered_values_op
             else:
                 filtered_values = filtered_values_op
@@ -291,7 +290,7 @@ class DBDB(object):
             return set(self.indexes[meta_variable][filter_v])
 
     def _sort_and_limit(self, select_keys, additional):
-        select_rows = {key: self.get(key) for key in select_keys}
+        select_rows = {key: self._de_stringify(self.get(key)) for key in select_keys}
         # sorting
         if additional is not None and "sort_by" in additional:
             if additional["sort_by"][0] == "+":
@@ -333,7 +332,7 @@ class DBDB(object):
         if meta is not None:
             for meta_variable, filter_v in meta.items():
                 filtered_values = self._filter_data(meta_variable, filter_v, select_values)
-                if select_values != {}:
+                if select_values != set():
                     select_values = select_values & filtered_values
                 else:
                     select_values = filtered_values
@@ -354,21 +353,22 @@ class DBDB(object):
             print('S> D> ALL FIELDS')  # except for the 'ts' field
             field_return = []
             for row in select_values:
-                fields_to_pick = list(self.rows[row].keys())
+                fields_to_pick = list(self._schema.keys())
                 fields_to_pick.remove('ts')
+                # fields_to_pick.remove('pk')
                 row_field = dict()
                 for k in fields_to_pick:
-                    row_field[k] = self.rows[row][k]
+                    row_field[k] = self._de_stringify(self.get(row))[k]
                 field_return.append(row_field)
             return select_values, field_return
         else:
             print('S> D> FIELDS', fields)
             field_return = []
             for row in select_values:
-                fields_to_pick = set(fields) & set(self.rows[row].keys())
+                fields_to_pick = set(fields) & set(self._schema.keys())
                 row_field = dict()
                 for k in fields_to_pick:
-                    row_field[k] = self.rows[row][k]
+                    row_field[k] = self._de_stringify(self.get(row))[k]
                 field_return.append(row_field)
             return select_values, field_return
 
