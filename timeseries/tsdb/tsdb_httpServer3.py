@@ -121,7 +121,7 @@ def insert():
 	db.insert_ts(pk, ts)
 	return 'OK'
 
-@app.route('/upsert_meta', methods=['POST'])
+@app.route('/upsert_meta', methods=['DELETE'])
 def upsert_meta():
 	#Allows you to instert a time series in json format
 	re = request.json

@@ -91,4 +91,22 @@ def augmented_select():
     print("In http:", result)
     # return flask.jsonify(**result)
     return json.dumps(result, sort_keys=False, indent=4, separators=(',', ': '))
+
+@app.route('/delete', methods=['POST'])
+def delete():
+    #Allows you to instert a time series in json format
+    pk = request.json
+    # print("RRREEEE",re)   
+    # data = json.loads(re)
+    # print("DELET", data)
+
+    # pk = list(data.keys())[0]
+
+    # print("PKKKK",pk)
+
+
+    client.delete(pk)
+
+    return 'OK'     
+
      
