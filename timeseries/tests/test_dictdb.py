@@ -3,9 +3,6 @@ import timeseries as ts
 import pytest
 
 
-def identity(x):
-    return x
-
 schema = {
   'pk': {'convert': str, 'index': None},  # will be indexed anyways
   'ts': {'convert': str, 'index': None},
@@ -21,7 +18,6 @@ schema = {
 def test_db_init():
     db = connect("/tmp/four_continents.dbdb", "/tmp/four_continents_idx.dbdb", schema)
     assert db._schema == schema
-    # assert db.pkfield == "pk"
     return db
 
 
@@ -70,6 +66,6 @@ def test_db_ops():
     assert db._filter_data("blarg", {'<=': 1}) == set(["one"])
     # test sorting and limit
     assert db._sort_and_limit(["one", "two"], additional={"sort_by": "-blarg", "limit": 1}) == list(["two"])
-    print("done")
+    db.close()
 
 test_db_ops()
