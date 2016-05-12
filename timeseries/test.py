@@ -18,11 +18,11 @@ schema = {
   'std': {'convert': float, 'index': 1},
   'vp': {'convert': bool, 'index': 1}
 }
-client = TSDBClient(30000)
-client.insert_ts("fifty", ts.TimeSeries([1, 2, 3], [2, 4, 9]))
-client.upsert_meta('fifty', {'order': 1, 'blarg': 1})
-client.select({'order': 1}, fields=['order', 'ts'], additional={'sort_by': '-order'})
-print("done")
+# client = TSDBClient(30000)
+# client.insert_ts("fifty", ts.TimeSeries([1, 2, 3], [2, 4, 9]))
+# client.upsert_meta('fifty', {'order': 1, 'blarg': 1})
+# client.select({'order': 1}, fields=['order', 'ts'], additional={'sort_by': '-order'})
+# print("done")
 # db = connect("/tmp/test2.dbdb", "/tmp/test2_idx.dbdb", schema)
 #
 # db.insert_ts("two", ts.TimeSeries([1, 2, 3], [2, 4, 9]).to_json())
