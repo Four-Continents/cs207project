@@ -87,10 +87,8 @@ def augmented_select():
 
     # self, proc, target, arg=None, metadata_dict={}, additional=None)
     _, result = client.augmented_select(proc, target, arg, md, additional)
-    print("RESULT", type(result))
-    print(result)
-
+   
+    print("In http:", result)
     # return flask.jsonify(**result)
-    return json.dumps(result, indent=4, separators=(',', ': '))
-    # return '<pre>'+ json.dumps(result, indent=4, separators=(',', ': '))+'</pre>'
+    return json.dumps(result, sort_keys=False, indent=4, separators=(',', ': '))
      

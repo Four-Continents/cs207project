@@ -63,13 +63,17 @@ class TSDBProtocol(asyncio.Protocol):
         # values from proc_main
         mod = import_module('procs.'+proc)
         storedproc = getattr(mod, 'proc_main')
-        # print ('Target:', target)
+        print('LOIDS:', loids)
         results = []
         for pk in loids:
+            print("PK",pk)
             row = self.server.db.rows[pk]
+            print("ROW", row)
             result = storedproc(pk, row, arg)
+            print("RESULT", result)
             results.append(dict(zip(target, result)))
-        return TSDBOp_Return(TSDBStatus.OK, op['op'], dict(zip(loids, results)))
+        print("FINAL",OrderedDict(zip(loids, results)))
+        return TSDBOp_Return(TSDBStatus.OK, op['op'], OrderedDict(zip(loids, results)))
 
     def _add_trigger(self, op):
         trigger_proc = op['proc']  # the module in procs
