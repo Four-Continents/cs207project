@@ -2,7 +2,6 @@
 
 import cmd
 import sys
-import re
 from . import lexer
 from . import parser
 from tsdb.tsdb_client import TSDBClient
@@ -14,38 +13,6 @@ from .ast import AST_proc
 
 
 class REPL(cmd.Cmd):
-    """
-    TODO
-    https://docs.python.org/3/library/cmd.html#cmd.Cmd.cmdloop
-
-    - tests
-    - help, docstrings for everything, error handling
-    - clean up code and defensive coding checks
-
-    - implement DELETE
-    - need to be able to connect to persistent database.. should be trivial
-    - implement transactions from database persistence and on the REPL side?
-    - port everything over all to ply?
-
-    - write a paragraph on what you did (a para on the architecture of the persistence, your additional part,
-    and REST api)
-    how to install your project, where to find the docs (for the rest api, running the server, populating the database
-
-    - prepare demo! (ply vs. hand parsers)
-      leverage from json parser - in ply would have required delimiters to wrap, then would have had to define lexer
-    to understand escaping to deal with delimiters
-    upsert - hand hack index and
-
-    two approach in ply:
-    1) write JSON grammar with all the productions and understand all of JSON. JSON dict and key-value pairs
-    2) alternative use delimiters to send a raw string to ply, then do json loads in parser to parse everything in the
-    delimiter, but then have to deal with escaping or have to specify in the docs can't include that delimiter which
-    restricts users from using certain json values
-
-    with upsert, just defined syntax to just chop off beginning and do JSON loads.
-
-    select, helpful to have ply, because pretty complicated custom syntax
-    """
     def __init__(self, client):
         super(REPL, self).__init__()
         self.client = client
@@ -69,20 +36,13 @@ class REPL(cmd.Cmd):
 
     def do_insert(self, arg):
         """
-        insert [1, 3, 5] @ [5, 6, 7] into primarykey
-        where the second [] are the timestamps
-        first [] are the values
+        Inserts TimeSeries into database under 'ts' field and adds primarykey under 'pk' field
 
-        insert [1,2,3] @ [4, 5, 6] into pke
-        insert [1,2] @ [3,4] into k
+        Use Cases:
+        >> insert [1, 3, 5] @ [5, 6, 7] into primarykey
+          where the [5, 6, 7] are the TimeSeries timestamps and [1, 2, 3] are the TimeSeries values
 
-        insert [1,2,3] @ [4,5,6] into k
-
-        insert abc @ [4,5,6] into pke
-        Error handling!
-
-        Parse Error: LexToken(ID,'abc',1,7)
-        Error!
+        Raises Parse Error if invalid syntax
         """
         lex = lexer.new_lexer()
         ast = self.parser.parse('insert ' + arg, lexer=lex)
@@ -101,28 +61,51 @@ class REPL(cmd.Cmd):
 
     def do_select(self, arg):
         """
-        TODO see console for command used
+        Returns all or selected named fields from all or selected primary keys with options to
+        limit number of rows returns, sort in ascending or descending order, or run procedures on data.
 
-        look in procs directory for available procs
-            - stats(): returns means and std
+        Use Cases:
 
-        select ts
+        Select all primary keys from the 'ts' field:
+        > select ts
 
-        select field1, field2, field2
-        select ts, pk from pke
+        Select specific fields from all primary keys
+        > select ts, pk
 
-        select from pke
-        select ts from something
+        Select all fields from specific specific primar ykey
+        > select from primarykey
 
-        select limit 1
-        select ts limit 2
+        Select specific fields from specific primary key
+        > select ts, pk from primarykey
 
-        select ts order by pk
-        select ts order by pk desc (ascending is by default, though can also pass in explicity asc)
+        ---------------------------------------------------------------------------------------------------
 
-        select stats() as mean, std
-        select stats() as mean, std from ginger
-        select stats() as mean, std limit 2
+        Limit: restrict number of observations returned
+
+        > select limit 1
+        > select ts limit 2
+
+        ---------------------------------------------------------------------------------------------------
+
+        Order By:
+
+        Order data in alphabetical order by primary key. Ascending order is done by default, though it is
+        possible to explicitly pass "asc". To return in descending order, type "desc".
+        > select ts order by primarykey
+        > select ts order by pk asc
+        > select ts order by pk desc
+
+        ---------------------------------------------------------------------------------------------------
+
+        Procs:
+        Look in procs directory for available procs
+        Currently supported:
+            - stats(): returns means and std of TimeSeries
+
+        >> select stats() as mean, std
+        >> select stats() as mean, std from pk
+        >> select stats() as mean, std limit 2
+        >> select proc() as field1, field2 order by ...
         """
         lex = lexer.new_lexer()
 
@@ -149,7 +132,7 @@ class REPL(cmd.Cmd):
             additional['limit'] = ast.limit
 
         if isinstance(ast.selector, AST_proc):
-            self.print_select_result(self.client.augmented_select(
+            self._print_select_result(self.client.augmented_select(
                 proc=ast.selector.id.id,
                 target=[i.id for i in ast.selector.targets],
                 metadata_dict=metadata_dict,
@@ -166,24 +149,22 @@ class REPL(cmd.Cmd):
                 metadata_dict=metadata_dict,
                 fields=fields,
                 additional=(additional or None))
-            self.print_select_result(res)
+            self._print_select_result(res)
 
 
     def do_dump(self, arg):
         """
-        prints ts field for all rows in database
+        prints 'ts' field for all rows in database
         """
-        self.print_select_result(self.client.select(fields=['ts']))
+        self._print_select_result(self.client.select(fields=['ts']))
 
     def do_upsert(self, arg):
         """
-        UPSERT pk {'hi': 'bye'}
+        Attaches metadata to an existing TimeSeries
 
-        upsert ginger {"label": "cute"}
+        Use Cases:
+        >> upsert ginger {"label": "cute"}
 
-        NOT case insensitive
-
-        attaches metadata to an existing TimeSeries
         dict keys must be strings
         """
         arg = arg.strip()
@@ -212,11 +193,7 @@ class REPL(cmd.Cmd):
         self.print('OK!')
 
 
-    def print_select_result(self, result):
-        """
-        :param result:
-        :return:
-        """
+    def _print_select_result(self, result):
         status, payload = result
         if status is not TSDBStatus.OK:
             self.print('Error! %r' % payload)
