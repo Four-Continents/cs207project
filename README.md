@@ -48,7 +48,7 @@ Instructions and Technical Details
 ================================= 
 
 ### Instructions on how to run the database REPL: 
-1. From the parent directory above the tsdb directory, launch the server by entering into the command line `PYTHONPATH=. python –m tsdb.tsdb_server`  
+1. From the parent directory above the tsdb directory, launch the server by entering into the command line `go_server.py`  
 2. From the parent directoy above the tsdb directory, launch the repl by entering into the command line `PYTHONPATH=. python -m repl.repl`  
 3. To get started on what commands are available, type `help`. To read documentation on specific commands, type `help <command name>`.  
 

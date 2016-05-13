@@ -80,3 +80,19 @@ class AST_proc():
         """
         self.id = id
         self.targets = targets
+
+
+class AST_simsearch():
+    def __init__(self, k, pk):
+        """
+        for similarity search
+
+        Parameters
+        ----------
+        k: int
+            k_nearest, number of closest timeseries
+        pk: AST_ID
+            timeseries to compare against
+        """
+        self.k = k
+        self.pk = pk

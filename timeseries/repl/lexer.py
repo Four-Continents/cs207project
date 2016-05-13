@@ -12,6 +12,8 @@ reserved = { # pattern : token-name
              'desc': 'DESC',
              'limit': 'LIMIT',
              'as': 'AS',
+             'like': 'LIKE',
+             'simsearch': 'SIMSEARCH',
              }
 
 # 'tokens' is a special word in ply's lexers.
@@ -39,7 +41,7 @@ t_ignore = '\t '
 
 # used to lex/match identifiers and reserved words
 def t_ID(t):
-    r'[a-zA-Z_][a-zA-Z_0-9]*'
+    r'[-a-zA-Z_][-a-zA-Z_0-9]*'
     # lower to make reserved words case insensitive
     t.type = reserved.get(t.value.lower(), t.type)    # Check for reserved words
     return t

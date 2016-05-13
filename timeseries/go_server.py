@@ -5,7 +5,7 @@ from tsdb import *
 
 
 schema = {
-  'pk': {'convert': str, 'index': None},  # will be indexed anyways
+  'pk': {'convert': str, 'index': 1},  # will be indexed anyways
   'ts': {'convert': str, 'index': None},
   'order': {'convert': int, 'index': 1},
   'blarg': {'convert': int, 'index': 1},

@@ -5,9 +5,9 @@ _tabversion = '3.8'
 
 _lr_method = 'LALR'
 
-_lr_signature = '262779ACF934452E4394E908906D21BC'
+_lr_signature = '9DBB5F0341783F8E01DA72239FEDDC11'
     
-_lr_action_items = {'INSERT':([0,],[1,]),'LBRACK':([1,13,],[4,4,]),'LIMIT':([6,7,8,10,23,24,31,34,35,36,38,],[-13,15,-16,-17,-15,-17,37,-18,39,-19,-14,]),'COMMA':([6,8,10,11,12,23,24,29,38,],[14,-16,-17,21,-12,-15,-17,-11,14,]),'$end':([3,6,7,8,10,18,23,24,25,26,31,33,34,35,36,38,40,41,],[0,-13,-4,-16,-17,-2,-15,-17,-5,-3,-6,-1,-18,-7,-19,-14,-8,-9,]),'DESC':([31,],[36,]),'RBRACK':([11,12,29,],[20,-12,-11,]),'AT':([5,20,],[13,-10,]),'RPAREN':([19,],[28,]),'AS':([28,],[32,]),'SELECT':([0,],[2,]),'ASC':([31,],[34,]),'INTO':([20,22,],[-10,30,]),'NUMBER':([4,15,21,37,39,],[12,25,29,40,41,]),'FROM':([2,6,7,8,10,23,24,38,],[9,-13,16,-16,-17,-15,-17,-14,]),'ID':([2,9,14,16,27,30,32,],[10,18,24,26,31,33,24,]),'BY':([17,],[27,]),'LPAREN':([10,],[19,]),'ORDER':([6,7,8,10,23,24,38,],[-13,17,-16,-17,-15,-17,-14,]),}
+_lr_action_items = {'LPAREN':([11,],[21,]),'RPAREN':([21,],[30,]),'RBRACK':([15,16,34,],[25,-13,-12,]),'NUMBER':([1,7,19,26,39,44,],[5,16,28,34,43,45,]),'AT':([6,25,],[14,-11,]),'AS':([30,],[36,]),'FROM':([4,9,10,11,12,31,32,42,],[8,-17,18,-18,-14,-16,-18,-15,]),'COMMA':([9,11,12,15,16,31,32,34,42,],[-17,-18,22,26,-13,-16,-18,-12,22,]),'INSERT':([0,],[2,]),'LBRACK':([2,14,],[7,7,]),'ASC':([35,],[38,]),'$end':([3,9,10,11,12,17,23,27,28,31,32,35,37,38,40,41,42,43,45,],[0,-17,-4,-18,-14,-2,-10,-3,-5,-16,-18,-6,-1,-19,-20,-7,-15,-8,-9,]),'INTO':([24,25,],[33,-11,]),'DESC':([35,],[40,]),'BY':([20,],[29,]),'LIKE':([5,],[13,]),'LIMIT':([9,10,11,12,31,32,35,38,40,41,42,],[-17,19,-18,-14,-16,-18,39,-19,-20,44,-15,]),'SELECT':([0,],[4,]),'ID':([4,8,13,18,22,29,33,36,],[11,17,23,27,32,35,37,32,]),'SIMSEARCH':([0,],[1,]),'ORDER':([9,10,11,12,31,32,42,],[-17,20,-18,-14,-16,-18,-15,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -16,7 +16,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'field_name':([2,14,32,],[8,23,8,]),'field_list':([2,32,],[6,38,]),'selector':([2,],[7,]),'number_list':([4,],[11,]),'bracketed_number_list':([1,13,],[5,22,]),'command':([0,],[3,]),'order_direction':([31,],[35,]),}
+_lr_goto_items = {'field_name':([4,22,36,],[9,31,9,]),'bracketed_number_list':([2,14,],[6,24,]),'number_list':([7,],[15,]),'selector':([4,],[10,]),'order_direction':([35,],[41,]),'field_list':([4,36,],[12,42,]),'command':([0,],[3,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -35,14 +35,15 @@ _lr_productions = [
   ('command -> SELECT selector ORDER BY ID order_direction','command',6,'p_select_multi','parser.py',28),
   ('command -> SELECT selector ORDER BY ID LIMIT NUMBER','command',7,'p_select_multi','parser.py',29),
   ('command -> SELECT selector ORDER BY ID order_direction LIMIT NUMBER','command',8,'p_select_multi','parser.py',30),
-  ('bracketed_number_list -> LBRACK number_list RBRACK','bracketed_number_list',3,'p_bracketed_number_list','parser.py',50),
-  ('number_list -> number_list COMMA NUMBER','number_list',3,'p_number_list','parser.py',55),
-  ('number_list -> NUMBER','number_list',1,'p_number_list','parser.py',56),
-  ('selector -> field_list','selector',1,'p_selector','parser.py',66),
-  ('selector -> ID LPAREN RPAREN AS field_list','selector',5,'p_selector','parser.py',67),
-  ('field_list -> field_list COMMA field_name','field_list',3,'p_field_list','parser.py',75),
-  ('field_list -> field_name','field_list',1,'p_field_list','parser.py',76),
-  ('field_name -> ID','field_name',1,'p_field_name','parser.py',86),
-  ('order_direction -> ASC','order_direction',1,'p_order_direction','parser.py',91),
-  ('order_direction -> DESC','order_direction',1,'p_order_direction','parser.py',92),
+  ('command -> SIMSEARCH NUMBER LIKE ID','command',4,'p_simsearch','parser.py',49),
+  ('bracketed_number_list -> LBRACK number_list RBRACK','bracketed_number_list',3,'p_bracketed_number_list','parser.py',58),
+  ('number_list -> number_list COMMA NUMBER','number_list',3,'p_number_list','parser.py',63),
+  ('number_list -> NUMBER','number_list',1,'p_number_list','parser.py',64),
+  ('selector -> field_list','selector',1,'p_selector','parser.py',74),
+  ('selector -> ID LPAREN RPAREN AS field_list','selector',5,'p_selector','parser.py',75),
+  ('field_list -> field_list COMMA field_name','field_list',3,'p_field_list','parser.py',83),
+  ('field_list -> field_name','field_list',1,'p_field_list','parser.py',84),
+  ('field_name -> ID','field_name',1,'p_field_name','parser.py',94),
+  ('order_direction -> ASC','order_direction',1,'p_order_direction','parser.py',99),
+  ('order_direction -> DESC','order_direction',1,'p_order_direction','parser.py',100),
 ]

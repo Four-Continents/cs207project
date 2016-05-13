@@ -10,6 +10,7 @@ import timeseries as ts
 import json
 from collections import OrderedDict
 from .ast import AST_proc
+import re
 
 
 class REPL(cmd.Cmd):
@@ -144,7 +145,6 @@ class REPL(cmd.Cmd):
             else:
                 fields = []
 
-            print('metadata_dict:', metadata_dict)
             res = self.client.select(
                 metadata_dict=metadata_dict,
                 fields=fields,
@@ -192,6 +192,84 @@ class REPL(cmd.Cmd):
 
         self.print('OK!')
 
+    def do_delete(self, arg):
+        """
+        deletes row in database by primary key
+
+        Use Cases:
+        >> delete primarykey
+        """
+        pk = arg.strip()
+        regex = lexer.t_ID.__doc__
+        if not re.match(regex, pk):
+            self.print('Bad syntax!')
+            return
+
+        self.client.delete(pk)
+        self.print('OK!')
+
+    def do_populate(self, arg):
+        """
+        Populates the database with 10 random timeseries and 5 randomly selected vantage points.
+        For each timeseries, it will populate the columns representing the distance metric to each
+        vantage point.
+        Takes no arguments
+
+        Use Cases:
+        >> populate
+
+        """
+        if arg.strip():
+            self.print('Bad syntax!')
+            return
+
+        self.client.populate_db(numElem=50, numVp=5)
+        self.print('OK!')
+
+    def do_simsearch(self, arg):
+        """
+        Find `k_nearest` most similar timeseries in the DB when compared to some given timeseries
+
+        >> simsearch 3 like primarykey
+        """
+        lex = lexer.new_lexer()
+
+        ast = self.parser.parse('simsearch ' + arg, lexer=lex)
+        # catch parse error condition
+        if ast is None:
+            self.print('Error!')
+            return
+
+        res = self.client.select(
+            metadata_dict={'pk': ast.pk.id},
+            fields=['ts'])
+
+        status, payload = res
+        if status is not TSDBStatus.OK:
+            self.print('Error! %r' % payload)
+            return
+
+        if len(payload) != 1:
+            self.print('Unexpected row count! Expected 1. Received %d, \n %r' % (len(payload), payload))
+            return
+
+        row = payload[ast.pk.id]
+        ts_field = row['ts']
+
+        times = ts_field['times']
+        values = ts_field['values']
+
+        sim_pks = self.client.find_similar(ts.TimeSeries(times, values), ast.k+1)
+        print('#####sim', sim_pks)
+        print(ast.k)
+
+        for pk in sorted(sim_pks):
+            if pk == ast.pk.id:
+                continue
+            res = self.client.select(
+                metadata_dict={'pk': pk},
+                fields=['ts'])
+            self._print_select_result(res)
 
     def _print_select_result(self, result):
         status, payload = result
@@ -212,9 +290,9 @@ class REPL(cmd.Cmd):
 
 
 if __name__ == '__main__':
-    client = TSDBClient()
+    client = TSDBClient(port=30000)
     r = REPL(client)
-    r.onecmd("insert [1,2,3] @ [4, 5, 6] into tabby")
-    r.onecmd("insert [8,9,10] @ [11, 12, 13] into ginger")
+    # r.onecmd("insert [1,2,3] @ [4, 5, 6] into tabby")
+    # r.onecmd("insert [8,9,10] @ [11, 12, 13] into ginger")
     r.cmdloop()
 
