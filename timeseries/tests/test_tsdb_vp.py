@@ -39,9 +39,11 @@ def setup():
     NUMVPS = 5
     for i in range(NUMVPS):
         schema["d_vp-{}".format(i)] = {'convert': float, 'index': 1}
-    fNames = ['/tmp/four_continents_tsdbs.dbdb', '/tmp/four_continents_tsdbs_idx.dbdb']
-    os.remove(fNames[0])
-    os.remove(fNames[1])
+    fNames = ['./four_continents_tsdb_vp.dbdb', './four_continents_tsdb_vp_idx.dbdb']
+    if os.path.isfile(fNames[0]):
+        os.remove(fNames[0])
+    if os.path.isfile(fNames[1]):
+        os.remove(fNames[1])
     db = connect(fNames[0], fNames[1], schema)
     s = TSDBServer(db, TEST_PORT) # Create a server
 
