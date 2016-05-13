@@ -107,11 +107,11 @@ state 3
     (17) field_name -> . ID
 
     FROM            shift and go to state 6
-    ID              shift and go to state 10
+    ID              shift and go to state 8
 
+    field_name                     shift and go to state 10
+    field_list                     shift and go to state 9
     selector                       shift and go to state 7
-    field_list                     shift and go to state 8
-    field_name                     shift and go to state 9
 
 state 4
 
@@ -126,9 +126,9 @@ state 5
     (11) number_list -> . number_list COMMA NUMBER
     (12) number_list -> . NUMBER
 
-    NUMBER          shift and go to state 12
+    NUMBER          shift and go to state 13
 
-    number_list                    shift and go to state 13
+    number_list                    shift and go to state 12
 
 state 6
 
@@ -147,13 +147,26 @@ state 7
     (8) command -> SELECT selector . ORDER BY ID LIMIT NUMBER
     (9) command -> SELECT selector . ORDER BY ID order_direction LIMIT NUMBER
 
-    FROM            shift and go to state 16
+    FROM            shift and go to state 15
     $end            reduce using rule 4 (command -> SELECT selector .)
     LIMIT           shift and go to state 17
-    ORDER           shift and go to state 15
+    ORDER           shift and go to state 16
 
 
 state 8
+
+    (14) selector -> ID . LPAREN RPAREN AS field_list
+    (17) field_name -> ID .
+
+    LPAREN          shift and go to state 18
+    COMMA           reduce using rule 17 (field_name -> ID .)
+    FROM            reduce using rule 17 (field_name -> ID .)
+    LIMIT           reduce using rule 17 (field_name -> ID .)
+    ORDER           reduce using rule 17 (field_name -> ID .)
+    $end            reduce using rule 17 (field_name -> ID .)
+
+
+state 9
 
     (13) selector -> field_list .
     (15) field_list -> field_list . COMMA field_name
@@ -162,10 +175,10 @@ state 8
     LIMIT           reduce using rule 13 (selector -> field_list .)
     ORDER           reduce using rule 13 (selector -> field_list .)
     $end            reduce using rule 13 (selector -> field_list .)
-    COMMA           shift and go to state 18
+    COMMA           shift and go to state 19
 
 
-state 9
+state 10
 
     (16) field_list -> field_name .
 
@@ -174,19 +187,6 @@ state 9
     LIMIT           reduce using rule 16 (field_list -> field_name .)
     ORDER           reduce using rule 16 (field_list -> field_name .)
     $end            reduce using rule 16 (field_list -> field_name .)
-
-
-state 10
-
-    (14) selector -> ID . LPAREN RPAREN AS field_list
-    (17) field_name -> ID .
-
-    LPAREN          shift and go to state 19
-    COMMA           reduce using rule 17 (field_name -> ID .)
-    FROM            reduce using rule 17 (field_name -> ID .)
-    LIMIT           reduce using rule 17 (field_name -> ID .)
-    ORDER           reduce using rule 17 (field_name -> ID .)
-    $end            reduce using rule 17 (field_name -> ID .)
 
 
 state 11
@@ -200,19 +200,19 @@ state 11
 
 state 12
 
-    (12) number_list -> NUMBER .
+    (10) bracketed_number_list -> LBRACK number_list . RBRACK
+    (11) number_list -> number_list . COMMA NUMBER
 
-    RBRACK          reduce using rule 12 (number_list -> NUMBER .)
-    COMMA           reduce using rule 12 (number_list -> NUMBER .)
+    RBRACK          shift and go to state 21
+    COMMA           shift and go to state 22
 
 
 state 13
 
-    (10) bracketed_number_list -> LBRACK number_list . RBRACK
-    (11) number_list -> number_list . COMMA NUMBER
+    (12) number_list -> NUMBER .
 
-    RBRACK          shift and go to state 22
-    COMMA           shift and go to state 21
+    RBRACK          reduce using rule 12 (number_list -> NUMBER .)
+    COMMA           reduce using rule 12 (number_list -> NUMBER .)
 
 
 state 14
@@ -224,19 +224,19 @@ state 14
 
 state 15
 
+    (3) command -> SELECT selector FROM . ID
+
+    ID              shift and go to state 23
+
+
+state 16
+
     (6) command -> SELECT selector ORDER . BY ID
     (7) command -> SELECT selector ORDER . BY ID order_direction
     (8) command -> SELECT selector ORDER . BY ID LIMIT NUMBER
     (9) command -> SELECT selector ORDER . BY ID order_direction LIMIT NUMBER
 
-    BY              shift and go to state 23
-
-
-state 16
-
-    (3) command -> SELECT selector FROM . ID
-
-    ID              shift and go to state 24
+    BY              shift and go to state 24
 
 
 state 17
@@ -248,19 +248,19 @@ state 17
 
 state 18
 
+    (14) selector -> ID LPAREN . RPAREN AS field_list
+
+    RPAREN          shift and go to state 26
+
+
+state 19
+
     (15) field_list -> field_list COMMA . field_name
     (17) field_name -> . ID
 
     ID              shift and go to state 27
 
-    field_name                     shift and go to state 26
-
-state 19
-
-    (14) selector -> ID LPAREN . RPAREN AS field_list
-
-    RPAREN          shift and go to state 28
-
+    field_name                     shift and go to state 28
 
 state 20
 
@@ -271,20 +271,27 @@ state 20
 
 state 21
 
-    (11) number_list -> number_list COMMA . NUMBER
-
-    NUMBER          shift and go to state 30
-
-
-state 22
-
     (10) bracketed_number_list -> LBRACK number_list RBRACK .
 
     AT              reduce using rule 10 (bracketed_number_list -> LBRACK number_list RBRACK .)
     INTO            reduce using rule 10 (bracketed_number_list -> LBRACK number_list RBRACK .)
 
 
+state 22
+
+    (11) number_list -> number_list COMMA . NUMBER
+
+    NUMBER          shift and go to state 30
+
+
 state 23
+
+    (3) command -> SELECT selector FROM ID .
+
+    $end            reduce using rule 3 (command -> SELECT selector FROM ID .)
+
+
+state 24
 
     (6) command -> SELECT selector ORDER BY . ID
     (7) command -> SELECT selector ORDER BY . ID order_direction
@@ -292,13 +299,6 @@ state 23
     (9) command -> SELECT selector ORDER BY . ID order_direction LIMIT NUMBER
 
     ID              shift and go to state 31
-
-
-state 24
-
-    (3) command -> SELECT selector FROM ID .
-
-    $end            reduce using rule 3 (command -> SELECT selector FROM ID .)
 
 
 state 25
@@ -310,13 +310,9 @@ state 25
 
 state 26
 
-    (15) field_list -> field_list COMMA field_name .
+    (14) selector -> ID LPAREN RPAREN . AS field_list
 
-    COMMA           reduce using rule 15 (field_list -> field_list COMMA field_name .)
-    FROM            reduce using rule 15 (field_list -> field_list COMMA field_name .)
-    LIMIT           reduce using rule 15 (field_list -> field_list COMMA field_name .)
-    ORDER           reduce using rule 15 (field_list -> field_list COMMA field_name .)
-    $end            reduce using rule 15 (field_list -> field_list COMMA field_name .)
+    AS              shift and go to state 32
 
 
 state 27
@@ -332,9 +328,13 @@ state 27
 
 state 28
 
-    (14) selector -> ID LPAREN RPAREN . AS field_list
+    (15) field_list -> field_list COMMA field_name .
 
-    AS              shift and go to state 32
+    COMMA           reduce using rule 15 (field_list -> field_list COMMA field_name .)
+    FROM            reduce using rule 15 (field_list -> field_list COMMA field_name .)
+    LIMIT           reduce using rule 15 (field_list -> field_list COMMA field_name .)
+    ORDER           reduce using rule 15 (field_list -> field_list COMMA field_name .)
+    $end            reduce using rule 15 (field_list -> field_list COMMA field_name .)
 
 
 state 29
@@ -362,11 +362,11 @@ state 31
     (19) order_direction -> . DESC
 
     $end            reduce using rule 6 (command -> SELECT selector ORDER BY ID .)
-    LIMIT           shift and go to state 37
-    ASC             shift and go to state 35
-    DESC            shift and go to state 34
+    LIMIT           shift and go to state 34
+    ASC             shift and go to state 37
+    DESC            shift and go to state 36
 
-    order_direction                shift and go to state 36
+    order_direction                shift and go to state 35
 
 state 32
 
@@ -377,8 +377,8 @@ state 32
 
     ID              shift and go to state 27
 
-    field_name                     shift and go to state 9
     field_list                     shift and go to state 38
+    field_name                     shift and go to state 10
 
 state 33
 
@@ -389,34 +389,34 @@ state 33
 
 state 34
 
+    (8) command -> SELECT selector ORDER BY ID LIMIT . NUMBER
+
+    NUMBER          shift and go to state 39
+
+
+state 35
+
+    (7) command -> SELECT selector ORDER BY ID order_direction .
+    (9) command -> SELECT selector ORDER BY ID order_direction . LIMIT NUMBER
+
+    $end            reduce using rule 7 (command -> SELECT selector ORDER BY ID order_direction .)
+    LIMIT           shift and go to state 40
+
+
+state 36
+
     (19) order_direction -> DESC .
 
     LIMIT           reduce using rule 19 (order_direction -> DESC .)
     $end            reduce using rule 19 (order_direction -> DESC .)
 
 
-state 35
+state 37
 
     (18) order_direction -> ASC .
 
     LIMIT           reduce using rule 18 (order_direction -> ASC .)
     $end            reduce using rule 18 (order_direction -> ASC .)
-
-
-state 36
-
-    (7) command -> SELECT selector ORDER BY ID order_direction .
-    (9) command -> SELECT selector ORDER BY ID order_direction . LIMIT NUMBER
-
-    $end            reduce using rule 7 (command -> SELECT selector ORDER BY ID order_direction .)
-    LIMIT           shift and go to state 39
-
-
-state 37
-
-    (8) command -> SELECT selector ORDER BY ID LIMIT . NUMBER
-
-    NUMBER          shift and go to state 40
 
 
 state 38
@@ -428,21 +428,21 @@ state 38
     LIMIT           reduce using rule 14 (selector -> ID LPAREN RPAREN AS field_list .)
     ORDER           reduce using rule 14 (selector -> ID LPAREN RPAREN AS field_list .)
     $end            reduce using rule 14 (selector -> ID LPAREN RPAREN AS field_list .)
-    COMMA           shift and go to state 18
+    COMMA           shift and go to state 19
 
 
 state 39
 
-    (9) command -> SELECT selector ORDER BY ID order_direction LIMIT . NUMBER
+    (8) command -> SELECT selector ORDER BY ID LIMIT NUMBER .
 
-    NUMBER          shift and go to state 41
+    $end            reduce using rule 8 (command -> SELECT selector ORDER BY ID LIMIT NUMBER .)
 
 
 state 40
 
-    (8) command -> SELECT selector ORDER BY ID LIMIT NUMBER .
+    (9) command -> SELECT selector ORDER BY ID order_direction LIMIT . NUMBER
 
-    $end            reduce using rule 8 (command -> SELECT selector ORDER BY ID LIMIT NUMBER .)
+    NUMBER          shift and go to state 41
 
 
 state 41
