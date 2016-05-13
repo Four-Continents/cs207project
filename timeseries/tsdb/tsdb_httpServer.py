@@ -10,6 +10,7 @@ from timeseries import TimeSeries
 import json
 import procs
 from importlib import import_module
+import re
 
 # from scipy.stats import norm
 
@@ -41,19 +42,31 @@ def select():
     split_md = md.split(',')
     md = dict(zip(split_md[::2], split_md[1::2])) if md else None
 
-
     fields = fields.split(',') if fields else None
 
     split_additional = additional.split(',')
     additional = dict(zip(split_additional[::2], split_additional[1::2])) or None
+
+
+    if additional is not None and  'limit' in additional:
+        additional['limit'] = int(additional['limit'])
+
+
+    print("MDDD",md)
+    if md is not None:
+        for k,v in md.items():
+            params = re.findall('\d+|\D+',v)
+            md2 = {}
+            filt = {}
+            filt[params[0]] = int(params[1])
+            md2[k] =  filt
+        md = md2
 
     _, results =  client.select(md, fields=fields, additional=additional)
 
     return '<pre>'+ json.dumps(results, indent=4, separators=(',', ': '))+'</pre>'
 
     # return flask.jsonify(**results)
-
-
 
 
 @app.route('/insert', methods=['POST'])

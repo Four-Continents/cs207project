@@ -126,9 +126,12 @@ class DictDB(object):
                     idx[v].add(pk)
 
     def _filter_data(self, meta_variable, filter_v):
+        print("FILTER",filter_v)
         if isinstance(filter_v, dict):
             filtered_values = set()  # sel_values
+            print("FILTERED", filtered_values)
             for _operator, operand in filter_v.items():
+                print("OPerator",_operator,"OPerand",operand)
                 filtered_values_op = set()
                 filtered_indices = [x for x in list(self.indexes[meta_variable].keys())
                                     if OPMAP[_operator](x, operand)]
@@ -184,7 +187,9 @@ class DictDB(object):
         select_values = set()  # set(self.rows.keys())
         if meta:
             for meta_variable, filter_v in meta.items():
+                print("META",meta_variable,"FILTER",filter_v)
                 filtered_values = self._filter_data(meta_variable, filter_v)
+                print("filtered",filtered_values)
                 if select_values != set():
                     select_values = select_values & filtered_values
                 else:

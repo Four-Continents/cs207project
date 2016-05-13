@@ -33,36 +33,34 @@ class ServerThread(threading.Thread):
 
 @pytest.fixture
 def setup():
-	schema = {
-	'pk': {'convert': str, 'index': None},  # will be indexed anyways
-	'ts': {'convert': str, 'index': None},
-	'order': {'convert': int, 'index': 1},
-	'blarg': {'convert': int, 'index': 1},
-	'useless': {'convert': str, 'index': None},
-	'mean': {'convert': float, 'index': 1},
-	'std': {'convert': float, 'index': 1},
-	'vp': {'convert': int, 'index': 1}
-	}
-	db = connect("/tmp/four_continents.dbdb", "/tmp/four_continents_idx.dbdb", schema)
-	s = TSDBServer(db, port=30000) # Create a server
-	t = ServerThread(s)
+    schema = {
+    'pk': {'convert': str, 'index': None},  # will be indexed anyways
+    'ts': {'convert': str, 'index': None},
+    'order': {'convert': int, 'index': 1},
+    'blarg': {'convert': int, 'index': 1},
+    'useless': {'convert': str, 'index': None},
+    'mean': {'convert': float, 'index': 1},
+    'std': {'convert': float, 'index': 1},
+    'vp': {'convert': int, 'index': 1}
+    }
+    db = connect("/tmp/four_continents.dbdb", "/tmp/four_continents_idx.dbdb", schema)
+    s = TSDBServer(db, port=30000) # Create a server
+    t = ServerThread(s)
     t.daemon = True
     t.start()
     return t
 
 @pytest.fixture
 def web():
-	app.config["JSON_SORT_KEYS"] = False
-	app.run(debug=True)
+    app.config["JSON_SORT_KEYS"] = False
+    app.run(debug=True)
     web = ServerThread(app, True)
     web.daemon = True
     web.start()
-	return web
+    return web
 
 def test_insert_ts(setup, web):
      
-
-  
     while not s.running:
         time.sleep(0.01)
 
