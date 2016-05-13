@@ -156,7 +156,7 @@ class TSDBClient(object):
         value being another Dictionary with the fields calculated bound to the \
         target specified
         """
-
+        print("HEEEREEE")
         json_dict = typemap["augmented_select"](proc, target, arg, metadata_dict, additional).to_json()
         msg = serialize(json_dict)
         return self._send(msg)
@@ -255,7 +255,9 @@ class TSDBClient(object):
         # print(res)
         # # 1b: choose the lowest distance vantage point
         # # you can do this in local code
+        print("REEEES", res)
         d_res = res[1]
+        print("D_REEEES", res[1])
         sorted_res = []
         for k, v in d_res.items():
             sorted_res.append((v['dist'], k))

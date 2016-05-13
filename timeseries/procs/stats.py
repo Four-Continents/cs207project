@@ -12,8 +12,10 @@ def proc_main(pk, row, arg):
     """
     including pk and arg because of call in tsdb_server.py
     """
-    damean = row['ts'].mean()
-    print("MEAN",damean)
-    dastd = row['ts'].std()
-    print("STD",std)
+    # damean = row['ts'].mean()
+    # dastd = row['ts'].std()
+    # return [damean, dastd]
+    damean = ts.TimeSeries(row['ts']['times'], row['ts']['values']).mean()
+    dastd = ts.TimeSeries(row['ts']['times'], row['ts']['values']).std()
     return [damean, dastd]
+

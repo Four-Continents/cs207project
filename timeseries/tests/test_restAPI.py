@@ -78,24 +78,7 @@ def test_insert_ts():
     # assert r.json() == {'1': {}, '2': {}}
 
 def test_upsert_md():
-    # s = setup()
-    # s.daemon = True
-    # s.start()
-
-    # web = ServerThread(app, True)
-    # web.daemon = True
-    # web.start()
-
-  
-    # while not s.running:
-    #     time.sleep(0.01)
-
-    # instert ts
-
-    # ts1 = '{"1": {"ts": {"times": [1, 2, 3], "values": [2, 4, 9]}}}'
-
-    # requests.post('http://127.0.0.1:2200/insert', json = ts1)
-    # time.sleep(1)
+ 
     requests.post('http://127.0.0.1:2200/upsert_meta', json = '{"1": {"order": 1, "blarg": 1}}')
     time.sleep(1)
     requests.post('http://127.0.0.1:2200/upsert_meta', json = '{"2": {"order": 2, "blarg": 2}}')
@@ -104,29 +87,12 @@ def test_upsert_md():
 
     assert r.text == '<pre>{\n    "2": {\n        "order": 2\n    },\n    "1": {\n        "order": 1\n    }\n}</pre>' or '<pre>{\n    "1": {\n        "order": 1\n    },\n    "2": {\n        "order": 2\n    }\n}</pre>'
 
-# def test_augmented_select():
-#     s = setup()
-#     s.daemon = True
-#     s.start()
+def test_augmented_select():
+   
+   augmented_data = '{"additional": {"limit": 2, "sort_by": "+order"}, "target": ["damean", "dastd"], "md": {"blarg": {">=": 1}}, "proc": "stats"}'
+   r = requests.post('http://127.0.0.1:2200/augmented_select', json = augmented_data)
+   time.sleep(1)
 
-#     web = ServerThread(app, True)
-#     web.daemon = True
-#     web.start()
+   assert r.text == '{\n    "1": {\n        "damean": 5.0,\n        "dastd": 2.943920288775949\n    },\n    "2": {\n        "damean": 5.333333333333333,\n        "dastd": 3.6817870057290873\n    }\n}'
 
-  
-#     while not s.running:
-#         time.sleep(0.01)
 
-#     # instert ts
-
-#     ts1 = '{"1": {"ts": {"times": [1, 2, 3], "values": [2, 4, 9]}}}'
-
-#     # requests.post('http://127.0.0.1:2200/insert', json = ts1)
-#     # time.sleep(1)
-#     requests.post('http://127.0.0.1:2200/upsert_meta', json = '{"1": {"order": 1, "blarg": 1}}')
-#     time.sleep(1)
-#     requests.post('http://127.0.0.1:2200/upsert_meta', json = '{"2": {"order": 2, "blarg": 2}}')
-#     time.sleep(1)
-#     r = requests.get('http://127.0.0.1:2200/select?fields=order', auth=('user', 'pass'))
-
-#     assert r.text == '<pre>{\n    "2": {\n        "order": 2\n    },\n    "1": {\n        "order": 1\n    }\n}</pre>' or '<pre>{\n    "1": {\n        "order": 1\n    },\n    "2": {\n        "order": 2\n    }\n}</pre>'

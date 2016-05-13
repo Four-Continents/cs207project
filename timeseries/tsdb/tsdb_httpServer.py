@@ -104,22 +104,21 @@ def augmented_select():
 
 @app.route('/find_similar', methods=['POST'])
 def find_similar():
+    client.populate_db(numElem = 50, numVp = 5)
+
     re = request.json
-    print("REEE",re)
     data = json.loads(re)
 
-    print("DATA",data)
 
     times = data['times']
     values = data['values']
-    k_nearest = data['k_nearest'] if 'k_nearest' in data else None
+    k_nearest = data['k_nearest'] if 'k_nearest' in data else 1
 
     query = TimeSeries(times, values)
-    print("QUERY",query)
 
-    nearestwanted = client.find_similar(self, query, k_nearest = 1)
-    print("NEAR",nearestwanted)
-    return nearestwanted
+    nearestwanted = client.find_similar(query, k_nearest)
+
+    return 'OK'
 
 
 @app.route('/delete', methods=['POST'])
