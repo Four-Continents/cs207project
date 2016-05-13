@@ -202,7 +202,8 @@ class TSDBServer(object):
 basic_schema = {
     'pk': {'convert': lambda x: x, 'index': 1},
     'ts': {'convert': lambda x: x, 'index': None},
-    'label': {'convert': lambda x: x, 'index': 1},
+    'label': {'convert': str, 'index': 1},
+    'order': {'convert': int, 'index': 1}
 }
 
 if __name__ == '__main__':
