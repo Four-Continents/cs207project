@@ -45,6 +45,14 @@ def p_select_multi(p):
     else:
         raise SyntaxError
 
+def p_simsearch(p):
+    r'''command : SIMSEARCH NUMBER LIKE ID'''
+    try:
+        k = int(p[2])
+    except ValueError:
+        raise SyntaxError
+    p[0] = AST_simsearch(k, AST_ID(p[4]))
+
 
 def p_bracketed_number_list(p):
     r'''bracketed_number_list : LBRACK number_list RBRACK'''
