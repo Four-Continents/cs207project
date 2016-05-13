@@ -10,14 +10,21 @@ from timeseries import TimeSeries
 import json
 import procs
 from importlib import import_module
+
 # from scipy.stats import norm
 
 app = Flask(__name__)
 
-empty_schema = {'pk': {'convert': lambda x: x, 'index': True},
-                'ts': {'convert': lambda x: x, 'index': None},
-                'order': {'convert': int, 'index': 1},
-                'blarg': {'convert': int, 'index': 1}}
+empty_schema = {
+    'pk': {'convert': str, 'index': None},  # will be indexed anyways
+    'ts': {'convert': str, 'index': None},
+    'order': {'convert': int, 'index': 1},
+    'blarg': {'convert': int, 'index': 1},
+    'useless': {'convert': str, 'index': None},
+    'mean': {'convert': float, 'index': 1},
+    'std': {'convert': float, 'index': 1},
+    'vp': {'convert': bool, 'index': 1}
+    }
 
 client = TSDBClient(30000)
 
@@ -43,6 +50,9 @@ def select():
     _, results =  client.select(md, fields=fields, additional=additional)
 
     return '<pre>'+ json.dumps(results, indent=4, separators=(',', ': '))+'</pre>'
+
+    # return flask.jsonify(**results)
+
 
 
 
@@ -92,21 +102,30 @@ def augmented_select():
     # return flask.jsonify(**result)
     return json.dumps(result, sort_keys=False, indent=4, separators=(',', ': '))
 
+@app.route('/find_similar', methods=['POST'])
+def find_similar():
+    re = request.json
+    print("REEE",re)
+    data = json.loads(re)
+
+    print("DATA",data)
+
+    times = data['times']
+    values = data['values']
+    k_nearest = data['k_nearest'] if 'k_nearest' in data else None
+
+    query = TimeSeries(times, values)
+    print("QUERY",query)
+
+    nearestwanted = client.find_similar(self, query, k_nearest = 1)
+    print("NEAR",nearestwanted)
+    return nearestwanted
+
+
 @app.route('/delete', methods=['POST'])
 def delete():
-    #Allows you to instert a time series in json format
     pk = request.json
-    # print("RRREEEE",re)   
-    # data = json.loads(re)
-    # print("DELET", data)
-
-    # pk = list(data.keys())[0]
-
-    # print("PKKKK",pk)
-
 
     client.delete(pk)
 
     return 'OK'     
-
-     

@@ -128,7 +128,7 @@ def main():
     res2 = client.augmented_select('corr', ['dist'], query, {'d_vp-{}'.format(D_vp): {'<=': 2*D}})
     print (res2)
     # # 2b: find the smallest distance amongst this ( or k smallest)
-    d_res = res[1]
+    d_res = res2[1]
     sorted_res = []
     for k, v in d_res.items():
         sorted_res.append( (v['dist'], k) )

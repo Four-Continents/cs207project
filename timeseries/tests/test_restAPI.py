@@ -1,82 +1,31 @@
-# import multiprocessing
-# import time
-# from tsdb import *
-# from tsdb import TSDBServer, DictDB, connect
-
-from tsdb.tsdb_httpServer import app
-
 # #  PYTHONPATH=. py.test -vv tests/test_restAPI.py 
 
-
-
-# def run_server():
-# 	schema = {
-#   'pk': {'convert': str, 'index': None},  # will be indexed anyways
-#   'ts': {'convert': str, 'index': None},
-#   'order': {'convert': int, 'index': 1},
-#   'blarg': {'convert': int, 'index': 1},
-#   'useless': {'convert': str, 'index': None},
-#   'mean': {'convert': float, 'index': 1},
-#   'std': {'convert': float, 'index': 1},
-#   'vp': {'convert': bool, 'index': 1}}
-
-# 	NUMVPS = 5
-# 	# we augment the schema by adding columns for 5 vantage points
-# 	for i in range(NUMVPS):
-# 	    schema["d_vp-{}".format(i)] = {'convert': float, 'index': 1}
-# 	# db = DictDB(schema, 'pk')
-# 	db = connect("/tmp/four_continents.dbdb", "/tmp/four_continents_idx.dbdb", schema)
-# 	server = TSDBServer(db, 32360)
-# 	server.run()
-
-
-# def run_rest_server():
-# 	app.config["JSON_SORT_KEYS"] = False
-# 	app.run(debug=True, port=8889)
-
-
-# def run_server_process():
-# 	server_process = multiprocessing.Process(target=run_server)
-# 	server_process.daemon = True
-# 	server_process.run()
-
-# 	# rest_server_process = multiprocessing.Process(target=run_rest_server)
-# 	# rest_server_process.run()
-
-# 	time.sleep(3)
-# 	return server_process #, rest_server_process
-
-# def test_servers():
-
-# 	a = run_server_process()
-# 	print("HERE", a)
-# 	# b.terminate()
-# 	print("Closing server process")
-# 	# a.join()
-# 	# print("Closing rest server process")
-# 	# b.join()
-
+from tsdb.tsdb_httpServer import app
 import asyncio
 import threading
 import time
 from tsdb.tsdb_server import TSDBServer
 from tsdb.dictdb import DictDB, connect
 import timeseries as ts
+import requests
 
-
-# to run, type in command line: ```PYTHONPATH=. py.test -vv tests/test_restAPI.py```
+Port = 2200
 
 class ServerThread(threading.Thread):
 
-    def __init__(self, server):
+    def __init__(self, server, web=False):
         super(ServerThread, self).__init__()
         self.server = server
         self.running = False
+        self.web = web
 
     def run(self):
         asyncio.set_event_loop(asyncio.new_event_loop())
         self.running = True
-        self.server.run()
+        if self.web:
+            self.server.run(port=Port)
+        else:
+            self.server.run()
 
 
 def setup():
@@ -91,29 +40,93 @@ def setup():
 	'vp': {'convert': bool, 'index': 1}
 	}
 	db = connect("/tmp/four_continents.dbdb", "/tmp/four_continents_idx.dbdb", schema)
-	s = TSDBServer(db) # Create a server
+	s = TSDBServer(db, port=30000) # Create a server
 	t = ServerThread(s)
 	return t
 
 def run_rest_server():
 	app.config["JSON_SORT_KEYS"] = False
-	app.run(debug=True, port=2000)
+	app.run(debug=True)
 	return app
 
-def test_whatever():
+def test_insert_ts():
     s = setup()
     s.daemon = True
     s.start()
 
-    # server_process = threading.Thread(target=run_rest_server)
-    # server_process.run()
-    run_rest_server()
-    print ('Hola')
-    app.terminate()
+    web = ServerThread(app, True)
+    web.daemon = True
+    web.start()
 
-
-
+  
     while not s.running:
         time.sleep(0.01)
 
+    # instert ts
+    ts1 = '{"1": {"ts": {"times": [1, 2, 3], "values": [2, 4, 9]}}}'
+    ts2 = '{"2": {"ts": {"times": [1, 2, 3], "values": [1, 5, 10]}}}'
+
+    requests.post('http://127.0.0.1:2200/insert', json = ts1)
+    time.sleep(1)
+    requests.post('http://127.0.0.1:2200/insert', json = ts2)
+    time.sleep(1)
+    r = requests.get('http://127.0.0.1:2200/select', auth=('user', 'pass'))
     
+    time.sleep(1)
+    # r.text
+    assert r.text == '<pre>{\n    "1": {},\n    "2": {}\n}</pre>' or r.text == '<pre>{\n    "2": {},\n    "1": {}\n}</pre>'
+    # assert r.json() == {'1': {}, '2': {}}
+
+def test_upsert_md():
+    # s = setup()
+    # s.daemon = True
+    # s.start()
+
+    # web = ServerThread(app, True)
+    # web.daemon = True
+    # web.start()
+
+  
+    # while not s.running:
+    #     time.sleep(0.01)
+
+    # instert ts
+
+    # ts1 = '{"1": {"ts": {"times": [1, 2, 3], "values": [2, 4, 9]}}}'
+
+    # requests.post('http://127.0.0.1:2200/insert', json = ts1)
+    # time.sleep(1)
+    requests.post('http://127.0.0.1:2200/upsert_meta', json = '{"1": {"order": 1, "blarg": 1}}')
+    time.sleep(1)
+    requests.post('http://127.0.0.1:2200/upsert_meta', json = '{"2": {"order": 2, "blarg": 2}}')
+    time.sleep(1)
+    r = requests.get('http://127.0.0.1:2200/select?fields=order', auth=('user', 'pass'))
+
+    assert r.text == '<pre>{\n    "2": {\n        "order": 2\n    },\n    "1": {\n        "order": 1\n    }\n}</pre>' or '<pre>{\n    "1": {\n        "order": 1\n    },\n    "2": {\n        "order": 2\n    }\n}</pre>'
+
+# def test_augmented_select():
+#     s = setup()
+#     s.daemon = True
+#     s.start()
+
+#     web = ServerThread(app, True)
+#     web.daemon = True
+#     web.start()
+
+  
+#     while not s.running:
+#         time.sleep(0.01)
+
+#     # instert ts
+
+#     ts1 = '{"1": {"ts": {"times": [1, 2, 3], "values": [2, 4, 9]}}}'
+
+#     # requests.post('http://127.0.0.1:2200/insert', json = ts1)
+#     # time.sleep(1)
+#     requests.post('http://127.0.0.1:2200/upsert_meta', json = '{"1": {"order": 1, "blarg": 1}}')
+#     time.sleep(1)
+#     requests.post('http://127.0.0.1:2200/upsert_meta', json = '{"2": {"order": 2, "blarg": 2}}')
+#     time.sleep(1)
+#     r = requests.get('http://127.0.0.1:2200/select?fields=order', auth=('user', 'pass'))
+
+#     assert r.text == '<pre>{\n    "2": {\n        "order": 2\n    },\n    "1": {\n        "order": 1\n    }\n}</pre>' or '<pre>{\n    "1": {\n        "order": 1\n    },\n    "2": {\n        "order": 2\n    }\n}</pre>'
