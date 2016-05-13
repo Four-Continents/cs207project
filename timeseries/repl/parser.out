@@ -70,8 +70,8 @@ state 0
     (8) command -> . SELECT selector ORDER BY ID LIMIT NUMBER
     (9) command -> . SELECT selector ORDER BY ID order_direction LIMIT NUMBER
 
-    INSERT          shift and go to state 2
-    SELECT          shift and go to state 3
+    INSERT          shift and go to state 3
+    SELECT          shift and go to state 2
 
     command                        shift and go to state 1
 
@@ -82,15 +82,6 @@ state 1
 
 
 state 2
-
-    (1) command -> INSERT . bracketed_number_list AT bracketed_number_list INTO ID
-    (10) bracketed_number_list -> . LBRACK number_list RBRACK
-
-    LBRACK          shift and go to state 5
-
-    bracketed_number_list          shift and go to state 4
-
-state 3
 
     (2) command -> SELECT . FROM ID
     (3) command -> SELECT . selector FROM ID
@@ -107,37 +98,65 @@ state 3
     (17) field_name -> . ID
 
     FROM            shift and go to state 6
-    ID              shift and go to state 8
+    ID              shift and go to state 5
 
-    field_name                     shift and go to state 10
-    field_list                     shift and go to state 9
-    selector                       shift and go to state 7
+    selector                       shift and go to state 8
+    field_name                     shift and go to state 7
+    field_list                     shift and go to state 4
+
+state 3
+
+    (1) command -> INSERT . bracketed_number_list AT bracketed_number_list INTO ID
+    (10) bracketed_number_list -> . LBRACK number_list RBRACK
+
+    LBRACK          shift and go to state 9
+
+    bracketed_number_list          shift and go to state 10
 
 state 4
 
-    (1) command -> INSERT bracketed_number_list . AT bracketed_number_list INTO ID
+    (13) selector -> field_list .
+    (15) field_list -> field_list . COMMA field_name
 
-    AT              shift and go to state 11
+    FROM            reduce using rule 13 (selector -> field_list .)
+    LIMIT           reduce using rule 13 (selector -> field_list .)
+    ORDER           reduce using rule 13 (selector -> field_list .)
+    $end            reduce using rule 13 (selector -> field_list .)
+    COMMA           shift and go to state 11
 
 
 state 5
 
-    (10) bracketed_number_list -> LBRACK . number_list RBRACK
-    (11) number_list -> . number_list COMMA NUMBER
-    (12) number_list -> . NUMBER
+    (14) selector -> ID . LPAREN RPAREN AS field_list
+    (17) field_name -> ID .
 
-    NUMBER          shift and go to state 13
+    LPAREN          shift and go to state 12
+    COMMA           reduce using rule 17 (field_name -> ID .)
+    FROM            reduce using rule 17 (field_name -> ID .)
+    LIMIT           reduce using rule 17 (field_name -> ID .)
+    ORDER           reduce using rule 17 (field_name -> ID .)
+    $end            reduce using rule 17 (field_name -> ID .)
 
-    number_list                    shift and go to state 12
 
 state 6
 
     (2) command -> SELECT FROM . ID
 
-    ID              shift and go to state 14
+    ID              shift and go to state 13
 
 
 state 7
+
+    (16) field_list -> field_name .
+
+    COMMA           reduce using rule 16 (field_list -> field_name .)
+    FROM            reduce using rule 16 (field_list -> field_name .)
+    LIMIT           reduce using rule 16 (field_list -> field_name .)
+    ORDER           reduce using rule 16 (field_list -> field_name .)
+    $end            reduce using rule 16 (field_list -> field_name .)
+
+
+state 8
 
     (3) command -> SELECT selector . FROM ID
     (4) command -> SELECT selector .
@@ -149,65 +168,84 @@ state 7
 
     FROM            shift and go to state 15
     $end            reduce using rule 4 (command -> SELECT selector .)
-    LIMIT           shift and go to state 17
-    ORDER           shift and go to state 16
-
-
-state 8
-
-    (14) selector -> ID . LPAREN RPAREN AS field_list
-    (17) field_name -> ID .
-
-    LPAREN          shift and go to state 18
-    COMMA           reduce using rule 17 (field_name -> ID .)
-    FROM            reduce using rule 17 (field_name -> ID .)
-    LIMIT           reduce using rule 17 (field_name -> ID .)
-    ORDER           reduce using rule 17 (field_name -> ID .)
-    $end            reduce using rule 17 (field_name -> ID .)
+    LIMIT           shift and go to state 16
+    ORDER           shift and go to state 14
 
 
 state 9
 
-    (13) selector -> field_list .
-    (15) field_list -> field_list . COMMA field_name
+    (10) bracketed_number_list -> LBRACK . number_list RBRACK
+    (11) number_list -> . number_list COMMA NUMBER
+    (12) number_list -> . NUMBER
 
-    FROM            reduce using rule 13 (selector -> field_list .)
-    LIMIT           reduce using rule 13 (selector -> field_list .)
-    ORDER           reduce using rule 13 (selector -> field_list .)
-    $end            reduce using rule 13 (selector -> field_list .)
-    COMMA           shift and go to state 19
+    NUMBER          shift and go to state 18
 
+    number_list                    shift and go to state 17
 
 state 10
 
-    (16) field_list -> field_name .
+    (1) command -> INSERT bracketed_number_list . AT bracketed_number_list INTO ID
 
-    COMMA           reduce using rule 16 (field_list -> field_name .)
-    FROM            reduce using rule 16 (field_list -> field_name .)
-    LIMIT           reduce using rule 16 (field_list -> field_name .)
-    ORDER           reduce using rule 16 (field_list -> field_name .)
-    $end            reduce using rule 16 (field_list -> field_name .)
+    AT              shift and go to state 19
 
 
 state 11
 
-    (1) command -> INSERT bracketed_number_list AT . bracketed_number_list INTO ID
-    (10) bracketed_number_list -> . LBRACK number_list RBRACK
+    (15) field_list -> field_list COMMA . field_name
+    (17) field_name -> . ID
 
-    LBRACK          shift and go to state 5
+    ID              shift and go to state 21
 
-    bracketed_number_list          shift and go to state 20
+    field_name                     shift and go to state 20
 
 state 12
+
+    (14) selector -> ID LPAREN . RPAREN AS field_list
+
+    RPAREN          shift and go to state 22
+
+
+state 13
+
+    (2) command -> SELECT FROM ID .
+
+    $end            reduce using rule 2 (command -> SELECT FROM ID .)
+
+
+state 14
+
+    (6) command -> SELECT selector ORDER . BY ID
+    (7) command -> SELECT selector ORDER . BY ID order_direction
+    (8) command -> SELECT selector ORDER . BY ID LIMIT NUMBER
+    (9) command -> SELECT selector ORDER . BY ID order_direction LIMIT NUMBER
+
+    BY              shift and go to state 23
+
+
+state 15
+
+    (3) command -> SELECT selector FROM . ID
+
+    ID              shift and go to state 24
+
+
+state 16
+
+    (5) command -> SELECT selector LIMIT . NUMBER
+
+    NUMBER          shift and go to state 25
+
+
+state 17
 
     (10) bracketed_number_list -> LBRACK number_list . RBRACK
     (11) number_list -> number_list . COMMA NUMBER
 
-    RBRACK          shift and go to state 21
-    COMMA           shift and go to state 22
+    RBRACK          shift and go to state 27
+    COMMA           shift and go to state 26
 
 
-state 13
+state 18
 
     (12) number_list -> NUMBER .
 
@@ -215,90 +253,59 @@ state 13
     COMMA           reduce using rule 12 (number_list -> NUMBER .)
 
 
-state 14
-
-    (2) command -> SELECT FROM ID .
-
-    $end            reduce using rule 2 (command -> SELECT FROM ID .)
-
-
-state 15
-
-    (3) command -> SELECT selector FROM . ID
-
-    ID              shift and go to state 23
-
-
-state 16
-
-    (6) command -> SELECT selector ORDER . BY ID
-    (7) command -> SELECT selector ORDER . BY ID order_direction
-    (8) command -> SELECT selector ORDER . BY ID LIMIT NUMBER
-    (9) command -> SELECT selector ORDER . BY ID order_direction LIMIT NUMBER
-
-    BY              shift and go to state 24
-
-
-state 17
-
-    (5) command -> SELECT selector LIMIT . NUMBER
-
-    NUMBER          shift and go to state 25
-
-
-state 18
-
-    (14) selector -> ID LPAREN . RPAREN AS field_list
-
-    RPAREN          shift and go to state 26
-
-
 state 19
 
-    (15) field_list -> field_list COMMA . field_name
-    (17) field_name -> . ID
+    (1) command -> INSERT bracketed_number_list AT . bracketed_number_list INTO ID
+    (10) bracketed_number_list -> . LBRACK number_list RBRACK
 
-    ID              shift and go to state 27
+    LBRACK          shift and go to state 9
 
-    field_name                     shift and go to state 28
+    bracketed_number_list          shift and go to state 28
 
 state 20
 
-    (1) command -> INSERT bracketed_number_list AT bracketed_number_list . INTO ID
+    (15) field_list -> field_list COMMA field_name .
 
-    INTO            shift and go to state 29
+    COMMA           reduce using rule 15 (field_list -> field_list COMMA field_name .)
+    FROM            reduce using rule 15 (field_list -> field_list COMMA field_name .)
+    LIMIT           reduce using rule 15 (field_list -> field_list COMMA field_name .)
+    ORDER           reduce using rule 15 (field_list -> field_list COMMA field_name .)
+    $end            reduce using rule 15 (field_list -> field_list COMMA field_name .)
 
 
 state 21
 
-    (10) bracketed_number_list -> LBRACK number_list RBRACK .
+    (17) field_name -> ID .
 
-    AT              reduce using rule 10 (bracketed_number_list -> LBRACK number_list RBRACK .)
-    INTO            reduce using rule 10 (bracketed_number_list -> LBRACK number_list RBRACK .)
+    COMMA           reduce using rule 17 (field_name -> ID .)
+    FROM            reduce using rule 17 (field_name -> ID .)
+    LIMIT           reduce using rule 17 (field_name -> ID .)
+    ORDER           reduce using rule 17 (field_name -> ID .)
+    $end            reduce using rule 17 (field_name -> ID .)
 
 
 state 22
 
-    (11) number_list -> number_list COMMA . NUMBER
+    (14) selector -> ID LPAREN RPAREN . AS field_list
 
-    NUMBER          shift and go to state 30
+    AS              shift and go to state 29
 
 
 state 23
-
-    (3) command -> SELECT selector FROM ID .
-
-    $end            reduce using rule 3 (command -> SELECT selector FROM ID .)
-
-
-state 24
 
     (6) command -> SELECT selector ORDER BY . ID
     (7) command -> SELECT selector ORDER BY . ID order_direction
     (8) command -> SELECT selector ORDER BY . ID LIMIT NUMBER
     (9) command -> SELECT selector ORDER BY . ID order_direction LIMIT NUMBER
 
-    ID              shift and go to state 31
+    ID              shift and go to state 30
+
+
+state 24
+
+    (3) command -> SELECT selector FROM ID .
+
+    $end            reduce using rule 3 (command -> SELECT selector FROM ID .)
 
 
 state 25
@@ -310,49 +317,39 @@ state 25
 
 state 26
 
-    (14) selector -> ID LPAREN RPAREN . AS field_list
+    (11) number_list -> number_list COMMA . NUMBER
 
-    AS              shift and go to state 32
+    NUMBER          shift and go to state 31
 
 
 state 27
 
-    (17) field_name -> ID .
+    (10) bracketed_number_list -> LBRACK number_list RBRACK .
 
-    COMMA           reduce using rule 17 (field_name -> ID .)
-    FROM            reduce using rule 17 (field_name -> ID .)
-    LIMIT           reduce using rule 17 (field_name -> ID .)
-    ORDER           reduce using rule 17 (field_name -> ID .)
-    $end            reduce using rule 17 (field_name -> ID .)
+    AT              reduce using rule 10 (bracketed_number_list -> LBRACK number_list RBRACK .)
+    INTO            reduce using rule 10 (bracketed_number_list -> LBRACK number_list RBRACK .)
 
 
 state 28
 
-    (15) field_list -> field_list COMMA field_name .
+    (1) command -> INSERT bracketed_number_list AT bracketed_number_list . INTO ID
 
-    COMMA           reduce using rule 15 (field_list -> field_list COMMA field_name .)
-    FROM            reduce using rule 15 (field_list -> field_list COMMA field_name .)
-    LIMIT           reduce using rule 15 (field_list -> field_list COMMA field_name .)
-    ORDER           reduce using rule 15 (field_list -> field_list COMMA field_name .)
-    $end            reduce using rule 15 (field_list -> field_list COMMA field_name .)
+    INTO            shift and go to state 32
 
 
 state 29
 
-    (1) command -> INSERT bracketed_number_list AT bracketed_number_list INTO . ID
+    (14) selector -> ID LPAREN RPAREN AS . field_list
+    (15) field_list -> . field_list COMMA field_name
+    (16) field_list -> . field_name
+    (17) field_name -> . ID
 
-    ID              shift and go to state 33
+    ID              shift and go to state 21
 
+    field_list                     shift and go to state 33
+    field_name                     shift and go to state 7
 
 state 30
-
-    (11) number_list -> number_list COMMA NUMBER .
-
-    RBRACK          reduce using rule 11 (number_list -> number_list COMMA NUMBER .)
-    COMMA           reduce using rule 11 (number_list -> number_list COMMA NUMBER .)
-
-
-state 31
 
     (6) command -> SELECT selector ORDER BY ID .
     (7) command -> SELECT selector ORDER BY ID . order_direction
@@ -362,64 +359,28 @@ state 31
     (19) order_direction -> . DESC
 
     $end            reduce using rule 6 (command -> SELECT selector ORDER BY ID .)
-    LIMIT           shift and go to state 34
-    ASC             shift and go to state 37
-    DESC            shift and go to state 36
+    LIMIT           shift and go to state 37
+    ASC             shift and go to state 36
+    DESC            shift and go to state 35
 
-    order_direction                shift and go to state 35
+    order_direction                shift and go to state 34
+
+state 31
+
+    (11) number_list -> number_list COMMA NUMBER .
+
+    RBRACK          reduce using rule 11 (number_list -> number_list COMMA NUMBER .)
+    COMMA           reduce using rule 11 (number_list -> number_list COMMA NUMBER .)
+
 
 state 32
 
-    (14) selector -> ID LPAREN RPAREN AS . field_list
-    (15) field_list -> . field_list COMMA field_name
-    (16) field_list -> . field_name
-    (17) field_name -> . ID
+    (1) command -> INSERT bracketed_number_list AT bracketed_number_list INTO . ID
 
-    ID              shift and go to state 27
+    ID              shift and go to state 38
 
-    field_list                     shift and go to state 38
-    field_name                     shift and go to state 10
 
 state 33
-
-    (1) command -> INSERT bracketed_number_list AT bracketed_number_list INTO ID .
-
-    $end            reduce using rule 1 (command -> INSERT bracketed_number_list AT bracketed_number_list INTO ID .)
-
-
-state 34
-
-    (8) command -> SELECT selector ORDER BY ID LIMIT . NUMBER
-
-    NUMBER          shift and go to state 39
-
-
-state 35
-
-    (7) command -> SELECT selector ORDER BY ID order_direction .
-    (9) command -> SELECT selector ORDER BY ID order_direction . LIMIT NUMBER
-
-    $end            reduce using rule 7 (command -> SELECT selector ORDER BY ID order_direction .)
-    LIMIT           shift and go to state 40
-
-
-state 36
-
-    (19) order_direction -> DESC .
-
-    LIMIT           reduce using rule 19 (order_direction -> DESC .)
-    $end            reduce using rule 19 (order_direction -> DESC .)
-
-
-state 37
-
-    (18) order_direction -> ASC .
-
-    LIMIT           reduce using rule 18 (order_direction -> ASC .)
-    $end            reduce using rule 18 (order_direction -> ASC .)
-
-
-state 38
 
     (14) selector -> ID LPAREN RPAREN AS field_list .
     (15) field_list -> field_list . COMMA field_name
@@ -428,21 +389,60 @@ state 38
     LIMIT           reduce using rule 14 (selector -> ID LPAREN RPAREN AS field_list .)
     ORDER           reduce using rule 14 (selector -> ID LPAREN RPAREN AS field_list .)
     $end            reduce using rule 14 (selector -> ID LPAREN RPAREN AS field_list .)
-    COMMA           shift and go to state 19
+    COMMA           shift and go to state 11
+
+
+state 34
+
+    (7) command -> SELECT selector ORDER BY ID order_direction .
+    (9) command -> SELECT selector ORDER BY ID order_direction . LIMIT NUMBER
+
+    $end            reduce using rule 7 (command -> SELECT selector ORDER BY ID order_direction .)
+    LIMIT           shift and go to state 39
+
+
+state 35
+
+    (19) order_direction -> DESC .
+
+    LIMIT           reduce using rule 19 (order_direction -> DESC .)
+    $end            reduce using rule 19 (order_direction -> DESC .)
+
+
+state 36
+
+    (18) order_direction -> ASC .
+
+    LIMIT           reduce using rule 18 (order_direction -> ASC .)
+    $end            reduce using rule 18 (order_direction -> ASC .)
+
+
+state 37
+
+    (8) command -> SELECT selector ORDER BY ID LIMIT . NUMBER
+
+    NUMBER          shift and go to state 40
+
+
+state 38
+
+    (1) command -> INSERT bracketed_number_list AT bracketed_number_list INTO ID .
+
+    $end            reduce using rule 1 (command -> INSERT bracketed_number_list AT bracketed_number_list INTO ID .)
 
 
 state 39
 
-    (8) command -> SELECT selector ORDER BY ID LIMIT NUMBER .
+    (9) command -> SELECT selector ORDER BY ID order_direction LIMIT . NUMBER
 
-    $end            reduce using rule 8 (command -> SELECT selector ORDER BY ID LIMIT NUMBER .)
+    NUMBER          shift and go to state 41
 
 
 state 40
 
-    (9) command -> SELECT selector ORDER BY ID order_direction LIMIT . NUMBER
+    (8) command -> SELECT selector ORDER BY ID LIMIT NUMBER .
 
-    NUMBER          shift and go to state 41
+    $end            reduce using rule 8 (command -> SELECT selector ORDER BY ID LIMIT NUMBER .)
 
 
 state 41
