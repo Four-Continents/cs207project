@@ -11,7 +11,7 @@ import pytest
 
 # to run, type in command line: ```PYTHONPATH=. py.test -vv tests/test_tsdb_vp.py```
 EPS = 1e-6
-TEST_PORT = 9500
+TEST_PORT = 9501
 class ServerThread(threading.Thread):
 
     def __init__(self, server):
