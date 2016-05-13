@@ -33,9 +33,11 @@ def setup():
         'mean': {'convert':float, 'index':1},
         'std': {'convert':float, 'index':1}
     }
-    fNames = ['/tmp/four_continents_tsdbs.dbdb', '/tmp/four_continents_tsdbs_idx.dbdb']
-    os.remove(fNames[0])
-    os.remove(fNames[1])
+    fNames = ['./four_continents_tsdbs.dbdb', './four_continents_tsdbs_idx.dbdb']
+    if os.path.isfile(fNames[0]):
+        os.remove(fNames[0])
+    if os.path.isfile(fNames[1]):
+        os.remove(fNames[1])
     db = connect(fNames[0], fNames[1], empty_schema)
     s = TSDBServer(db, TEST_PORT) # Create a server
     t = ServerThread(s)
