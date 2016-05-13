@@ -110,13 +110,4 @@ def test_insert(setup):
 
     assert not res
 
-    # print(res)
-
-    # client.populate_db()
-    # client.augmented_select('corr', info['ts'])
-
-    # print (t)
-    # res = client.select()
-    # print(res)
-    # client.
-    assert 0
+    # assert 0

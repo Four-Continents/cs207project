@@ -286,7 +286,7 @@ class TSDBClient(object):
           with the lowest distance to the `query` timeseries
         """
         all_vps = self.select({'vp':{'>=':0}}, ['vp'])[1]
-        print ('allvps:', all_vps)
+        # print ('allvps:', all_vps)
         res = self.augmented_select('corr', ['dist'], query, {'vp': {'>=':0}})
         # print(res)
         # # 1b: choose the lowest distance vantage point
@@ -316,9 +316,10 @@ class TSDBClient(object):
         sorted_res.sort()
         D = sorted_res[0][0]
         D_k = sorted_res[0][1]
-        print (sorted_res, 'D = ', D, 'D_k = ', D_k)
+        # print (sorted_res, 'D = ', D, 'D_k = ', D_k)
         nearestwanted = [sorted_res[i][1] for i in range(min(k_nearest, len(sorted_res)))]
-        print ('Sorted res:', sorted_res)
+        # print ('Sorted res:', sorted_res)
+        # print (k_nearest, min(k_nearest, len(sorted_res)))
         return nearestwanted
 
     # Feel free to change this to be completely synchronous
