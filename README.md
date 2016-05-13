@@ -25,7 +25,7 @@ We also have atomicity at the individual operation-level by committing to disk a
 - Similarity search is implemented by first assuming that the database is up to date in terms of populating the vantage point information. A time series is provided to the search function (call this is ‘query’ time series) which is then compared to the vantage points to find the most similar; call this distance to the most similar vantage point ‘D’. Finally, a select is performed to get all time series within `2*D` distance from the nearest vantage point.  
 - Populate database is a quick way to get a database of random time series of size 100 into the database. The database is updated to the point where the similarity search can be run.  
 
-### REPL
+### REPL & Database Query Language
 
 For the additional feature, we chose to implement a new database language with a REPL as a client for the database because we were interested in tying together concepts learned from all three major modules of CS207: timeseries, pype, and databases. The REPL leverages Python's cmd library while the database language uses the ply library covered in the pype module to manage some of the production rules and grammars. Though this may not be the "purist" approach, we made an explicit design choice to implement the language using a hybrid approach in which simpler database commands were parsed and executed directly in the Python code for the REPL, whereas more complex commands such as SELECT involving a wide permutation of optional arguments such as limit, order by ascending and descending order, and procs were handled by ply with separate scripts housing the AST classes, lexer, and parser.  
 
