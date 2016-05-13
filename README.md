@@ -4,9 +4,6 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/Four-Continents/cs207project/badge.svg?branch=master)](https://coveralls.io/github/Four-Continents/cs207project?branch=master)
 
-In order to run tests locally, type command:
-PYTHONPATH=. py.test --cov pype --cov-report term-missing
-(otherwise pytest will only show timeseries, and not pype - likely some bug because the parent directory is the same name as the timeseries module. Note that changing the source in .coveragerc does not help)
 
 ==========
 Timeseries
