@@ -58,4 +58,4 @@ Developers
 * Fanny Heneine <fannyheneine@g.harvard.edu>   
 * Isadora Nun <isadoranun@g.harvard.edu>  
 * Vinay Subbiah <vinayps89@gmail.com>  
-* Victor Lei <vlei@g.harvard.edu>  
+* Victor Lei <vlei@g.harvard.edu> 
