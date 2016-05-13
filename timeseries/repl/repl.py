@@ -73,7 +73,7 @@ class REPL(cmd.Cmd):
         Select specific fields from all primary keys
         > select ts, pk
 
-        Select all fields from specific specific primar ykey
+        Select all fields from specific primary key
         > select from primarykey
 
         Select specific fields from specific primary key
