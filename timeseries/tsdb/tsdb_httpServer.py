@@ -39,7 +39,7 @@ def select():
     additional = request.args.get('additional', '')
 
     split_md = md.split(',')
-    md = dict(zip(split_md[::2], split_md[1::2])) if md else None
+    md = dict(zip(split_md[::2], split_md[1::2])) if md else False;
 
 
     fields = fields.split(',') if fields else None

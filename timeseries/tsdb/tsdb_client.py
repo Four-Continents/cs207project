@@ -120,6 +120,8 @@ class TSDBClient(object):
         value being another OrderedDict with the fields requested
         """
         json_dict = typemap["select"](metadata_dict, fields, additional).to_json()
+        print("ACAs", json_dict)
+
         msg = serialize(json_dict)
         return self._send(msg)
         # YOUR CODE HERE
