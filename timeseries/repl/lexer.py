@@ -1,6 +1,5 @@
 import ply.lex
 
-# LEXING phase: emits pairs of types and contents
 
 reserved = { # pattern : token-name
              'insert': 'INSERT',
@@ -28,7 +27,8 @@ tokens = [
 
 t_LBRACK = r'\['
 t_RBRACK = r'\]'
-t_NUMBER = r'[0-9]+'
+# floats and ints
+t_NUMBER = r'[0-9]+(?:\.[0-9]+)?'
 t_AT = r'@'
 t_COMMA = r','
 t_LPAREN = r'\('
