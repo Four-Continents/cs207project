@@ -4,10 +4,10 @@ import time
 from repl import repl
 from tsdb.tsdb_client import TSDBClient
 from tsdb.tsdb_server import TSDBServer, basic_schema
-from tsdb.dictdb import DictDB
+from tsdb.dictdb import DictDB, connect
 import timeseries as ts
 import sys
-
+import os
 
 # to run, type in command line: ```PYTHONPATH=. py.test -s -vv tests/test_repl.py```
 
@@ -26,7 +26,13 @@ class ServerThread(threading.Thread):
 
 
 def setup():
-    db = DictDB(basic_schema, 'pk')
+    # db = DictDB(basic_schema, 'pk')
+    fNames = ['./four_continents_test_repl.dbdb', './four_continents_test_repl_idx.dbdb']
+    if os.path.isfile(fNames[0]):
+        os.remove(fNames[0])
+    if os.path.isfile(fNames[1]):
+        os.remove(fNames[1])
+    db = connect(fNames[0], fNames[1], basic_schema)
     s = TSDBServer(db) # Create a server
     t = ServerThread(s)
     return t
@@ -80,7 +86,7 @@ def test_repl():
     r.onecmd('select from tabby')
     print([line.strip() for line in output])
     assert [line.strip() for line in output] == \
-           ['tabby', 'pk :  tabby']
+           ['tabby', 'label :  null', 'order :  -1', 'pk :  tabby']
     reset()
 
     r.onecmd('select ts, pk')
