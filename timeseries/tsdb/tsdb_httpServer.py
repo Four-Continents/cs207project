@@ -49,7 +49,7 @@ def select():
 
     _, results =  client.select(md, fields=fields, additional=additional)
 
-    return '<pre>'+ json.dumps(results, indent=4, separators=(',', ': '))+'</pre>'
+    return json.dumps(results, indent=4, separators=(',', ': '))
 
     # return flask.jsonify(**results)
 
@@ -104,17 +104,21 @@ def augmented_select():
 
 @app.route('/find_similar', methods=['POST'])
 def find_similar():
-    client.populate_db(numElem = 50, numVp = 5)
+
 
     re = request.json
     data = json.loads(re)
 
+    client.populate_db(numElem = int(data['numElem']), numVp = int(data['numVp']))
 
+    # return 'OK'
     times = data['times']
     values = data['values']
-    k_nearest = data['k_nearest'] if 'k_nearest' in data else 1
+    k_nearest = int(data['k_nearest']) if 'k_nearest' in data else 1
 
     query = TimeSeries(times, values)
+
+    print (query, k_nearest)
 
     nearestwanted = client.find_similar(query, k_nearest)
 
