@@ -52,14 +52,6 @@ def setup():
     t.start()
     return t
 
-# def _list_equal(a, b):
-#     if len(a) != len(b):
-#         return False
-#     for i in range(len(a)):
-#         if a[i] != b[i]:
-#             return False
-#     return True
-
 def test_insert(setup):
     # This test looks at some of the core server functions
     # Normally, this would be split over multiple tests, but the server threading makes it

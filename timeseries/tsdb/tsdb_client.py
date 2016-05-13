@@ -241,9 +241,9 @@ class TSDBClient(object):
         # our stats trigger
         self.add_trigger('stats', 'insert_ts', ['mean', 'std'], None)
         # Set up 50 time series
-        mus = np.random.uniform(low=0.0, high=1.0, size=50)
-        sigs = np.random.uniform(low=0.05, high=0.4, size=50)
-        jits = np.random.uniform(low=0.05, high=0.2, size=50)
+        mus = np.random.uniform(low=0.0, high=1.0, size=numElem)
+        sigs = np.random.uniform(low=0.05, high=0.4, size=numElem)
+        jits = np.random.uniform(low=0.05, high=0.2, size=numElem)
 
         # dictionaries for time series and their metadata
         tsdict = {}
@@ -285,6 +285,7 @@ class TSDBClient(object):
         List, of size `k_nearest`, containing the primary keys of the `k_nearest` timeseries in the DB
           with the lowest distance to the `query` timeseries
         """
+
         all_vps = self.select({'vp':{'>=':0}}, ['vp'])[1]
         # print ('allvps:', all_vps)
         res = self.augmented_select('corr', ['dist'], query, {'vp': {'>=':0}})
