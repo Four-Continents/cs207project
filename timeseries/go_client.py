@@ -75,7 +75,7 @@ def main():
     for k in results:
         print(k, results[k])
 
-    print('---------ALL FILEDS------------')
+    print('---------ALL FIELDS------------')
     client.select(fields=[])
 
     print('------------TS with order 1---------')
@@ -98,7 +98,7 @@ def main():
     for k in results:
         print(k, results[k])
 
-    # print('------now computing vantage point stuff---------------------')
+    print('------now computing vantage point stuff---------------------')
     print("VPS", vpkeys)
     #
     # # we first create a query time series.
@@ -110,13 +110,13 @@ def main():
     # # Step 1: in the vpdist key, get  distances from query to vantage points
     # # this is an augmented select
     res = client.augmented_select('corr', ['dist'], query, {'vp': True})
-    print (res)
+    print(res)
     # # 1b: choose the lowest distance vantage point
     # # you can do this in local code
     d_res = res[1]
     sorted_res = []
     for k, v in d_res.items():
-        sorted_res.append( (v['dist'], k) )
+        sorted_res.append((v['dist'], k))
 
     sorted_res.sort()
     D = sorted_res[0][0]
@@ -128,7 +128,7 @@ def main():
     res2 = client.augmented_select('corr', ['dist'], query, {'d_vp-{}'.format(D_vp): {'<=': 2*D}})
     print (res2)
     # # 2b: find the smallest distance amongst this ( or k smallest)
-    d_res = res[1]
+    d_res = res2[1]
     sorted_res = []
     for k, v in d_res.items():
         sorted_res.append( (v['dist'], k) )

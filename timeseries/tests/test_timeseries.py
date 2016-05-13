@@ -4,6 +4,7 @@ import numpy as np
 
 # to run, type in command line: ```PYTHONPATH=. py.test -vv tests/test_timeseries.py```
 
+
 class TimeSeriesTest(unittest.TestCase):
 
     def test_init(self):

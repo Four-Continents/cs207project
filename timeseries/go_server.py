@@ -1,21 +1,18 @@
 #!/usr/bin/env python3
 from tsdb import TSDBServer, DictDB
 from timeseries import timeseries as ts
-
-
-def identity(x):
-    return x
+from tsdb import *
 
 
 schema = {
-  'pk': {'convert': identity, 'index': None},  # will be indexed anyways
-  'ts': {'convert': identity, 'index': None},
+  'pk': {'convert': str, 'index': None},  # will be indexed anyways
+  'ts': {'convert': str, 'index': None},
   'order': {'convert': int, 'index': 1},
   'blarg': {'convert': int, 'index': 1},
-  'useless': {'convert': identity, 'index': None},
+  'useless': {'convert': str, 'index': None},
   'mean': {'convert': float, 'index': 1},
   'std': {'convert': float, 'index': 1},
-  'vp': {'convert': bool, 'index': 1}
+  'vp': {'convert': int, 'index': 1}
 }
 
 NUMVPS = 5
@@ -25,9 +22,9 @@ def main():
     # we augment the schema by adding columns for 5 vantage points
     for i in range(NUMVPS):
         schema["d_vp-{}".format(i)] = {'convert': float, 'index': 1}
-    db = DictDB(schema, 'pk')
+    # db = DictDB(schema, 'pk')
+    db = connect("/tmp/four_continents.dbdb", "/tmp/four_continents_idx.dbdb", schema)
     server = TSDBServer(db, 30000)
-    # print(schema)
     server.run()
 
 if __name__ == '__main__':

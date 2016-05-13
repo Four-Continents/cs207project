@@ -3,6 +3,8 @@ from .tsdb_serialization import serialize, LENGTH_FIELD_LENGTH, Deserializer
 from .tsdb_ops import *
 from .tsdb_error import *
 import time
+import numpy as np
+import scipy.stats
 
 """
 Constructor for the TimeSeries class.
@@ -63,6 +65,20 @@ class TSDBClient(object):
         msg = serialize(json_dict)
         self._send(msg)
         # your code here, construct from the code in tsdb_ops.py
+
+    def delete(self, primary_key):
+        """
+        Deletes a timeseries in the database
+
+        Parameters
+        ----------
+        primary_key: string
+            PK for the row being deleted
+        """
+        json_dict = typemap["delete_ts"](primary_key).to_json()
+        msg = serialize(json_dict)
+        print ('Deleting:', msg)
+        self._send(msg)
 
     def upsert_meta(self, primary_key, metadata_dict):
         """
@@ -185,6 +201,126 @@ class TSDBClient(object):
         msg = serialize(json_dict)
         self._send(msg)
         # YOUR CODE HERE
+
+    def _tsmaker(self, m, s, j):
+        """
+        Helper function to create a random new time series
+
+        Parameters
+        ----------
+        m: float
+            Mean
+        s: float
+            Standard deviation
+        j: float
+            Scaling factor
+        """
+        meta = {}
+        meta['order'] = int(np.random.choice([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]))
+        meta['blarg'] = int(np.random.choice([1, 2]))
+        t = np.arange(0.0, 1.0, 0.01)
+        v = scipy.stats.norm.pdf(t, m, s) + j*np.random.randn(100)
+        return meta, ts.TimeSeries(t, v)
+
+    def populate_db(self, numElem = 50, numVp = 5):
+        """
+        Populate the database with numElem random timeseries and randomly select numVp vantage points.
+        For each timeseries, it will populate the columns representing the distance metric to each
+        vantage point.
+
+        Parameters
+        ----------
+        numElem: int
+            Number of random timeseries elements to generate and insert into the DB.
+        numVp: int
+            Number of vantage points to use.
+        """
+        # add a trigger. notice the argument. It does not do anything here but
+        # could be used to save a shlep of data from client to server.
+        self.add_trigger('junk', 'insert_ts', None, 'db:one:ts')
+        # our stats trigger
+        self.add_trigger('stats', 'insert_ts', ['mean', 'std'], None)
+        # Set up 50 time series
+        mus = np.random.uniform(low=0.0, high=1.0, size=50)
+        sigs = np.random.uniform(low=0.05, high=0.4, size=50)
+        jits = np.random.uniform(low=0.05, high=0.2, size=50)
+
+        # dictionaries for time series and their metadata
+        tsdict = {}
+        metadict = {}
+        for i, m, s, j in zip(range(numElem), mus, sigs, jits):
+            meta, tsrs = self._tsmaker(m, s, j)
+            # the primary key format is ts-1, ts-2, etc
+            pk = "ts-{}".format(i)
+            tsdict[pk] = tsrs
+            meta['vp'] = -1  # augment metadata with a boolean asking if this is a  VP.
+            metadict[pk] = meta
+
+        # choose 5 distinct vantage point time series
+        vpkeys = ["ts-{}".format(i) for i in np.random.choice(range(numElem), size=numVp, replace=False)]
+        for i in range(numVp):
+            # add 5 triggers to upsert distances to these vantage points
+            self.add_trigger('corr', 'insert_ts', ["d_vp-{}".format(i)], tsdict[vpkeys[i]])
+            # change the metadata for the vantage points to have meta['vp']=True
+            metadict[vpkeys[i]]['vp'] = i
+        # Having set up the triggers, now insert the time series, and upsert the metadata
+        for k in tsdict:
+            self.insert_ts(k, tsdict[k])
+            time.sleep(1)
+            self.upsert_meta(k, metadict[k])
+
+    def find_similar(self, query, k_nearest = 1):
+        """
+        Find `k_nearest` most similar timeseries in the DB when compared to some given timeseries `query`
+
+        Parameters
+        ----------
+        query: TimeSeries
+            A timeseries that will be used to compare against all the other timeseries in the DB
+        k_nearest: int
+            Number of closest timeseries to return
+
+        Returns
+        -------
+        List, of size `k_nearest`, containing the primary keys of the `k_nearest` timeseries in the DB
+          with the lowest distance to the `query` timeseries
+        """
+        all_vps = self.select({'vp':{'>=':0}}, ['vp'])[1]
+        # print ('allvps:', all_vps)
+        res = self.augmented_select('corr', ['dist'], query, {'vp': {'>=':0}})
+        # print(res)
+        # # 1b: choose the lowest distance vantage point
+        # # you can do this in local code
+        d_res = res[1]
+        sorted_res = []
+        for k, v in d_res.items():
+            sorted_res.append((v['dist'], k))
+
+        sorted_res.sort()
+        best_D, best_vp = sorted_res[0]
+
+        get_vp_idx = all_vps[best_vp]['vp']
+        # D_vp = vpkeys.index(sorted_res[0][1])
+        # print (sorted_res, 'D = ', best_D, 'pk = ', best_vp, 'vp_idx = ', get_vp_idx)
+
+        # # Step 2: find all time series within 2*d(query, nearest_vp_to_query)
+        # # this is an augmented select to the same proc in correlation
+        res2 = self.augmented_select('corr', ['dist'], query, {'d_vp-{}'.format(get_vp_idx): {'<=': 2*best_D}})
+        # print (res2)
+        # # 2b: find the smallest distance amongst this ( or k smallest)
+        d_res = res2[1]
+        sorted_res = []
+        for k, v in d_res.items():
+            sorted_res.append( (v['dist'], k) )
+
+        sorted_res.sort()
+        D = sorted_res[0][0]
+        D_k = sorted_res[0][1]
+        # print (sorted_res, 'D = ', D, 'D_k = ', D_k)
+        nearestwanted = [sorted_res[i][1] for i in range(min(k_nearest, len(sorted_res)))]
+        # print ('Sorted res:', sorted_res)
+        # print (k_nearest, min(k_nearest, len(sorted_res)))
+        return nearestwanted
 
     # Feel free to change this to be completely synchronous
     # from here onwards. Return the status and the payload

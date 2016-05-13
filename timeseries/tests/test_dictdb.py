@@ -1,26 +1,23 @@
-from tsdb import DictDB
+from tsdb import *
 import timeseries as ts
 import pytest
 
 
-def identity(x):
-    return x
-
 schema = {
-  'pk': {'convert': identity, 'index': None},  # will be indexed anyways
-  'ts': {'convert': identity, 'index': None},
+  'pk': {'convert': str, 'index': None},  # will be indexed anyways
+  'ts': {'convert': str, 'index': None},
   'order': {'convert': int, 'index': 1},
   'blarg': {'convert': int, 'index': 1},
-  'useless': {'convert': identity, 'index': None},
-  'mean': {'convert': identity, 'index': None},
-  'std': {'convert': identity, 'index': None},
+  'useless': {'convert': str, 'index': None},
+  'mean': {'convert': float, 'index': 1},
+  'std': {'convert': float, 'index': 1},
+  'vp': {'convert': bool, 'index': 1}
 }
 
 
 def test_db_init():
-    db = DictDB(schema, 'pk')
-    assert db.schema == schema
-    assert db.pkfield == "pk"
+    db = connect("/tmp/four_continents_test.dbdb", "/tmp/four_continents_idx_test.dbdb", schema)
+    assert db._schema == schema
     return db
 
 
@@ -29,25 +26,30 @@ def test_db_ops():
     # test insert
     db.insert_ts("one", ts.TimeSeries([1, 2, 3], [2, 4, 9]))
     db.insert_ts("two", ts.TimeSeries([1, 2, 3], [1, 5, 10]))
-    assert db.rows["one"]['ts'] == ts.TimeSeries([1, 2, 3], [2, 4, 9])
-    # test insert raise error
+    assert db._de_stringify(db.get("one"))['ts'] == ts.TimeSeries([1, 2, 3], [2, 4, 9]).to_json()
+    db.close()
     with pytest.raises(ValueError):
-        db.insert_ts("one", ts.TimeSeries([1, 2, 3], [2, 4, 9]))
+        db._assert_not_closed()
     # test upsert
-    assert "order" not in list(db.rows["one"].keys())
-    assert "blarg" not in list(db.rows["one"].keys())
+    db = test_db_init()
+    assert db._de_stringify(db.get("one"))["order"] == -1
+    assert db._de_stringify(db.get("one"))["blarg"] == -1
     db.upsert_meta('one', {'order': 1, 'blarg': 1})
     db.upsert_meta('two', {'order': 2, 'blarg': 2})
-    assert db.rows["one"]["order"] == 1
-    assert db.rows["one"]["blarg"] == 1
+    assert db._de_stringify(db.get("one"))["order"] == 1
+    assert db._de_stringify(db.get("two"))["blarg"] == 2
+    db.close()
     # test select
-    sel_values, field_return = db.select({}, fields=None, additional=None)
+    db = test_db_init()
+    sel_values, field_return = db.select(None, fields=None, additional=None)
     assert len(sel_values) == 2
     assert field_return is None
-    sel_values, field_return = db.select({}, fields=[], additional={"sort_by": "+order", "limit": 1})
+    sel_values, field_return = db.select(None, fields=[], additional={"sort_by": "+order", "limit": 1})
     assert len(sel_values) == 1
-    assert field_return == [{'blarg': 1, 'order': 1, 'pk': 'one'}]
-    sel_values, field_return = db.select({}, fields=None, additional={"sort_by": "+order", "limit": 1})
+    assert field_return == [{'pk': 'one', 'std': -1, 'blarg': 1, 'mean': -1, 'order': 1, 'vp': False, 'useless': 'null'}]
+    db.close()
+    db = test_db_init()
+    sel_values, field_return = db.select(None, fields=None, additional={"sort_by": "+order", "limit": 1})
     assert list(sel_values) == ['one']
     assert field_return is None
     sel_values, field_return = db.select({'blarg': {'<=': 2}}, fields=['blarg'], additional={"sort_by": "-order", "limit": 1})
@@ -61,8 +63,9 @@ def test_db_ops():
     with pytest.raises(ValueError):
         sel_values, field_return = db.select({}, fields=[], additional={"sort_by": "+pk"})
     # test predicate filter
-    assert db._filter_data("blarg", {'<=': 1}, set(["one"])) == set(["one"])
+    assert db._filter_data("blarg", {'<=': 1}) == set(["one"])
     # test sorting and limit
     assert db._sort_and_limit(["one", "two"], additional={"sort_by": "-blarg", "limit": 1}) == list(["two"])
+    db.close()
 
 test_db_ops()
