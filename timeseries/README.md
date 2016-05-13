@@ -4,16 +4,11 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/Four-Continents/cs207project/badge.svg?branch=master)](https://coveralls.io/github/Four-Continents/cs207project?branch=master)
 
-==========
-Timeseries
-==========
-
-
-Add a short description here!
-
 
 Description
 ===========
+
+This packages implements a persistent timeseries database with a REST API.  
 
 ### REPL
 
@@ -47,7 +42,7 @@ Developers
 ==========
 
 * Amy Lee <amymaelee@g.harvard.edu>  
-* Fanny Heneine <fannyheneine@g.harvard.edu>  
+* Fanny Heneine <fannyheneine@g.harvard.edu>   
 * Isadora Nun <isadoranun@g.harvard.edu>  
 * Vinay Subbiah <vinayps89@gmail.com>  
 * Victor Lei <vlei@g.harvard.edu>  

@@ -5,16 +5,10 @@
 [![Coverage Status](https://coveralls.io/repos/github/Four-Continents/cs207project/badge.svg?branch=master)](https://coveralls.io/github/Four-Continents/cs207project?branch=master)
 
 
-==========
-Timeseries
-==========
-
-
-Add a short description here!
-
-
 Description
 ===========
+
+This packages implements a persistent timeseries database with a REST API.  
 
 ### REPL
 
