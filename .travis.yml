@@ -25,6 +25,6 @@ install:
   - pip install portalocker
   - pip install flask
 script:
-  - py.test
+  - py.test --ignore=timeseries/tsdb/tsdb_httpServer.py
 after_success:
   - coveralls
