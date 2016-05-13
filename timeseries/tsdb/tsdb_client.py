@@ -393,7 +393,8 @@ class TSDBClient(object):
         Tuple, with status indicating success of message transmission and \
         actual payload
         """
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         coro = asyncio.ensure_future(self._send_coro(msg, loop))
         loop.run_until_complete(coro)
         return coro.result()

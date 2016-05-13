@@ -118,7 +118,7 @@ def find_similar():
 
     nearestwanted = client.find_similar(query, k_nearest)
 
-    return 'OK'
+    return json.dumps(nearestwanted)
 
 
 @app.route('/delete', methods=['POST'])
