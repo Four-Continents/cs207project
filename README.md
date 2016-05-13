@@ -20,9 +20,7 @@ The REPL also has a help feature similar to man-pages that allows users to look 
 
 
 Instructions and Technical Details
-=================================
-### Install
-The package can be installed by running `python setup.py install`.  
+================================= 
 
 ### Instructions on how to run the database REPL: 
 1. From the parent directory above the tsdb directory, launch the server by entering into the command line `PYTHONPATH=. python –m tsdb.tsdb_server`  
