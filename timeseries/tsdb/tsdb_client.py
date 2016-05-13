@@ -203,7 +203,18 @@ class TSDBClient(object):
         # YOUR CODE HERE
 
     def _tsmaker(self, m, s, j):
-        "returns metadata and a time series in the shape of a jittered normal"
+        """
+        Helper function to create a random new time series
+
+        Parameters
+        ----------
+        m: float
+            Mean
+        s: float
+            Standard deviation
+        j: float
+            Scaling factor
+        """
         meta = {}
         meta['order'] = int(np.random.choice([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]))
         meta['blarg'] = int(np.random.choice([1, 2]))
@@ -212,7 +223,18 @@ class TSDBClient(object):
         return meta, ts.TimeSeries(t, v)
 
     def populate_db(self, numElem = 50, numVp = 5):
+        """
+        Populate the database with numElem random timeseries and randomly select numVp vantage points.
+        For each timeseries, it will populate the columns representing the distance metric to each
+        vantage point.
 
+        Parameters
+        ----------
+        numElem: int
+            Number of random timeseries elements to generate and insert into the DB.
+        numVp: int
+            Number of vantage points to use.
+        """
         # add a trigger. notice the argument. It does not do anything here but
         # could be used to save a shlep of data from client to server.
         self.add_trigger('junk', 'insert_ts', None, 'db:one:ts')
@@ -248,6 +270,21 @@ class TSDBClient(object):
             self.upsert_meta(k, metadict[k])
 
     def find_similar(self, query, k_nearest = 1):
+        """
+        Find `k_nearest` most similar timeseries in the DB when compared to some given timeseries `query`
+
+        Parameters
+        ----------
+        query: TimeSeries
+            A timeseries that will be used to compare against all the other timeseries in the DB
+        k_nearest: int
+            Number of closest timeseries to return
+
+        Returns
+        -------
+        List, of size `k_nearest`, containing the primary keys of the `k_nearest` timeseries in the DB
+          with the lowest distance to the `query` timeseries
+        """
         all_vps = self.select({'vp':{'>=':0}}, ['vp'])[1]
         print ('allvps:', all_vps)
         res = self.augmented_select('corr', ['dist'], query, {'vp': {'>=':0}})
